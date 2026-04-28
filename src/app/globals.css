@@ -80,6 +80,17 @@ body {
 }
 .animate-fade-in { animation: fade-in 0.3s ease-out both; }
 
+/*
+  iOS Safari tự zoom khi focus vào input có font-size < 16px.
+  max(16px, 1em) đảm bảo tối thiểu 16px mà không phá vỡ font-size lớn hơn.
+  Không dùng maximum-scale/user-scalable=no vì sẽ chặn pinch-to-zoom (vi phạm WCAG 1.4.4).
+*/
+input:not([type='checkbox']):not([type='radio']):not([type='range']),
+select,
+textarea {
+  font-size: max(16px, 1em);
+}
+
 /* Scrollbar thanh mảnh */
 .scrollbar-thin::-webkit-scrollbar { height: 6px; width: 6px; }
 .scrollbar-thin::-webkit-scrollbar-track { background: transparent; }
