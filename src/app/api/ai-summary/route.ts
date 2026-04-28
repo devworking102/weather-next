@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { geminiGenerate } from '@/shared/lib/gemini'
+import { aiGenerate } from '@/shared/lib/ai'
 import { wmoInfo } from '@/features/weather/utils/wmo'
 
 interface Payload {
@@ -23,9 +23,9 @@ Mô tả: ${wmoInfo(body.weatherCode).label}
 Gió: ${Math.round(body.windSpeed)} km/h
 Chỉ trả về văn bản thuần, không markdown.`
 
-  const text = await geminiGenerate(prompt, { temperature: 0.6, maxOutputTokens: 220 })
-  if (text) {
-    return NextResponse.json({ summary: text, source: 'gemini' })
+  const result = await aiGenerate(prompt, { temperature: 0.6, maxOutputTokens: 220 })
+  if (result) {
+    return NextResponse.json({ summary: result.text, source: result.source })
   }
   return NextResponse.json({ summary: buildHeuristicSummary(body), source: 'heuristic' })
 }

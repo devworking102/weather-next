@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { geminiGenerate } from '@/shared/lib/gemini'
+import { aiGenerate } from '@/shared/lib/ai'
+import type { AiSource } from '@/shared/lib/ai'
 
 export interface HealthInsightPayload {
   locationName: string
@@ -15,7 +16,7 @@ export interface HealthInsightPayload {
 
 export interface HealthInsightResponse {
   insight: string
-  source: 'gemini' | 'fallback'
+  source: AiSource | 'fallback'
 }
 
 export async function POST(req: NextRequest) {
@@ -38,9 +39,9 @@ Viết đúng 2 câu tiếng Việt ngắn gọn, tự nhiên:
 
 Chỉ trả về 2 câu văn bản thuần, không dùng markdown, không đánh số.`
 
-  const text = await geminiGenerate(prompt, { temperature: 0.5, maxOutputTokens: 150 })
-  if (text) {
-    return NextResponse.json({ insight: text, source: 'gemini' } satisfies HealthInsightResponse)
+  const result = await aiGenerate(prompt, { temperature: 0.5, maxOutputTokens: 150 })
+  if (result) {
+    return NextResponse.json({ insight: result.text, source: result.source } satisfies HealthInsightResponse)
   }
   return NextResponse.json({ insight: buildFallback(body), source: 'fallback' } satisfies HealthInsightResponse)
 }

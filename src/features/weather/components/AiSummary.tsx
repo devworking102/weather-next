@@ -4,6 +4,8 @@ import { useMutation } from '@tanstack/react-query'
 import { Sparkles } from 'lucide-react'
 import { useEffect } from 'react'
 import { Card } from '@/shared/ui/Card'
+import { AiBadge } from '@/shared/ui/AiBadge'
+import type { AiSource } from '@/shared/lib/ai'
 import type { WeatherBundle } from '@/features/weather/types'
 import type { GeoLocation } from '@/features/geocoding/types'
 
@@ -13,7 +15,7 @@ interface Props {
 }
 
 export function AiSummary({ location, weather }: Props) {
-  const mutation = useMutation<{ summary: string; source: 'gemini' | 'heuristic' }, Error>({
+  const mutation = useMutation<{ summary: string; source: AiSource | 'heuristic' }, Error>({
     mutationFn: async () => {
       const res = await fetch('/api/ai-summary', {
         method: 'POST',
@@ -43,6 +45,9 @@ export function AiSummary({ location, weather }: Props) {
       <div className="flex items-center gap-2 text-sm font-semibold uppercase tracking-wide text-sky-700 dark:text-sky-300">
         <Sparkles size={14} />
         Tóm tắt
+        {mutation.data?.source && mutation.data.source !== 'heuristic' && (
+          <AiBadge source={mutation.data.source} />
+        )}
       </div>
       {mutation.isPending && !mutation.data ? (
         <div className="mt-3 space-y-2">

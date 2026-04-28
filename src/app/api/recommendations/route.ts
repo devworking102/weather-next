@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { geminiGenerate, parseGeminiJson } from '@/shared/lib/gemini'
+import { aiGenerate, parseGeminiJson } from '@/shared/lib/ai'
+import type { AiSource } from '@/shared/lib/ai'
 
 interface Payload {
   locationName: string
@@ -14,7 +15,7 @@ export interface Recommendations {
   food: string[]
   activity: string[]
   clothes: string[]
-  source: 'gemini' | 'fallback'
+  source: AiSource | 'fallback'
 }
 
 export async function POST(req: NextRequest) {
@@ -27,21 +28,21 @@ Hãy đóng vai trợ lý địa phương, gợi ý chính xác 4 món ăn đặ
 Trả về DUY NHẤT một JSON đúng cấu trúc:
 {"title":"1 câu nhận xét thời tiết ngắn","food":["...","...","...","..."],"activity":["...","...","...","..."],"clothes":["...","...","...","..."]}`
 
-  const text = await geminiGenerate(prompt, {
+  const result = await aiGenerate(prompt, {
     temperature: 0.7,
     maxOutputTokens: 450,
     json: true,
   })
 
-  if (text) {
-    const parsed = parseGeminiJson<Omit<Recommendations, 'source'>>(text)
+  if (result) {
+    const parsed = parseGeminiJson<Omit<Recommendations, 'source'>>(result.text)
     if (
       parsed &&
       Array.isArray(parsed.food) && parsed.food.length >= 4 &&
       Array.isArray(parsed.activity) && parsed.activity.length >= 4 &&
       Array.isArray(parsed.clothes) && parsed.clothes.length >= 4
     ) {
-      return NextResponse.json({ ...parsed, source: 'gemini' } satisfies Recommendations)
+      return NextResponse.json({ ...parsed, source: result.source } satisfies Recommendations)
     }
   }
 

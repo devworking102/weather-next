@@ -3,7 +3,7 @@
 import { useMemo } from 'react'
 import { Card } from '@/shared/ui/Card'
 import { Skeleton } from '@/shared/ui/Skeleton'
-import { GeminiBadge } from '@/shared/ui/GeminiBadge'
+import { AiBadge } from '@/shared/ui/AiBadge'
 import { useAirQuality } from '@/features/weather/hooks/useWeather'
 import { useLocationStore } from '@/features/geocoding/store/location-store'
 import { computeHealthIndices } from '@/features/weather/utils/health'
@@ -56,7 +56,7 @@ export function HealthTab({ weather }: Props) {
               <h3 className="text-sm font-semibold text-slate-800 dark:text-slate-200">
                 AI Phân tích sức khỏe hôm nay
               </h3>
-              {insight?.source === 'gemini' && <GeminiBadge />}
+              {insight?.source && insight.source !== 'fallback' && <AiBadge source={insight.source} />}
             </div>
             {insightLoading ? (
               <div className="space-y-1.5">
