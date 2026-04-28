@@ -48,7 +48,7 @@ export function DailyTab({ weather, days }: Props) {
           Biểu đồ nhiệt độ {days} ngày
         </h3>
         <div className="h-72">
-          <ResponsiveContainer width="100%" height="100%">
+          <ResponsiveContainer width="100%" height="100%" minWidth={0}>
             <BarChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 40 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="currentColor" strokeOpacity={0.08} />
               <XAxis
