@@ -6,6 +6,9 @@ import { Skeleton } from '@/shared/ui/Skeleton'
 import { useAirQuality } from '@/features/weather/hooks/useWeather'
 import { useLocationStore } from '@/features/geocoding/store/location-store'
 import { aqiCategory } from '@/features/weather/utils/format'
+import { useAiInsight } from '@/shared/hooks/useAiInsight'
+import { GeminiBadge } from '@/shared/ui/GeminiBadge'
+import type { AqiInsightPayload, AqiInsightResponse } from '@/app/api/aqi-insight/route'
 import {
   Area,
   AreaChart,
@@ -30,6 +33,29 @@ const SCALE = [
 export function AirQualityTab() {
   const location = useLocationStore((s) => s.current)
   const { data, isLoading, isError } = useAirQuality(location?.latitude, location?.longitude)
+
+  const insightPayload = useMemo<AqiInsightPayload | null>(
+    () =>
+      data && location
+        ? {
+            locationName: location.name,
+            europeanAqi: data.current.europeanAqi,
+            usAqi: data.current.usAqi,
+            pm25: data.current.pm25,
+            pm10: data.current.pm10,
+            no2: data.current.no2,
+            ozone: data.current.ozone,
+            co: data.current.co,
+          }
+        : null,
+    [data, location],
+  )
+
+  const { data: insight, isLoading: insightLoading } = useAiInsight<AqiInsightPayload, AqiInsightResponse>(
+    '/api/aqi-insight',
+    insightPayload,
+    [location?.latitude, location?.longitude],
+  )
 
   const chart = useMemo(() => {
     if (!data) return []
@@ -98,9 +124,17 @@ export function AirQualityTab() {
           <div className="mt-0.5 text-xs font-bold uppercase tracking-wider text-slate-500">
             Chỉ số AQI (EU) · US AQI: <strong>{Math.round(c.usAqi)}</strong>
           </div>
-          <p className="mt-2 text-sm leading-relaxed text-slate-700 dark:text-slate-300">
-            {cat.advice}
-          </p>
+          {insightLoading ? (
+            <div className="mt-2 space-y-1.5">
+              <Skeleton className="h-3.5 w-full rounded" />
+              <Skeleton className="h-3.5 w-3/4 rounded" />
+            </div>
+          ) : (
+            <p className="mt-2 text-sm leading-relaxed text-slate-700 dark:text-slate-300">
+              {insight?.insight ?? cat.advice}
+              {insight?.source === 'gemini' && <GeminiBadge className="ml-2" />}
+            </p>
+          )}
         </div>
       </Card>
 

@@ -2,10 +2,14 @@
 
 import { useMemo } from 'react'
 import { Card } from '@/shared/ui/Card'
+import { Skeleton } from '@/shared/ui/Skeleton'
+import { GeminiBadge } from '@/shared/ui/GeminiBadge'
 import { useAirQuality } from '@/features/weather/hooks/useWeather'
 import { useLocationStore } from '@/features/geocoding/store/location-store'
 import { computeHealthIndices } from '@/features/weather/utils/health'
+import { useAiInsight } from '@/shared/hooks/useAiInsight'
 import type { WeatherBundle } from '@/features/weather/types'
+import type { HealthInsightPayload, HealthInsightResponse } from '@/app/api/health-insight/route'
 
 interface Props {
   weather: WeatherBundle
@@ -17,8 +21,58 @@ export function HealthTab({ weather }: Props) {
 
   const indices = useMemo(() => computeHealthIndices(weather, aqi ?? undefined), [weather, aqi])
 
+  const insightPayload = useMemo<HealthInsightPayload | null>(
+    () =>
+      location
+        ? {
+            locationName: location.name,
+            temperature: weather.current.temperature,
+            tempMax: weather.daily[0]?.tempMax ?? weather.current.temperature,
+            humidity: weather.current.humidity,
+            windSpeed: weather.current.windSpeed,
+            cloudCover: weather.current.cloudCover,
+            precipProb: weather.daily[0]?.precipitationProbability ?? 0,
+            aqi: aqi?.current.europeanAqi ?? 0,
+            uvIndex: weather.current.uvIndex,
+          }
+        : null,
+    [location, weather, aqi],
+  )
+
+  const { data: insight, isLoading: insightLoading } = useAiInsight<HealthInsightPayload, HealthInsightResponse>(
+    '/api/health-insight',
+    insightPayload,
+    [location?.latitude, location?.longitude],
+  )
+
   return (
     <div className="space-y-4">
+      {/* AI insight card */}
+      <Card className="p-5">
+        <div className="flex items-start gap-3">
+          <span className="text-2xl">🤖</span>
+          <div className="flex-1">
+            <div className="mb-1.5 flex items-center gap-2">
+              <h3 className="text-sm font-semibold text-slate-800 dark:text-slate-200">
+                AI Phân tích sức khỏe hôm nay
+              </h3>
+              {insight?.source === 'gemini' && <GeminiBadge />}
+            </div>
+            {insightLoading ? (
+              <div className="space-y-1.5">
+                <Skeleton className="h-3.5 w-full rounded" />
+                <Skeleton className="h-3.5 w-4/5 rounded" />
+              </div>
+            ) : (
+              <p className="text-sm leading-relaxed text-slate-600 dark:text-slate-400">
+                {insight?.insight ?? '—'}
+              </p>
+            )}
+          </div>
+        </div>
+      </Card>
+
+      {/* Health indices grid */}
       <Card className="p-0">
         <div className="flex items-center gap-2 border-b border-black/5 px-5 py-3 dark:border-white/5">
           <span className="text-lg">❤️</span>
