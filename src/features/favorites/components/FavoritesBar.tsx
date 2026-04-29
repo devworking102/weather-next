@@ -2,6 +2,7 @@
 
 import { useUiStore } from '@/shared/store/ui-store'
 import { useLocationStore } from '@/features/geocoding/store/location-store'
+import { useT } from '@/shared/hooks/useT'
 import { X } from 'lucide-react'
 
 export function FavoritesBar() {
@@ -9,13 +10,14 @@ export function FavoritesBar() {
   const remove = useUiStore((s) => s.removeFavorite)
   const setCurrent = useLocationStore((s) => s.setCurrent)
   const setPinned = useLocationStore((s) => s.setPinned)
+  const t = useT()
 
   if (favorites.length === 0) return null
 
   return (
     <div className="flex flex-wrap items-center gap-2">
       <span className="text-xs font-semibold uppercase tracking-wide text-slate-500">
-        Yêu thích
+        {t.favorites.title}
       </span>
       {favorites.map((f) => (
         <div
@@ -35,7 +37,7 @@ export function FavoritesBar() {
           <button
             onClick={() => remove(f.id)}
             className="px-2 py-1.5 text-amber-500 transition-colors hover:bg-rose-50 hover:text-rose-500 dark:hover:bg-rose-500/10"
-            aria-label="Bỏ yêu thích"
+            aria-label={t.favorites.removeLabel}
             type="button"
           >
             <X size={14} />

@@ -12,6 +12,7 @@ export function WeatherTabsBar() {
   const setTab = useUiStore((s) => s.setWeatherTab)
   const tab = useUiStore((s) => s.weatherTab)
   const unit = useUiStore((s) => s.unit)
+  const locale = useUiStore((s) => s.locale)
   const tempUnit = unit === 'f' ? 'fahrenheit' : 'celsius'
 
   const location = useLocationStore((s) => s.current)
@@ -20,8 +21,8 @@ export function WeatherTabsBar() {
   const { data: quakes } = useEarthquakes(location?.latitude, location?.longitude)
 
   const alertCount = useMemo(
-    () => computeAlerts(data, aqi, quakes).length,
-    [data, aqi, quakes],
+    () => computeAlerts(data, aqi, quakes, locale).length,
+    [data, aqi, quakes, locale],
   )
 
   return (

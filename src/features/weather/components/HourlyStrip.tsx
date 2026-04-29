@@ -5,6 +5,7 @@ import { Card } from '@/shared/ui/Card'
 import type { HourlyPoint } from '@/features/weather/types'
 import { wmoInfo } from '@/features/weather/utils/wmo'
 import { formatTime } from '@/features/weather/utils/format'
+import { useT } from '@/shared/hooks/useT'
 
 interface Props {
   hourly: HourlyPoint[]
@@ -12,6 +13,7 @@ interface Props {
 }
 
 export function HourlyStrip({ hourly, hoursAhead = 24 }: Props) {
+  const t = useT()
   const rows = useMemo(() => {
     const now = new Date().toISOString().slice(0, 13) + ':00'
     const startIdx = Math.max(0, hourly.findIndex((h) => h.time >= now))
@@ -22,9 +24,9 @@ export function HourlyStrip({ hourly, hoursAhead = 24 }: Props) {
     <Card className="p-0">
       <div className="flex items-center justify-between border-b border-black/5 px-5 py-3 dark:border-white/5">
         <h3 className="text-sm font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
-          Dự báo theo giờ
+          {t.hourlyStrip.title}
         </h3>
-        <span className="text-xs text-slate-400">{rows.length} giờ</span>
+        <span className="text-xs text-slate-400">{rows.length}h</span>
       </div>
       <div className="scrollbar-thin overflow-x-auto">
         <div className="flex gap-1 px-3 py-4">
@@ -40,7 +42,7 @@ export function HourlyStrip({ hourly, hoursAhead = 24 }: Props) {
                     : 'text-slate-700 dark:text-slate-300'
                 }`}
               >
-                <span className="text-xs font-medium">{isNow ? 'Giờ' : formatTime(h.time)}</span>
+                <span className="text-xs font-medium">{isNow ? t.hourlyStrip.now : formatTime(h.time)}</span>
                 <span className="text-2xl leading-none" aria-hidden>
                   {info.icon}
                 </span>

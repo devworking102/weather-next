@@ -10,6 +10,8 @@ import { computeAlerts } from '@/features/alerts/utils/compute'
 import { TyphoonCard } from '@/features/typhoons/components/TyphoonCard'
 import type { WeatherBundle } from '@/features/weather/types'
 import { cn } from '@/shared/lib/cn'
+import { useT } from '@/shared/hooks/useT'
+import { useUiStore } from '@/shared/store/ui-store'
 
 const levelStyles = {
   info: 'border-sky-200 bg-sky-50 text-sky-900 dark:border-sky-500/30 dark:bg-sky-500/10 dark:text-sky-100',
@@ -22,13 +24,15 @@ interface Props {
 }
 
 export function AlertsTab({ weather }: Props) {
+  const t = useT()
+  const locale = useUiStore((s) => s.locale)
   const location = useLocationStore((s) => s.current)
   const { data: aqi } = useAirQuality(location?.latitude, location?.longitude)
   const { data: quakes } = useEarthquakes(location?.latitude, location?.longitude)
 
   const alerts = useMemo(
-    () => computeAlerts(weather, aqi ?? undefined, quakes ?? undefined),
-    [weather, aqi, quakes],
+    () => computeAlerts(weather, aqi ?? undefined, quakes ?? undefined, locale),
+    [weather, aqi, quakes, locale],
   )
 
   return (
@@ -38,9 +42,9 @@ export function AlertsTab({ weather }: Props) {
           <CheckCircle size={20} className="shrink-0 text-emerald-500" />
           <div>
             <div className="font-semibold text-emerald-800 dark:text-emerald-200">
-              Không có cảnh báo
+              {t.alerts.noAlerts}
             </div>
-            <p className="mt-0.5 text-xs text-slate-500">Điều kiện thời tiết hiện tại an toàn.</p>
+            <p className="mt-0.5 text-xs text-slate-500">{t.alerts.safeConditions}</p>
           </div>
         </Card>
       ) : (

@@ -3,9 +3,11 @@
 import { useMemo } from 'react'
 import { Card } from '@/shared/ui/Card'
 import { toLunarDate, zodiacHours } from '@/features/calendar/utils/lunar'
+import { useT } from '@/shared/hooks/useT'
 import { cn } from '@/shared/lib/cn'
 
 export function LunarHoursCard() {
+  const t = useT()
   const { lunar, hours, currentIdx } = useMemo(() => {
     const now = new Date()
     const l = toLunarDate(now)
@@ -19,28 +21,28 @@ export function LunarHoursCard() {
       <div className="flex items-center gap-2 border-b border-black/5 px-5 py-3 dark:border-white/5">
         <span className="text-lg">🏮</span>
         <h3 className="text-sm font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
-          Lịch âm & Giờ hoàng đạo
+          {t.lunar.cardTitle}
         </h3>
       </div>
       <div className="p-4">
         <div className="mb-4 flex items-center gap-3">
           <div className="min-w-[70px] rounded-xl border border-sky-200 bg-sky-50 p-2.5 text-center text-sky-700 dark:border-sky-500/30 dark:bg-sky-500/10 dark:text-sky-200">
             <div className="text-[10px] font-semibold uppercase tracking-wider">
-              Tháng {lunar.month}
+              {t.lunar.month(lunar.month)}
             </div>
             <div className="text-2xl font-black leading-none">{lunar.day}</div>
           </div>
           <div>
             <div className="flex items-center gap-1.5 text-sm font-bold text-slate-800 dark:text-slate-100">
-              Âm lịch {lunar.year}
+              {t.lunar.year(String(lunar.year))}
               {lunar.leap ? (
                 <span className="rounded border border-amber-200 bg-amber-100 px-1 py-0.5 text-[9px] font-bold uppercase text-amber-700">
-                  Nhuận
+                  {t.lunar.leap}
                 </span>
               ) : null}
             </div>
             <p className="mt-0.5 text-xs text-slate-500">
-              Giờ hoàng đạo mang ý nghĩa phong tục tham khảo.
+              {t.lunar.hint}
             </p>
           </div>
         </div>
@@ -79,7 +81,7 @@ export function LunarHoursCard() {
                           : 'bg-slate-200 text-slate-600 dark:bg-white/10 dark:text-slate-300',
                     )}
                   >
-                    {h.good ? 'Hoàng đạo' : 'Hắc đạo'}
+                    {h.good ? t.lunar.good : t.lunar.bad}
                   </div>
                 </div>
               )

@@ -3,6 +3,7 @@
 import { Clock, ExternalLink } from 'lucide-react'
 import Image from 'next/image'
 import { useDisasterNews } from '@/features/news/hooks/useNews'
+import { useT } from '@/shared/hooks/useT'
 import { Card } from '@/shared/ui/Card'
 import { Skeleton } from '@/shared/ui/Skeleton'
 
@@ -15,6 +16,7 @@ function formatDate(s: string) {
 
 export function NewsList() {
   const { data, isLoading, isError } = useDisasterNews()
+  const t = useT()
 
   if (isLoading) {
     return (
@@ -28,12 +30,12 @@ export function NewsList() {
 
   if (isError) {
     return (
-      <Card className="text-center text-sm text-rose-600">Không tải được dữ liệu tin tức.</Card>
+      <Card className="text-center text-sm text-rose-600">{t.news.loadFailed}</Card>
     )
   }
 
   if (!data?.length) {
-    return <Card className="text-center text-sm text-slate-500">Chưa có tin tức mới.</Card>
+    return <Card className="text-center text-sm text-slate-500">{t.news.empty}</Card>
   }
 
   return (

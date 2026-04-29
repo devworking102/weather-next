@@ -4,6 +4,7 @@ import { Card } from '@/shared/ui/Card'
 import { Skeleton } from '@/shared/ui/Skeleton'
 import { useLocationStore } from '@/features/geocoding/store/location-store'
 import { useTyphoons } from '@/features/typhoons/hooks/useTyphoons'
+import { useT } from '@/shared/hooks/useT'
 import type { Typhoon } from '@/features/typhoons/types'
 
 function sevClass(cat: string) {
@@ -23,6 +24,7 @@ function fDateTime(ms: number) {
 
 export function TyphoonCard() {
   const location = useLocationStore((s) => s.current)
+  const t = useT()
   const { data, isLoading, isError } = useTyphoons(location?.latitude, location?.longitude)
 
   return (
@@ -30,7 +32,7 @@ export function TyphoonCard() {
       <div className="mb-3 flex items-center gap-2">
         <span className="text-xl">🌀</span>
         <h3 className="text-sm font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
-          Bão đang hoạt động (Tây Thái Bình Dương)
+          {t.typhoons.title}
         </h3>
       </div>
       {isLoading ? (
@@ -39,9 +41,9 @@ export function TyphoonCard() {
           <Skeleton className="h-20" />
         </div>
       ) : isError ? (
-        <p className="text-sm text-rose-500">Không tải được dữ liệu bão.</p>
+        <p className="text-sm text-rose-500">{t.typhoons.loadFailed}</p>
       ) : !data?.length ? (
-        <p className="text-sm text-slate-500">🌤️ Hiện không có bão hoạt động trong khu vực.</p>
+        <p className="text-sm text-slate-500">🌤️ {t.typhoons.noTyphoons}</p>
       ) : (
         <ul className="space-y-3">
           {data.map((t: Typhoon) => (

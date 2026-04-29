@@ -4,6 +4,7 @@ import { Card } from '@/shared/ui/Card'
 import { Skeleton } from '@/shared/ui/Skeleton'
 import { useHistorical } from '@/features/historical/hooks/useHistorical'
 import { useUiStore } from '@/shared/store/ui-store'
+import { useT } from '@/shared/hooks/useT'
 import { cn } from '@/shared/lib/cn'
 
 interface Props {
@@ -26,15 +27,16 @@ function deltaColor(d: number | null | undefined) {
   return 'text-slate-500'
 }
 
-function label(d: number | null | undefined) {
-  if (d == null) return 'Không có dữ liệu'
+function label(d: number | null | undefined, noData: string, approx: string) {
+  if (d == null) return noData
   const rounded = Math.round(d * 10) / 10
-  if (Math.abs(rounded) < 0.5) return 'xấp xỉ'
+  if (Math.abs(rounded) < 0.5) return approx
   return `${rounded > 0 ? '+' : ''}${rounded}°`
 }
 
 export function HistoricalCompareCard({ lat, lon, todayMax }: Props) {
   const unit = useUiStore((s) => s.unit)
+  const t = useT()
   const sym = unit === 'f' ? '°F' : '°C'
   const { data, isLoading } = useHistorical(lat, lon, todayMax)
 
@@ -43,7 +45,7 @@ export function HistoricalCompareCard({ lat, lon, todayMax }: Props) {
       <div className="mb-3 flex items-center gap-2">
         <span className="text-lg">📊</span>
         <h3 className="text-sm font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
-          So sánh lịch sử
+          {t.history.title}
         </h3>
       </div>
       {isLoading && !data ? (
@@ -54,20 +56,24 @@ export function HistoricalCompareCard({ lat, lon, todayMax }: Props) {
       ) : data ? (
         <div className="grid grid-cols-2 gap-3">
           <Block
-            title="So với hôm qua"
+            title={t.history.vsYesterday}
             delta={data.deltaMax}
             base={data.yesterdayMax}
             unit={sym}
+            noData={t.history.noData}
+            approx={t.history.approx}
           />
           <Block
-            title="Cùng ngày năm trước"
+            title={t.history.vsLastYear}
             delta={data.deltaYearMax}
             base={data.lastYearMax}
             unit={sym}
+            noData={t.history.noData}
+            approx={t.history.approx}
           />
         </div>
       ) : (
-        <p className="text-xs text-slate-400">Không tải được dữ liệu lịch sử.</p>
+        <p className="text-xs text-slate-400">{t.history.loadFailed}</p>
       )}
     </Card>
   )
@@ -78,11 +84,15 @@ function Block({
   delta,
   base,
   unit,
+  noData,
+  approx,
 }: {
   title: string
   delta: number | null | undefined
   base: number | null | undefined
   unit: string
+  noData: string
+  approx: string
 }) {
   return (
     <div className="rounded-xl border border-black/5 bg-slate-50 p-3 dark:border-white/5 dark:bg-slate-800/40">
@@ -91,7 +101,7 @@ function Block({
       </div>
       <div className="flex items-baseline gap-2">
         <span className={cn('text-2xl font-black', deltaColor(delta))}>
-          {arrow(delta)} {label(delta)}
+          {arrow(delta)} {label(delta, noData, approx)}
         </span>
       </div>
       <div className="mt-1 text-[11px] text-slate-400">

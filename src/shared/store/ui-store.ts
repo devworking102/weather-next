@@ -4,6 +4,7 @@ import { persist, createJSONStorage } from 'zustand/middleware'
 export type ThemeMode = 'light' | 'dark' | 'system'
 export type TempUnit = 'c' | 'f'
 export type WindUnit = 'kmh' | 'mph' | 'ms'
+export type Locale = 'vi' | 'en'
 export type WeatherTabId =
   | 'today'
   | 'hourly'
@@ -30,12 +31,14 @@ interface UiState {
   theme: ThemeMode
   unit: TempUnit
   windUnit: WindUnit
+  locale: Locale
   notifyEnabled: boolean
   favorites: FavoriteLocation[]
   weatherTab: WeatherTabId
   setTheme: (t: ThemeMode) => void
   setUnit: (u: TempUnit) => void
   setWindUnit: (u: WindUnit) => void
+  setLocale: (l: Locale) => void
   setNotifyEnabled: (v: boolean) => void
   addFavorite: (loc: FavoriteLocation) => void
   removeFavorite: (id: number) => void
@@ -49,12 +52,14 @@ export const useUiStore = create<UiState>()(
       theme: 'system',
       unit: 'c',
       windUnit: 'kmh',
+      locale: 'vi',
       notifyEnabled: false,
       favorites: [],
       weatherTab: 'today',
       setTheme: (t) => set({ theme: t }),
       setUnit: (u) => set({ unit: u }),
       setWindUnit: (u) => set({ windUnit: u }),
+      setLocale: (l) => set({ locale: l }),
       setNotifyEnabled: (v) => set({ notifyEnabled: v }),
       addFavorite: (loc) => {
         const existing = get().favorites
@@ -72,6 +77,7 @@ export const useUiStore = create<UiState>()(
         theme: s.theme,
         unit: s.unit,
         windUnit: s.windUnit,
+        locale: s.locale,
         notifyEnabled: s.notifyEnabled,
         favorites: s.favorites,
       }),

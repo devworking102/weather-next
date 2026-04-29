@@ -4,6 +4,7 @@ import { useRef, useState } from 'react'
 import { Loader2, MapPin, Search } from 'lucide-react'
 import { usePlaceAutocomplete } from '@/features/geocoding/hooks/useGeocoding'
 import { useLocationStore } from '@/features/geocoding/store/location-store'
+import { useT } from '@/shared/hooks/useT'
 import type { GeoLocation } from '@/features/geocoding/types'
 import { Input } from '@/shared/ui/Input'
 
@@ -13,6 +14,7 @@ export function SearchBar() {
   const rootRef = useRef<HTMLDivElement>(null)
   const setCurrent = useLocationStore((s) => s.setCurrent)
   const setPinned = useLocationStore((s) => s.setPinned)
+  const t = useT()
 
   const { data, isFetching } = usePlaceAutocomplete(query)
 
@@ -29,12 +31,12 @@ export function SearchBar() {
       (pos) => {
         setCurrent({
           id: Date.now(),
-          name: 'Vị trí hiện tại',
+          name: t.search.currentLocation,
           latitude: pos.coords.latitude,
           longitude: pos.coords.longitude,
           country: '',
         })
-        setPinned(false) // tự dò → không pin, cho phép auto update
+        setPinned(false)
       },
       () => {},
       { timeout: 8000 },
@@ -53,7 +55,7 @@ export function SearchBar() {
           }}
           onFocus={() => setOpen(true)}
           onBlur={() => setTimeout(() => setOpen(false), 180)}
-          placeholder="Tìm thành phố, quốc gia..."
+          placeholder={t.search.placeholder}
           className="h-9 border-none bg-transparent px-0 focus:ring-0 dark:bg-transparent"
         />
         {isFetching && query.length >= 2 ? (
@@ -62,7 +64,7 @@ export function SearchBar() {
         <button
           onClick={onLocate}
           className="rounded-lg p-1.5 text-slate-500 transition-colors hover:bg-slate-100 hover:text-sky-600 dark:hover:bg-white/5"
-          title="Dùng vị trí hiện tại"
+          title={t.search.useCurrentLocation}
           type="button"
         >
           <MapPin size={18} />

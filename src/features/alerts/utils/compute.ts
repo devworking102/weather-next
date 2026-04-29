@@ -1,92 +1,45 @@
+import { translations, type Locale } from '@/shared/i18n/translations'
 import type { AirQualityBundle, WeatherBundle } from '@/features/weather/types'
 import type { Earthquake } from '@/features/earthquakes/types'
 import type { WeatherAlert } from '@/features/alerts/types'
 
-// Tính toán cảnh báo dựa trên ngưỡng khoa học + dân sự cơ bản.
 export function computeAlerts(
   weather: WeatherBundle | undefined,
   aqi: AirQualityBundle | undefined,
   quakes: Earthquake[] | undefined,
+  locale: Locale = 'vi',
 ): WeatherAlert[] {
   const alerts: WeatherAlert[] = []
+  const a = translations[locale].alertsData
+
   if (weather) {
     const c = weather.current
     if (c.temperature >= 38) {
-      alerts.push({
-        id: 'heat-extreme',
-        level: 'danger',
-        icon: '🔥',
-        title: 'Cảnh báo nắng nóng gay gắt',
-        message: `Nhiệt độ hiện tại ${Math.round(c.temperature)}°C. Hạn chế ra ngoài trời từ 11–15h, bổ sung nước và điện giải.`,
-      })
+      alerts.push({ id: 'heat-extreme', level: 'danger', icon: '🔥', title: a.heatExtreme.title, message: a.heatExtreme.message(Math.round(c.temperature)) })
     } else if (c.temperature >= 35) {
-      alerts.push({
-        id: 'heat-warning',
-        level: 'warning',
-        icon: '☀️',
-        title: 'Nắng nóng',
-        message: `Nhiệt độ ${Math.round(c.temperature)}°C. Tránh hoạt động cường độ cao ngoài trời.`,
-      })
+      alerts.push({ id: 'heat-warning', level: 'warning', icon: '☀️', title: a.heatWarning.title, message: a.heatWarning.message(Math.round(c.temperature)) })
     }
     if (c.temperature <= 10) {
-      alerts.push({
-        id: 'cold',
-        level: 'warning',
-        icon: '🥶',
-        title: 'Rét đậm',
-        message: `Nhiệt độ ${Math.round(c.temperature)}°C, cần giữ ấm, đặc biệt với người già và trẻ nhỏ.`,
-      })
+      alerts.push({ id: 'cold', level: 'warning', icon: '🥶', title: a.cold.title, message: a.cold.message(Math.round(c.temperature)) })
     }
     if (c.uvIndex >= 8) {
-      alerts.push({
-        id: 'uv',
-        level: 'warning',
-        icon: '🧴',
-        title: 'Chỉ số UV cao',
-        message: `UV ${Math.round(c.uvIndex)}. Bôi kem chống nắng SPF 30+, đội mũ rộng vành khi ra ngoài.`,
-      })
+      alerts.push({ id: 'uv', level: 'warning', icon: '🧴', title: a.uv.title, message: a.uv.message(Math.round(c.uvIndex)) })
     }
     if (c.windSpeed >= 50 || c.windGusts >= 70) {
-      alerts.push({
-        id: 'wind',
-        level: c.windGusts >= 90 ? 'danger' : 'warning',
-        icon: '💨',
-        title: 'Gió mạnh',
-        message: `Gió ${Math.round(c.windSpeed)} km/h, giật ${Math.round(c.windGusts)} km/h. Cẩn thận với cây lớn và vật dễ đổ.`,
-      })
+      alerts.push({ id: 'wind', level: c.windGusts >= 90 ? 'danger' : 'warning', icon: '💨', title: a.wind.title, message: a.wind.message(Math.round(c.windSpeed), Math.round(c.windGusts)) })
     }
-    const rainyHours = weather.hourly
-      .slice(0, 12)
-      .filter((h) => h.precipitationProbability >= 70).length
+    const rainyHours = weather.hourly.slice(0, 12).filter((h) => h.precipitationProbability >= 70).length
     if (rainyHours >= 4) {
-      alerts.push({
-        id: 'rain',
-        level: 'info',
-        icon: '🌧️',
-        title: 'Mưa kéo dài trong 12 giờ tới',
-        message: `${rainyHours}/12 giờ có khả năng mưa ≥70%. Chuẩn bị áo mưa, hạn chế đi vùng ngập.`,
-      })
+      alerts.push({ id: 'rain', level: 'info', icon: '🌧️', title: a.rain.title, message: a.rain.message(rainyHours) })
     }
   }
 
   if (aqi?.current.europeanAqi != null) {
     const v = aqi.current.europeanAqi
     if (v > 100) {
-      alerts.push({
-        id: 'aqi-hazard',
-        level: 'danger',
-        icon: '☠️',
-        title: 'Chất lượng không khí nguy hại',
-        message: `AQI châu Âu ${Math.round(v)}. Tránh ra ngoài, đeo khẩu trang N95 nếu bắt buộc.`,
-      })
+      alerts.push({ id: 'aqi-hazard', level: 'danger', icon: '☠️', title: a.aqiHazard.title, message: a.aqiHazard.message(Math.round(v)) })
     } else if (v > 80) {
-      alerts.push({
-        id: 'aqi-bad',
-        level: 'warning',
-        icon: '😷',
-        title: 'Không khí rất kém',
-        message: `AQI ${Math.round(v)}. Hạn chế hoạt động ngoài trời, đóng cửa sổ.`,
-      })
+      alerts.push({ id: 'aqi-bad', level: 'warning', icon: '😷', title: a.aqiBad.title, message: a.aqiBad.message(Math.round(v)) })
     }
   }
 
@@ -98,8 +51,8 @@ export function computeAlerts(
         id: `quake-${big.id}`,
         level: big.magnitude >= 6.5 ? 'danger' : 'warning',
         icon: big.tsunami ? '🌊' : '⚠️',
-        title: `Động đất M${big.magnitude.toFixed(1)} gần đây`,
-        message: `${big.place}. Cách vị trí hiện tại ~${big.distanceKm.toFixed(0)} km.`,
+        title: a.quake.title(big.magnitude.toFixed(1)),
+        message: a.quake.message(big.place, big.distanceKm.toFixed(0)),
       })
     }
   }

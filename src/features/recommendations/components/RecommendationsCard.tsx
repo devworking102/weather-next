@@ -2,6 +2,7 @@
 
 import { Skeleton } from '@/shared/ui/Skeleton'
 import { useRecommendations } from '@/features/recommendations/hooks/useRecommendations'
+import { useT } from '@/shared/hooks/useT'
 import type { GeoLocation } from '@/features/geocoding/types'
 import type { WeatherBundle } from '@/features/weather/types'
 
@@ -12,6 +13,7 @@ interface Props {
 
 export function RecommendationsCard({ location, weather }: Props) {
   const { data, isLoading } = useRecommendations(location, weather)
+  const t = useT()
 
   if (isLoading || !data) {
     return (
@@ -27,7 +29,7 @@ export function RecommendationsCard({ location, weather }: Props) {
     <div className="grid animate-fade-in gap-4 md:grid-cols-3">
       <Column
         icon="👕"
-        title="Mặc gì hôm nay?"
+        title={t.recommendations.clothes}
         subtitle={data.title}
         items={data.clothes}
         tone="from-sky-50 to-indigo-50 border-sky-100 text-sky-900 dark:from-sky-500/10 dark:to-indigo-500/10 dark:border-sky-500/20 dark:text-sky-100"
@@ -36,7 +38,7 @@ export function RecommendationsCard({ location, weather }: Props) {
       />
       <Column
         icon="🍲"
-        title="Ăn gì hợp lý?"
+        title={t.recommendations.food}
         subtitle={data.title}
         items={data.food}
         tone="from-orange-50 to-amber-50 border-orange-100 text-orange-900 dark:from-orange-500/10 dark:to-amber-500/10 dark:border-orange-500/20 dark:text-orange-100"
@@ -45,7 +47,7 @@ export function RecommendationsCard({ location, weather }: Props) {
       />
       <Column
         icon="🎒"
-        title="Đi đâu chơi?"
+        title={t.recommendations.activity}
         subtitle={data.title}
         items={data.activity}
         tone="from-emerald-50 to-teal-50 border-emerald-100 text-emerald-900 dark:from-emerald-500/10 dark:to-teal-500/10 dark:border-emerald-500/20 dark:text-emerald-100"

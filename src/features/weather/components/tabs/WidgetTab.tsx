@@ -3,24 +3,26 @@
 import { useState } from 'react'
 import { Card } from '@/shared/ui/Card'
 import { useLocationStore } from '@/features/geocoding/store/location-store'
+import { useT } from '@/shared/hooks/useT'
 
 type Theme = 'auto' | 'light' | 'dark'
 type Units = 'celsius' | 'fahrenheit'
-
-const THEMES: { value: Theme; label: string }[] = [
-  { value: 'auto', label: '🌓 Tự động' },
-  { value: 'light', label: '☀️ Sáng' },
-  { value: 'dark', label: '🌙 Tối' },
-]
 
 const WIDGET_HEIGHTS: Record<string, number> = { compact: 180, standard: 240 }
 
 export function WidgetTab() {
   const location = useLocationStore((s) => s.current)
+  const t = useT()
   const [copied, setCopied] = useState(false)
   const [theme, setTheme] = useState<Theme>('auto')
   const [units, setUnits] = useState<Units>('celsius')
   const [size, setSize] = useState<'compact' | 'standard'>('compact')
+
+  const THEMES: { value: Theme; label: string }[] = [
+    { value: 'auto', label: t.widget.themeAuto },
+    { value: 'light', label: t.widget.themeLight },
+    { value: 'dark', label: t.widget.themeDark },
+  ]
 
   const baseUrl = typeof window !== 'undefined' ? window.location.origin : 'https://weather.app'
   const lat = location?.latitude?.toFixed(4) ?? ''
@@ -56,13 +58,13 @@ export function WidgetTab() {
         <div className="mb-4 flex items-center gap-2">
           <span className="text-lg">⚙️</span>
           <h3 className="text-sm font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
-            Tùy chỉnh widget
+            {t.widget.configTitle}
           </h3>
         </div>
         <div className="grid gap-4 sm:grid-cols-3">
           {/* Theme */}
           <div>
-            <p className="mb-1.5 text-xs font-medium text-slate-500 dark:text-slate-400">Giao diện</p>
+            <p className="mb-1.5 text-xs font-medium text-slate-500 dark:text-slate-400">{t.widget.themeLabel}</p>
             <div className="flex gap-1">
               {THEMES.map((t) => (
                 <button
@@ -83,7 +85,7 @@ export function WidgetTab() {
 
           {/* Units */}
           <div>
-            <p className="mb-1.5 text-xs font-medium text-slate-500 dark:text-slate-400">Đơn vị nhiệt độ</p>
+            <p className="mb-1.5 text-xs font-medium text-slate-500 dark:text-slate-400">{t.widget.unitsLabel}</p>
             <div className="flex gap-1">
               {(['celsius', 'fahrenheit'] as const).map((u) => (
                 <button
@@ -104,7 +106,7 @@ export function WidgetTab() {
 
           {/* Size */}
           <div>
-            <p className="mb-1.5 text-xs font-medium text-slate-500 dark:text-slate-400">Kích thước</p>
+            <p className="mb-1.5 text-xs font-medium text-slate-500 dark:text-slate-400">{t.widget.sizeLabel}</p>
             <div className="flex gap-1">
               {(['compact', 'standard'] as const).map((s) => (
                 <button
@@ -117,7 +119,7 @@ export function WidgetTab() {
                       : 'border-slate-200 text-slate-600 hover:bg-slate-50 dark:border-slate-700 dark:text-slate-400 dark:hover:bg-white/5'
                   }`}
                 >
-                  {s === 'compact' ? `Nhỏ (${WIDGET_HEIGHTS.compact}px)` : `Vừa (${WIDGET_HEIGHTS.standard}px)`}
+                  {s === 'compact' ? `${t.widget.sizeCompact} (${WIDGET_HEIGHTS.compact}px)` : `${t.widget.sizeStandard} (${WIDGET_HEIGHTS.standard}px)`}
                 </button>
               ))}
             </div>
@@ -130,13 +132,13 @@ export function WidgetTab() {
         <div className="mb-4 flex items-center gap-2">
           <span className="text-lg">🔗</span>
           <h3 className="text-sm font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
-            Mã nhúng
+            {t.widget.embedCodeTitle}
           </h3>
         </div>
         {lat && lon ? (
           <>
             <p className="mb-3 text-sm text-slate-600 dark:text-slate-400">
-              Sao chép đoạn mã bên dưới để nhúng widget vào trang web của bạn.
+              {t.widget.embedHint}
             </p>
             <div className="relative">
               <pre className="scrollbar-thin overflow-x-auto rounded-xl bg-slate-900 p-4 text-xs leading-relaxed text-slate-200">
@@ -147,19 +149,19 @@ export function WidgetTab() {
                 className="absolute right-3 top-3 rounded-lg bg-white/10 px-3 py-1.5 text-[11px] font-semibold text-white transition-colors hover:bg-white/20"
                 type="button"
               >
-                {copied ? '✓ Đã sao chép' : 'Sao chép'}
+                {copied ? `✓ ${t.widget.copied}` : t.widget.copy}
               </button>
             </div>
           </>
         ) : (
-          <p className="text-sm text-slate-400">Chọn vị trí để tạo mã nhúng.</p>
+          <p className="text-sm text-slate-400">{t.widget.noLocation}</p>
         )}
       </Card>
 
       {/* Preview */}
       <Card className="p-5">
         <h3 className="mb-3 text-sm font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
-          Xem trước
+          {t.widget.previewTitle}
         </h3>
         {embedSrc ? (
           <iframe
@@ -171,7 +173,7 @@ export function WidgetTab() {
             title="Preview widget"
           />
         ) : (
-          <p className="text-sm text-slate-400">Chọn vị trí để xem trước widget.</p>
+          <p className="text-sm text-slate-400">{t.widget.noPreview}</p>
         )}
       </Card>
     </div>

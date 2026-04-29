@@ -4,6 +4,7 @@ import { useMemo } from 'react'
 import { Card } from '@/shared/ui/Card'
 import { moonPhase } from '@/features/calendar/utils/lunar'
 import { formatTime } from '@/features/weather/utils/format'
+import { useT } from '@/shared/hooks/useT'
 
 interface Props {
   sunrise: string
@@ -11,6 +12,7 @@ interface Props {
 }
 
 export function SunMoonCard({ sunrise, sunset }: Props) {
+  const t = useT()
   const daylight = useMemo(() => {
     const rise = new Date(`1970-01-01T${formatTime(sunrise)}:00`)
     const set = new Date(`1970-01-01T${formatTime(sunset)}:00`)
@@ -23,13 +25,13 @@ export function SunMoonCard({ sunrise, sunset }: Props) {
       <div className="flex items-center gap-2 border-b border-black/5 px-5 py-3 dark:border-white/5">
         <span className="text-lg">🌅</span>
         <h3 className="text-sm font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
-          Mặt trời & Mặt trăng
+          {t.sunMoon.title}
         </h3>
       </div>
       <div className="grid grid-cols-2 gap-3 p-4">
-        <Item icon="🌅" value={formatTime(sunrise)} label="Bình minh" />
-        <Item icon="🌇" value={formatTime(sunset)} label="Hoàng hôn" />
-        <Item icon="☀️" value={daylight} label="Ban ngày" />
+        <Item icon="🌅" value={formatTime(sunrise)} label={t.sunMoon.sunrise} />
+        <Item icon="🌇" value={formatTime(sunset)} label={t.sunMoon.sunset} />
+        <Item icon="☀️" value={daylight} label={t.sunMoon.daylight} />
         <Item icon={moon.icon} value={`${moon.illumination}%`} label={moon.name} />
       </div>
     </Card>

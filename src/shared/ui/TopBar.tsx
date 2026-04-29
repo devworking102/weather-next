@@ -5,25 +5,26 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { SettingsMenu } from './SettingsMenu'
 import { InstallButton } from '@/features/pwa/components/InstallButton'
+import { useT } from '@/shared/hooks/useT'
 import { cn } from '@/shared/lib/cn'
-
-const nav = [
-  { href: '/weather', label: '🌤️ Thời tiết' },
-  { href: '/news', label: '📰 Tin tức' },
-  { href: '/earthquakes', label: '🌍 Địa chấn' },
-  { href: '/calendar', label: '🕒 Lịch âm' },
-  { href: '/aqi', label: '💨 Không khí' },
-  { href: '/health', label: '❤️ Sức khỏe' },
-  { href: '/wind', label: '🗺️ Bản đồ gió' },
-  { href: '/alerts', label: '⚠️ Cảnh báo' },
-  { href: '/widget', label: '🔗 Nhúng' },
-]
 
 export function TopBar() {
   const pathname = usePathname()
   const [open, setOpen] = useState(false)
+  const t = useT()
 
-  // lock body scroll when drawer is open
+  const nav = [
+    { href: '/weather',     label: t.nav.weather     },
+    { href: '/news',        label: t.nav.news        },
+    { href: '/earthquakes', label: t.nav.earthquakes },
+    { href: '/calendar',    label: t.nav.calendar    },
+    { href: '/aqi',         label: t.nav.aqi         },
+    { href: '/health',      label: t.nav.health      },
+    { href: '/wind',        label: t.nav.wind        },
+    { href: '/alerts',      label: t.nav.alerts      },
+    { href: '/widget',      label: t.nav.widget      },
+  ]
+
   useEffect(() => {
     document.body.style.overflow = open ? 'hidden' : ''
     return () => { document.body.style.overflow = '' }
@@ -33,13 +34,11 @@ export function TopBar() {
     <>
       <header className="sticky top-0 z-40 border-b border-black/5 bg-[color:var(--background)]/85 backdrop-blur dark:border-white/5">
         <div className="mx-auto flex container items-center justify-between gap-4 px-4 py-3 md:px-6">
-          {/* Logo */}
           <Link href="/" className="inline-flex items-center gap-2 font-bold tracking-tight">
             <span className="text-xl" aria-hidden>🌤️</span>
             <span>Weather</span>
           </Link>
 
-          {/* Desktop nav — hidden on mobile/tablet */}
           <nav className="hidden lg:flex items-center gap-1 overflow-x-auto whitespace-nowrap">
             {nav.map(({ href, label }) => {
               const active = pathname?.startsWith(href)
@@ -63,11 +62,9 @@ export function TopBar() {
           <div className="flex items-center gap-2">
             <InstallButton />
             <SettingsMenu />
-
-            {/* Hamburger button — visible on mobile/tablet only */}
             <button
               type="button"
-              aria-label="Mở menu"
+              aria-label={t.nav.openMenu}
               aria-expanded={open}
               onClick={() => setOpen(true)}
               className="lg:hidden inline-flex items-center justify-center rounded-lg p-2 text-slate-600 transition-colors hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-white/5"
@@ -82,8 +79,6 @@ export function TopBar() {
         </div>
       </header>
 
-      {/* Mobile/tablet side drawer */}
-      {/* Backdrop */}
       <div
         aria-hidden
         onClick={() => setOpen(false)}
@@ -93,7 +88,6 @@ export function TopBar() {
         )}
       />
 
-      {/* Drawer panel */}
       <aside
         aria-label="Navigation menu"
         className={cn(
@@ -102,7 +96,6 @@ export function TopBar() {
           open ? 'translate-x-0' : '-translate-x-full',
         )}
       >
-        {/* Drawer header */}
         <div className="flex items-center justify-between border-b border-black/5 px-5 py-4 dark:border-white/5">
           <Link href="/" className="inline-flex items-center gap-2 font-bold tracking-tight" onClick={() => setOpen(false)}>
             <span className="text-xl" aria-hidden>🌤️</span>
@@ -110,7 +103,7 @@ export function TopBar() {
           </Link>
           <button
             type="button"
-            aria-label="Đóng menu"
+            aria-label={t.nav.closeMenu}
             onClick={() => setOpen(false)}
             className="rounded-lg p-2 text-slate-500 transition-colors hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-white/5"
           >
@@ -120,7 +113,6 @@ export function TopBar() {
           </button>
         </div>
 
-        {/* Nav links */}
         <nav className="flex-1 overflow-y-auto py-3">
           {nav.map(({ href, label }) => {
             const active = pathname?.startsWith(href)

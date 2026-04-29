@@ -6,6 +6,7 @@ import type { GeoLocation } from '@/features/geocoding/types'
 import { wmoInfo } from '@/features/weather/utils/wmo'
 import { formatTemp } from '@/features/weather/utils/format'
 import { useUiStore } from '@/shared/store/ui-store'
+import { useT } from '@/shared/hooks/useT'
 import { DynamicBackground } from './DynamicBackground'
 
 interface Props {
@@ -15,6 +16,7 @@ interface Props {
 
 export function HeroCard({ location, weather }: Props) {
   const unit = useUiStore((s) => s.unit)
+  const t = useT()
   const { current } = weather
   const info = wmoInfo(current.weatherCode)
   const tempUnit = unit === 'f' ? 'fahrenheit' : 'celsius'
@@ -42,11 +44,11 @@ export function HeroCard({ location, weather }: Props) {
             </span>
           </div>
           <p className="mt-2 text-sm text-white/80">
-            Cảm nhận {formatTemp(current.apparentTemperature, tempUnit)}
+            {t.hero.feelsLike} {formatTemp(current.apparentTemperature, tempUnit)}
             {today ? (
               <>
                 {' · '}
-                Cao {formatTemp(today.tempMax, tempUnit)} / Thấp {formatTemp(today.tempMin, tempUnit)}
+                {t.hero.high} {formatTemp(today.tempMax, tempUnit)} / {t.hero.low} {formatTemp(today.tempMin, tempUnit)}
               </>
             ) : null}
           </p>

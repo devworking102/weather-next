@@ -12,6 +12,7 @@ import {
 } from 'recharts'
 import { Card } from '@/shared/ui/Card'
 import type { HourlyPoint } from '@/features/weather/types'
+import { useT } from '@/shared/hooks/useT'
 
 interface Props {
   hourly: HourlyPoint[]
@@ -19,6 +20,7 @@ interface Props {
 }
 
 export function RainProbabilityChart({ hourly, hours = 24 }: Props) {
+  const t = useT()
   const data = useMemo(() => {
     const now = new Date().toISOString().slice(0, 13) + ':00'
     const idx = Math.max(0, hourly.findIndex((h) => h.time >= now))
@@ -31,7 +33,7 @@ export function RainProbabilityChart({ hourly, hours = 24 }: Props) {
   return (
     <Card className="p-5">
       <h3 className="mb-4 text-sm font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
-        Khả năng mưa · {hours} giờ
+        {t.chart.rainTitle(hours)}
       </h3>
       <div className="h-56">
         <ResponsiveContainer width="100%" height="100%" minWidth={0}>
@@ -50,7 +52,7 @@ export function RainProbabilityChart({ hourly, hours = 24 }: Props) {
             />
             <Tooltip
               contentStyle={{ borderRadius: 12, border: '1px solid rgba(0,0,0,0.08)', fontSize: 12 }}
-              formatter={((value: number) => [`${value}%`, 'Khả năng mưa']) as never}
+              formatter={((value: number) => [`${value}%`, t.chart.rainTooltip]) as never}
             />
             <Bar dataKey="prob" fill="#0ea5e9" radius={[6, 6, 0, 0]} />
           </BarChart>

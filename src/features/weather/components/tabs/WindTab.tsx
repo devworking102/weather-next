@@ -2,9 +2,11 @@
 
 import { Card } from '@/shared/ui/Card'
 import { useLocationStore } from '@/features/geocoding/store/location-store'
+import { useT } from '@/shared/hooks/useT'
 
 export function WindTab() {
   const location = useLocationStore((s) => s.current)
+  const t = useT()
 
   const lat = location?.latitude?.toFixed(2) ?? '16'
   const lon = location?.longitude?.toFixed(2) ?? '108'
@@ -17,7 +19,7 @@ export function WindTab() {
         <div className="flex items-center gap-2 border-b border-black/5 px-5 py-3 dark:border-white/5">
           <span className="text-lg">🗺️</span>
           <h3 className="text-sm font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
-            Bản đồ gió toàn cầu (Windy)
+            {t.wind.title}
           </h3>
         </div>
         <div className="aspect-[4/3] w-full sm:aspect-video">
@@ -26,7 +28,7 @@ export function WindTab() {
             width="100%"
             height="100%"
             className="border-0"
-            title="Bản đồ gió Windy"
+            title={t.wind.iframeTitle}
             allowFullScreen
           />
         </div>

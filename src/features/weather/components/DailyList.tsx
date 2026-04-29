@@ -4,6 +4,7 @@ import { Card } from '@/shared/ui/Card'
 import type { DailyPoint } from '@/features/weather/types'
 import { wmoInfo } from '@/features/weather/utils/wmo'
 import { dayLabel, formatDate } from '@/features/weather/utils/format'
+import { useT } from '@/shared/hooks/useT'
 
 interface Props {
   daily: DailyPoint[]
@@ -11,6 +12,7 @@ interface Props {
 }
 
 export function DailyList({ daily, days = 7 }: Props) {
+  const t = useT()
   const rows = daily.slice(0, days)
   const allMin = Math.min(...rows.map((d) => d.tempMin))
   const allMax = Math.max(...rows.map((d) => d.tempMax))
@@ -20,7 +22,7 @@ export function DailyList({ daily, days = 7 }: Props) {
     <Card className="p-0">
       <div className="flex items-center justify-between border-b border-black/5 px-5 py-3 dark:border-white/5">
         <h3 className="text-sm font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
-          Dự báo {days} ngày
+          {t.dailyList.title(days)}
         </h3>
       </div>
       <ul className="divide-y divide-black/5 dark:divide-white/5">

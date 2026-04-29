@@ -5,13 +5,14 @@ import { Card } from '@/shared/ui/Card'
 import { Skeleton } from '@/shared/ui/Skeleton'
 import { useAirQuality } from '@/features/weather/hooks/useWeather'
 import { useLocationStore } from '@/features/geocoding/store/location-store'
+import { useUiStore } from '@/shared/store/ui-store'
 import { aqiCategory } from '@/features/weather/utils/format'
 import { useAiInsight } from '@/shared/hooks/useAiInsight'
 import { AiBadge } from '@/shared/ui/AiBadge'
+import { useT } from '@/shared/hooks/useT'
 import type { AqiInsightPayload, AqiInsightResponse } from '@/app/api/aqi-insight/route'
 import {
   Area,
-  AreaChart,
   CartesianGrid,
   Line,
   ComposedChart,
@@ -21,17 +22,12 @@ import {
   YAxis,
 } from 'recharts'
 
-const SCALE = [
-  { label: '0–20', name: 'Tốt', color: '#4ade80' },
-  { label: '20–40', name: 'Khá tốt', color: '#a3e635' },
-  { label: '40–60', name: 'Trung bình', color: '#facc15' },
-  { label: '60–80', name: 'Kém', color: '#f97316' },
-  { label: '80–100', name: 'Rất kém', color: '#ef4444' },
-  { label: '100+', name: 'Nguy hại', color: '#a855f7' },
-]
+const SCALE_COLORS = ['#4ade80', '#a3e635', '#facc15', '#f97316', '#ef4444', '#a855f7']
 
 export function AirQualityTab() {
   const location = useLocationStore((s) => s.current)
+  const locale = useUiStore((s) => s.locale)
+  const t = useT()
   const { data, isLoading, isError } = useAirQuality(location?.latitude, location?.longitude)
 
   const insightPayload = useMemo<AqiInsightPayload | null>(
@@ -46,15 +42,16 @@ export function AirQualityTab() {
             no2: data.current.no2,
             ozone: data.current.ozone,
             co: data.current.co,
+            locale,
           }
         : null,
-    [data, location],
+    [data, location, locale],
   )
 
   const { data: insight, isLoading: insightLoading } = useAiInsight<AqiInsightPayload, AqiInsightResponse>(
     '/api/aqi-insight',
     insightPayload,
-    [location?.latitude, location?.longitude],
+    [location?.latitude, location?.longitude, locale],
   )
 
   const chart = useMemo(() => {
@@ -68,13 +65,11 @@ export function AirQualityTab() {
     }))
   }, [data])
 
-  if (isLoading) {
-    return <Skeleton className="h-64 rounded-2xl" />
-  }
+  if (isLoading) return <Skeleton className="h-64 rounded-2xl" />
   if (isError || !data) {
     return (
       <Card className="text-center text-sm text-slate-500">
-        ⚠️ Dữ liệu chất lượng không khí không khả dụng.
+        ⚠️ {t.aqi.unavailable}
       </Card>
     )
   }
@@ -92,37 +87,19 @@ export function AirQualityTab() {
     <div className="space-y-4">
       <Card
         className="flex flex-col items-center gap-4 sm:flex-row sm:gap-6"
-        style={{
-          background: `${cat.color}15`,
-          borderColor: `${cat.color}44`,
-        }}
+        style={{ background: `${cat.color}15`, borderColor: `${cat.color}44` }}
       >
         <svg width="160" height="92" viewBox="0 0 160 92" className="shrink-0">
-          <path
-            d="M 10 80 A 70 70 0 0 1 150 80"
-            fill="none"
-            stroke="rgba(0,0,0,0.08)"
-            strokeWidth="14"
-            strokeLinecap="round"
-          />
+          <path d="M 10 80 A 70 70 0 0 1 150 80" fill="none" stroke="rgba(0,0,0,0.08)" strokeWidth="14" strokeLinecap="round" />
           <path d={arcPath} fill="none" stroke={cat.color} strokeWidth="14" strokeLinecap="round" />
-          <text
-            x="80"
-            y="72"
-            textAnchor="middle"
-            fill="currentColor"
-            fontSize="28"
-            fontWeight="800"
-          >
+          <text x="80" y="72" textAnchor="middle" fill="currentColor" fontSize="28" fontWeight="800">
             {Math.round(c.europeanAqi)}
           </text>
         </svg>
         <div className="flex-1">
-          <div className="text-2xl font-black" style={{ color: cat.color }}>
-            {cat.label}
-          </div>
+          <div className="text-2xl font-black" style={{ color: cat.color }}>{cat.label}</div>
           <div className="mt-0.5 text-xs font-bold uppercase tracking-wider text-slate-500">
-            Chỉ số AQI (EU) · US AQI: <strong>{Math.round(c.usAqi)}</strong>
+            {t.aqi.usAqiLabel} <strong>{Math.round(c.usAqi)}</strong>
           </div>
           {insightLoading ? (
             <div className="mt-2 space-y-1.5">
@@ -142,7 +119,7 @@ export function AirQualityTab() {
         <div className="flex items-center gap-2 border-b border-black/5 px-5 py-3 dark:border-white/5">
           <span className="text-lg">🔬</span>
           <h3 className="text-sm font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
-            Các chất ô nhiễm hiện tại
+            {t.aqi.currentPollutants}
           </h3>
         </div>
         <div className="grid grid-cols-2 gap-3 p-4 sm:grid-cols-3 lg:grid-cols-5">
@@ -150,19 +127,13 @@ export function AirQualityTab() {
           <Pollutant label="PM10" value={c.pm10.toFixed(1)} unit="μg/m³" pct={c.pm10 / 150} scale="rg" />
           <Pollutant label="NO₂" value={c.no2.toFixed(1)} unit="μg/m³" pct={c.no2 / 200} color="#a78bfa" />
           <Pollutant label="O₃" value={c.ozone.toFixed(1)} unit="μg/m³" pct={c.ozone / 240} color="#60a5fa" />
-          <Pollutant
-            label="CO"
-            value={(c.co / 1000).toFixed(2)}
-            unit="mg/m³"
-            pct={c.co / 10000}
-            color="#fb923c"
-          />
+          <Pollutant label="CO" value={(c.co / 1000).toFixed(2)} unit="mg/m³" pct={c.co / 10000} color="#fb923c" />
         </div>
       </Card>
 
       <Card className="p-5">
         <h3 className="mb-4 text-sm font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
-          AQI & PM2.5 · 24 giờ tới
+          {t.aqi.forecast}
         </h3>
         <div className="h-60">
           <ResponsiveContainer width="100%" height="100%" minWidth={0}>
@@ -171,9 +142,7 @@ export function AirQualityTab() {
               <XAxis dataKey="label" tickLine={false} axisLine={false} fontSize={11} stroke="currentColor" strokeOpacity={0.5} />
               <YAxis yAxisId="left" tickLine={false} axisLine={false} fontSize={11} stroke="currentColor" strokeOpacity={0.5} width={30} />
               <YAxis yAxisId="right" orientation="right" tickLine={false} axisLine={false} fontSize={11} stroke="#a855f7" strokeOpacity={0.7} width={30} />
-              <Tooltip
-                contentStyle={{ borderRadius: 12, border: '1px solid rgba(0,0,0,0.08)', fontSize: 12 }}
-              />
+              <Tooltip contentStyle={{ borderRadius: 12, border: '1px solid rgba(0,0,0,0.08)', fontSize: 12 }} />
               <defs>
                 <linearGradient id="aqi-fill" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="0%" stopColor="#f97316" stopOpacity={0.4} />
@@ -189,12 +158,12 @@ export function AirQualityTab() {
 
       <Card className="p-5">
         <h3 className="mb-3 text-sm font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
-          Thang đo EU AQI
+          {t.aqi.scale}
         </h3>
         <div className="flex flex-wrap gap-3 text-xs">
-          {SCALE.map((s) => (
+          {t.aqi.scaleItems.map((s, i) => (
             <div key={s.label} className="flex items-center gap-1.5">
-              <span className="h-3 w-3 rounded-full" style={{ background: s.color }} />
+              <span className="h-3 w-3 rounded-full" style={{ background: SCALE_COLORS[i] }} />
               <span className="font-bold text-slate-400">{s.label}</span>
               <span className="font-bold text-slate-700 dark:text-slate-200">{s.name}</span>
             </div>
@@ -205,20 +174,8 @@ export function AirQualityTab() {
   )
 }
 
-function Pollutant({
-  label,
-  value,
-  unit,
-  pct,
-  color,
-  scale,
-}: {
-  label: string
-  value: string
-  unit: string
-  pct: number
-  color?: string
-  scale?: 'rg'
+function Pollutant({ label, value, unit, pct, color, scale }: {
+  label: string; value: string; unit: string; pct: number; color?: string; scale?: 'rg'
 }) {
   const fill = color ?? (scale === 'rg' ? (pct < 0.3 ? '#4ade80' : pct < 0.7 ? '#facc15' : '#ef4444') : '#0ea5e9')
   return (

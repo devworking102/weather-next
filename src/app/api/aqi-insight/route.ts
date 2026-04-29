@@ -11,6 +11,7 @@ export interface AqiInsightPayload {
   no2: number
   ozone: number
   co: number
+  locale?: string
 }
 
 export interface AqiInsightResponse {
@@ -20,23 +21,24 @@ export interface AqiInsightResponse {
 
 export async function POST(req: NextRequest) {
   const body = (await req.json()) as AqiInsightPayload
+  const lang = body.locale === 'en' ? 'English' : 'Vietnamese'
 
-  const prompt = `Bạn là chuyên gia môi trường. Phân tích chất lượng không khí tại ${body.locationName || 'khu vực này'}.
+  const prompt = `You are an environmental expert. Analyze the air quality at ${body.locationName || 'this location'}.
 
-Dữ liệu ô nhiễm không khí hiện tại:
+Current air pollution data:
 - AQI (EU): ${Math.round(body.europeanAqi)}
 - AQI (US): ${Math.round(body.usAqi)}
-- PM2.5: ${body.pm25.toFixed(1)} μg/m³ (ngưỡng WHO an toàn: <15)
-- PM10: ${body.pm10.toFixed(1)} μg/m³ (ngưỡng WHO an toàn: <45)
+- PM2.5: ${body.pm25.toFixed(1)} μg/m³ (WHO safe limit: <15)
+- PM10: ${body.pm10.toFixed(1)} μg/m³ (WHO safe limit: <45)
 - NO₂: ${body.no2.toFixed(1)} μg/m³
 - O₃: ${body.ozone.toFixed(1)} μg/m³
 - CO: ${(body.co / 1000).toFixed(2)} mg/m³
 
-Viết đúng 2 câu tiếng Việt:
-1. Đánh giá mức độ ô nhiễm và chất ô nhiễm đáng lo ngại nhất (nếu có)
-2. Khuyến nghị cụ thể: ai cần hạn chế tiếp xúc, có cần đeo khẩu trang không, và hoạt động phù hợp
+Write exactly 2 sentences in ${lang}:
+1. Assess the pollution level and the most concerning pollutant (if any)
+2. Specific recommendation: who should limit exposure, whether a mask is needed, and suitable activities
 
-Chỉ trả về 2 câu văn bản thuần, không markdown, không đánh số.`
+Return plain text only, no markdown, no numbering.`
 
   const result = await aiGenerate(prompt, { temperature: 0.4, maxOutputTokens: 150 })
   if (result) {
@@ -47,6 +49,17 @@ Chỉ trả về 2 câu văn bản thuần, không markdown, không đánh số.
 
 function buildFallback(b: AqiInsightPayload): string {
   const aqi = b.europeanAqi
+  const en = b.locale === 'en'
+  if (en) {
+    if (aqi <= 20) return 'Air quality is excellent with minimal pollution. Everyone can enjoy outdoor activities normally.'
+    if (aqi <= 40) return 'Air quality is good. Sensitive individuals may exercise outdoors but should monitor for symptoms.'
+    if (aqi <= 60) {
+      const main = b.pm25 > 15 ? 'PM2.5 above WHO guidelines' : 'moderate pollution levels'
+      return `Air quality is moderate with ${main}. Asthma and cardiovascular patients should avoid intense outdoor exercise.`
+    }
+    if (aqi <= 80) return 'Poor air quality, harmful to sensitive groups. Elderly, children and respiratory patients should stay indoors and keep windows closed.'
+    return 'Very poor or hazardous air quality. Everyone should minimize outdoor exposure, especially vigorous activity. Wear an N95 mask if you must go outside.'
+  }
   if (aqi <= 20) return 'Không khí trong lành, ít ô nhiễm. Mọi người có thể hoạt động ngoài trời bình thường.'
   if (aqi <= 40) return 'Chất lượng không khí khá tốt. Người nhạy cảm có thể hoạt động ngoài trời nhưng nên theo dõi nếu có triệu chứng.'
   if (aqi <= 60) {

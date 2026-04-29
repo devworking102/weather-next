@@ -12,6 +12,7 @@ import {
 } from 'recharts'
 import { Card } from '@/shared/ui/Card'
 import type { HourlyPoint } from '@/features/weather/types'
+import { useT } from '@/shared/hooks/useT'
 
 interface Props {
   hourly: HourlyPoint[]
@@ -19,6 +20,7 @@ interface Props {
 }
 
 export function TemperatureChart({ hourly, hours = 24 }: Props) {
+  const t = useT()
   const data = useMemo(() => {
     const now = new Date().toISOString().slice(0, 13) + ':00'
     const idx = Math.max(0, hourly.findIndex((h) => h.time >= now))
@@ -32,7 +34,7 @@ export function TemperatureChart({ hourly, hours = 24 }: Props) {
   return (
     <Card className="p-5">
       <h3 className="mb-4 text-sm font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
-        Nhiệt độ · {hours} giờ
+        {t.chart.temperatureTitle(hours)}
       </h3>
       <div className="h-56">
         <ResponsiveContainer width="100%" height="100%" minWidth={0}>
@@ -54,7 +56,7 @@ export function TemperatureChart({ hourly, hours = 24 }: Props) {
               }}
               formatter={((value: number, name: string) => [
                 `${value}°`,
-                name === 'temp' ? 'Nhiệt độ' : 'Cảm nhận',
+                name === 'temp' ? t.chart.tempLabel : t.chart.feelsLabel,
               ]) as never}
             />
             <Area

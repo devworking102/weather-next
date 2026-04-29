@@ -6,6 +6,7 @@ import type { WeatherBundle } from '@/features/weather/types'
 import { wmoInfo } from '@/features/weather/utils/wmo'
 import { dayLabel, formatDate, formatTime, uvCategory } from '@/features/weather/utils/format'
 import { useUiStore, windLabel, convertWind } from '@/shared/store/ui-store'
+import { useT } from '@/shared/hooks/useT'
 import {
   Bar,
   BarChart,
@@ -24,6 +25,7 @@ interface Props {
 export function DailyTab({ weather, days }: Props) {
   const unit = useUiStore((s) => s.unit)
   const wUnit = useUiStore((s) => s.windUnit)
+  const t = useT()
   const sym = unit === 'f' ? '°F' : '°C'
 
   const sliced = useMemo(() => weather.daily.slice(0, days), [weather.daily, days])
@@ -45,7 +47,7 @@ export function DailyTab({ weather, days }: Props) {
     <div className="space-y-4">
       <Card className="p-5">
         <h3 className="mb-4 text-sm font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
-          Biểu đồ nhiệt độ {days} ngày
+          {t.chart.tempChartTitle(days)}
         </h3>
         <div className="h-72">
           <ResponsiveContainer width="100%" height="100%" minWidth={0}>
@@ -79,8 +81,8 @@ export function DailyTab({ weather, days }: Props) {
                   fontSize: 12,
                 }}
               />
-              <Bar dataKey="max" fill="#f97316" radius={[6, 6, 0, 0]} name={`Cao nhất (${sym})`} />
-              <Bar dataKey="min" fill="#38bdf8" radius={[6, 6, 0, 0]} name={`Thấp nhất (${sym})`} />
+              <Bar dataKey="max" fill="#f97316" radius={[6, 6, 0, 0]} name={t.chart.highestLabel(sym)} />
+              <Bar dataKey="min" fill="#38bdf8" radius={[6, 6, 0, 0]} name={t.chart.lowestLabel(sym)} />
             </BarChart>
           </ResponsiveContainer>
         </div>
@@ -90,7 +92,7 @@ export function DailyTab({ weather, days }: Props) {
         <div className="flex items-center gap-2 border-b border-black/5 px-5 py-3 dark:border-white/5">
           <span className="text-lg">📅</span>
           <h3 className="text-sm font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
-            Chi tiết {days} ngày
+            {t.chart.dailyDetailTitle(days)}
           </h3>
         </div>
         <div className="scrollbar-thin overflow-x-auto">

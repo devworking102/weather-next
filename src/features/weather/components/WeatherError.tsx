@@ -3,6 +3,7 @@
 import { AlertTriangle } from 'lucide-react'
 import { Card } from '@/shared/ui/Card'
 import { Button } from '@/shared/ui/Button'
+import { useT } from '@/shared/hooks/useT'
 
 interface Props {
   message?: string
@@ -10,14 +11,15 @@ interface Props {
 }
 
 export function WeatherError({ message, onRetry }: Props) {
+  const t = useT()
   return (
     <Card className="flex flex-col items-center gap-3 py-10 text-center">
       <AlertTriangle className="h-10 w-10 text-rose-500" />
-      <h3 className="text-lg font-semibold text-slate-900 dark:text-white">Không tải được dữ liệu</h3>
+      <h3 className="text-lg font-semibold text-slate-900 dark:text-white">{t.error.title}</h3>
       <p className="max-w-md text-sm text-slate-500 dark:text-slate-400">
-        {message ?? 'Có lỗi xảy ra khi kết nối tới máy chủ thời tiết. Vui lòng thử lại sau giây lát.'}
+        {message ?? t.error.hint}
       </p>
-      {onRetry ? <Button onClick={onRetry}>Thử lại</Button> : null}
+      {onRetry ? <Button onClick={onRetry}>{t.error.retry}</Button> : null}
     </Card>
   )
 }

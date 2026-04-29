@@ -6,8 +6,10 @@ import { Skeleton } from '@/shared/ui/Skeleton'
 import { AiBadge } from '@/shared/ui/AiBadge'
 import { useAirQuality } from '@/features/weather/hooks/useWeather'
 import { useLocationStore } from '@/features/geocoding/store/location-store'
+import { useUiStore } from '@/shared/store/ui-store'
 import { computeHealthIndices } from '@/features/weather/utils/health'
 import { useAiInsight } from '@/shared/hooks/useAiInsight'
+import { useT } from '@/shared/hooks/useT'
 import type { WeatherBundle } from '@/features/weather/types'
 import type { HealthInsightPayload, HealthInsightResponse } from '@/app/api/health-insight/route'
 
@@ -17,9 +19,11 @@ interface Props {
 
 export function HealthTab({ weather }: Props) {
   const location = useLocationStore((s) => s.current)
+  const locale = useUiStore((s) => s.locale)
+  const t = useT()
   const { data: aqi } = useAirQuality(location?.latitude, location?.longitude)
 
-  const indices = useMemo(() => computeHealthIndices(weather, aqi ?? undefined), [weather, aqi])
+  const indices = useMemo(() => computeHealthIndices(weather, aqi ?? undefined, locale), [weather, aqi, locale])
 
   const insightPayload = useMemo<HealthInsightPayload | null>(
     () =>
@@ -34,27 +38,27 @@ export function HealthTab({ weather }: Props) {
             precipProb: weather.daily[0]?.precipitationProbability ?? 0,
             aqi: aqi?.current.europeanAqi ?? 0,
             uvIndex: weather.current.uvIndex,
+            locale,
           }
         : null,
-    [location, weather, aqi],
+    [location, weather, aqi, locale],
   )
 
   const { data: insight, isLoading: insightLoading } = useAiInsight<HealthInsightPayload, HealthInsightResponse>(
     '/api/health-insight',
     insightPayload,
-    [location?.latitude, location?.longitude],
+    [location?.latitude, location?.longitude, locale],
   )
 
   return (
     <div className="space-y-4">
-      {/* AI insight card */}
       <Card className="p-5">
         <div className="flex items-start gap-3">
           <span className="text-2xl">🤖</span>
           <div className="flex-1">
             <div className="mb-1.5 flex items-center gap-2">
               <h3 className="text-sm font-semibold text-slate-800 dark:text-slate-200">
-                AI Phân tích sức khỏe hôm nay
+                {t.health.aiTitle}
               </h3>
               {insight?.source && insight.source !== 'fallback' && <AiBadge source={insight.source} />}
             </div>
@@ -72,12 +76,11 @@ export function HealthTab({ weather }: Props) {
         </div>
       </Card>
 
-      {/* Health indices grid */}
       <Card className="p-0">
         <div className="flex items-center gap-2 border-b border-black/5 px-5 py-3 dark:border-white/5">
           <span className="text-lg">❤️</span>
           <h3 className="text-sm font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
-            Chỉ số sức khỏe hôm nay
+            {t.health.indices}
           </h3>
         </div>
         <div className="grid grid-cols-1 gap-0 divide-y divide-black/5 dark:divide-white/5 sm:grid-cols-2 sm:divide-y-0">
@@ -90,22 +93,14 @@ export function HealthTab({ weather }: Props) {
   )
 }
 
-function HealthRow({
-  index,
-  border,
-}: {
+function HealthRow({ index, border }: {
   index: ReturnType<typeof computeHealthIndices>[number]
   border: boolean
 }) {
   const dots = Array.from({ length: 5 }, (_, i) => i < index.rating.value)
-
   return (
-    <div
-      className={`flex items-start gap-4 px-5 py-4 ${border ? 'sm:border-r sm:border-black/5 sm:dark:border-white/5' : ''}`}
-    >
-      <span className="text-3xl drop-shadow-sm" aria-hidden>
-        {index.icon}
-      </span>
+    <div className={`flex items-start gap-4 px-5 py-4 ${border ? 'sm:border-r sm:border-black/5 sm:dark:border-white/5' : ''}`}>
+      <span className="text-3xl drop-shadow-sm" aria-hidden>{index.icon}</span>
       <div className="min-w-0 flex-1">
         <div className="mb-1.5 flex items-center justify-between gap-2">
           <span className="text-sm font-bold text-slate-800 dark:text-slate-200">{index.title}</span>
@@ -118,16 +113,12 @@ function HealthRow({
         </div>
         <div className="mb-1.5 flex gap-1">
           {dots.map((filled, i) => (
-            <span
-              key={i}
-              className="h-2 w-6 rounded-full"
+            <span key={i} className="h-2 w-6 rounded-full"
               style={{ background: filled ? index.rating.color : 'rgba(0,0,0,0.08)' }}
             />
           ))}
         </div>
-        <p className="text-xs leading-relaxed text-slate-500 dark:text-slate-400">
-          {index.message}
-        </p>
+        <p className="text-xs leading-relaxed text-slate-500 dark:text-slate-400">{index.message}</p>
       </div>
     </div>
   )

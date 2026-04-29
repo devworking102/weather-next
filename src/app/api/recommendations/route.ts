@@ -8,6 +8,7 @@ interface Payload {
   admin1?: string
   temperature: number
   weatherCode: number
+  locale?: string
 }
 
 export interface Recommendations {
@@ -23,10 +24,11 @@ export async function POST(req: NextRequest) {
   const fallback = buildFallback(body)
 
   const locLabel = [body.locationName, body.admin1, body.country].filter(Boolean).join(', ')
-  const prompt = `Tôi đang ở ${locLabel}. Nhiệt độ hiện tại là ${Math.round(body.temperature)}°C, mã thời tiết WMO ${body.weatherCode}.
-Hãy đóng vai trợ lý địa phương, gợi ý chính xác 4 món ăn đặc sản/phổ biến tại khu vực hợp thời tiết (kèm emoji), 4 hoạt động hợp lý (kèm emoji), và 4 trang phục nên mặc (kèm emoji).
-Trả về DUY NHẤT một JSON đúng cấu trúc:
-{"title":"1 câu nhận xét thời tiết ngắn","food":["...","...","...","..."],"activity":["...","...","...","..."],"clothes":["...","...","...","..."]}`
+  const lang = body.locale === 'en' ? 'English' : 'Vietnamese'
+  const prompt = `I am at ${locLabel}. Current temperature is ${Math.round(body.temperature)}°C, WMO weather code ${body.weatherCode}.
+Act as a local assistant and suggest exactly 4 local specialty/popular foods suitable for this weather (with emoji), 4 reasonable activities (with emoji), and 4 clothing items to wear (with emoji). All text must be in ${lang}.
+Return ONLY a JSON with this exact structure:
+{"title":"1 short weather comment","food":["...","...","...","..."],"activity":["...","...","...","..."],"clothes":["...","...","...","..."]}`
 
   const result = await aiGenerate(prompt, {
     temperature: 0.7,

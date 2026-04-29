@@ -5,7 +5,9 @@
       "Bash(yarn tsc *)",
       "Bash(yarn next *)",
       "Bash(npx tsc *)",
-      "PowerShell(Get-ChildItem -Path \"c:\\\\Users\\\\khainv19\\\\Desktop\\\\Dev\\\\weather-next\\\\src\\\\features\" -Recurse -File | Where-Object { $_.Extension -eq \".ts\" -or $_.Extension -eq \".tsx\" } | Select-Object -First 80)"
+      "PowerShell(Get-ChildItem -Path \"c:\\\\Users\\\\khainv19\\\\Desktop\\\\Dev\\\\weather-next\\\\src\\\\features\" -Recurse -File | Where-Object { $_.Extension -eq \".ts\" -or $_.Extension -eq \".tsx\" } | Select-Object -First 80)",
+      "Bash(xargs cat *)",
+      "Bash(xargs grep *)"
     ]
   }
 }

@@ -4,6 +4,7 @@ import { Droplets, Wind, Gauge, Eye, Sun, Cloud, ThermometerSun, Compass } from 
 import { Card } from '@/shared/ui/Card'
 import type { WeatherBundle } from '@/features/weather/types'
 import { formatWind, uvCategory, windDirection } from '@/features/weather/utils/format'
+import { useT } from '@/shared/hooks/useT'
 
 interface Props {
   weather: WeatherBundle
@@ -19,16 +20,17 @@ interface StatItem {
 
 export function StatsGrid({ weather }: Props) {
   const c = weather.current
+  const t = useT()
   const uv = uvCategory(c.uvIndex)
   const items: StatItem[] = [
-    { icon: Droplets, label: 'Độ ẩm', value: `${Math.round(c.humidity)}%`, hint: 'Tương đối' },
-    { icon: Wind, label: 'Gió', value: formatWind(c.windSpeed), hint: windDirection(c.windDirection) },
-    { icon: ThermometerSun, label: 'Cảm nhận', value: `${Math.round(c.apparentTemperature)}°` },
-    { icon: Gauge, label: 'Áp suất', value: `${Math.round(c.pressure)} hPa` },
-    { icon: Sun, label: 'UV', value: `${Math.round(c.uvIndex)}`, hint: uv.label, hintColor: uv.color },
-    { icon: Eye, label: 'Tầm nhìn', value: `${(c.visibility / 1000).toFixed(1)} km` },
-    { icon: Cloud, label: 'Mây', value: `${Math.round(c.cloudCover)}%` },
-    { icon: Compass, label: 'Điểm sương', value: `${Math.round(c.dewPoint)}°` },
+    { icon: Droplets, label: t.stats.humidity, value: `${Math.round(c.humidity)}%`, hint: t.stats.relative },
+    { icon: Wind, label: t.stats.wind, value: formatWind(c.windSpeed), hint: windDirection(c.windDirection) },
+    { icon: ThermometerSun, label: t.stats.feelsLike, value: `${Math.round(c.apparentTemperature)}°` },
+    { icon: Gauge, label: t.stats.pressure, value: `${Math.round(c.pressure)} hPa` },
+    { icon: Sun, label: t.stats.uv, value: `${Math.round(c.uvIndex)}`, hint: uv.label, hintColor: uv.color },
+    { icon: Eye, label: t.stats.visibility, value: `${(c.visibility / 1000).toFixed(1)} km` },
+    { icon: Cloud, label: t.stats.cloud, value: `${Math.round(c.cloudCover)}%` },
+    { icon: Compass, label: t.stats.dewPoint, value: `${Math.round(c.dewPoint)}°` },
   ]
 
   return (

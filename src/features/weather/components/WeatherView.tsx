@@ -2,6 +2,7 @@
 
 import { useMemo } from 'react'
 import { useUiStore } from '@/shared/store/ui-store'
+import { useT } from '@/shared/hooks/useT'
 import { useWeather, useAirQuality } from '@/features/weather/hooks/useWeather'
 import { useLocationStore } from '@/features/geocoding/store/location-store'
 import { useAutoLocation } from '@/features/geocoding/hooks/useAutoLocation'
@@ -44,6 +45,8 @@ export function WeatherView() {
   useAutoLocation()
   const location = useLocationStore((s) => s.current)
   const unit = useUiStore((s) => s.unit)
+  const locale = useUiStore((s) => s.locale)
+  const t = useT()
   const tempUnit = unit === 'f' ? 'fahrenheit' : 'celsius'
   const tab = useUiStore((s) => s.weatherTab)
 
@@ -58,8 +61,8 @@ export function WeatherView() {
   useNotificationScanner(data, aqi, quakes, location?.name)
 
   const alertCount = useMemo(
-    () => computeAlerts(data, aqi, quakes).length,
-    [data, aqi, quakes],
+    () => computeAlerts(data, aqi, quakes, locale).length,
+    [data, aqi, quakes, locale],
   )
 
   return (
@@ -125,7 +128,7 @@ export function WeatherView() {
                 <div className="mb-4 flex items-center gap-2">
                   <span className="text-lg">📰</span>
                   <h3 className="text-sm font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
-                    Tin tức thiên tai & môi trường
+                    {t.today.newsTitle}
                   </h3>
                 </div>
                 <NewsList />

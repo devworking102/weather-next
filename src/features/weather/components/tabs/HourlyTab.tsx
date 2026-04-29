@@ -6,6 +6,7 @@ import type { WeatherBundle } from '@/features/weather/types'
 import { wmoInfo } from '@/features/weather/utils/wmo'
 import { formatTime, uvCategory } from '@/features/weather/utils/format'
 import { useUiStore, windLabel, convertWind } from '@/shared/store/ui-store'
+import { useT } from '@/shared/hooks/useT'
 import { dynamicChart } from '../chart-loader'
 
 const TemperatureChart = dynamicChart('temperature')
@@ -18,6 +19,7 @@ interface Props {
 export function HourlyTab({ weather, hours = 48 }: Props) {
   const wUnit = useUiStore((s) => s.windUnit)
   const unit = useUiStore((s) => s.unit)
+  const t = useT()
   const sym = unit === 'f' ? '°F' : '°C'
 
   const rows = useMemo(() => {
@@ -33,7 +35,7 @@ export function HourlyTab({ weather, hours = 48 }: Props) {
         <div className="flex items-center gap-2 border-b border-black/5 px-5 py-3 dark:border-white/5">
           <span className="text-lg">🕐</span>
           <h3 className="text-sm font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
-            Chi tiết theo giờ
+            {t.hourlyTab.title}
           </h3>
         </div>
         <div className="scrollbar-thin overflow-x-auto">
@@ -42,14 +44,14 @@ export function HourlyTab({ weather, hours = 48 }: Props) {
               className="grid gap-4 border-b border-black/5 px-2 py-2 text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:border-white/5"
               style={{ gridTemplateColumns: '1fr 1fr 1.2fr 1.8fr 1.2fr 2fr 1.2fr 1.2fr' }}
             >
-              <span>Giờ</span>
-              <span>Trời</span>
-              <span>Nhiệt độ</span>
-              <span>Cảm giác</span>
-              <span>Mưa%</span>
-              <span>Gió</span>
-              <span>Ẩm</span>
-              <span>UV</span>
+              <span>{t.hourlyTab.colTime}</span>
+              <span>{t.hourlyTab.colWeather}</span>
+              <span>{t.hourlyTab.colTemp}</span>
+              <span>{t.hourlyTab.colFeels}</span>
+              <span>{t.hourlyTab.colRain}</span>
+              <span>{t.hourlyTab.colWind}</span>
+              <span>{t.hourlyTab.colHumidity}</span>
+              <span>{t.hourlyTab.colUv}</span>
             </div>
             {rows.map((h) => {
               const info = wmoInfo(h.weatherCode)

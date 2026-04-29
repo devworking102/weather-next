@@ -18,14 +18,15 @@ const levelStyles = {
 export function AlertsBanner() {
   const location = useLocationStore((s) => s.current)
   const unit = useUiStore((s) => s.unit)
+  const locale = useUiStore((s) => s.locale)
   const tempUnit = unit === 'f' ? 'fahrenheit' : 'celsius'
   const weather = useWeather(location?.latitude, location?.longitude, tempUnit)
   const aqi = useAirQuality(location?.latitude, location?.longitude)
   const quakes = useEarthquakes(location?.latitude, location?.longitude)
 
   const alerts = useMemo(
-    () => computeAlerts(weather.data, aqi.data, quakes.data),
-    [weather.data, aqi.data, quakes.data],
+    () => computeAlerts(weather.data, aqi.data, quakes.data, locale),
+    [weather.data, aqi.data, quakes.data, locale],
   )
 
   if (alerts.length === 0) return null
