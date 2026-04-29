@@ -28,7 +28,7 @@ export function TopBar() {
   useEffect(() => {
     document.body.style.overflow = open ? 'hidden' : ''
     return () => { document.body.style.overflow = '' }
-  }, [open])
+  }, [open]) 
 
   return (
     <>
