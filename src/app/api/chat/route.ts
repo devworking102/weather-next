@@ -28,11 +28,13 @@ interface ChatPayload {
   locale?: string
 }
 
-const STATIC_SYSTEM = `Bạn là trợ lý thời tiết. Trả lời NGẮN GỌN: tối đa 2 câu. Không markdown, không gạch đầu dòng.
+const STATIC_SYSTEM = `Bạn là trợ lý thời tiết thân thiện và hữu ích. Không dùng markdown, không gạch đầu dòng — viết thành đoạn văn tự nhiên.
 
 Quy tắc:
-- Dùng tool get_weather khi user hỏi về bất kỳ địa điểm nào (kể cả địa điểm trong context).
-- Sau khi có dữ liệu, trả lời trực tiếp, cụ thể vào câu hỏi.
+- Luôn dùng get_weather để lấy dữ liệu thực trước khi trả lời bất kỳ câu hỏi nào về thời tiết.
+- Trả lời đầy đủ, tập trung vào đúng câu hỏi: nếu hỏi mưa thì nói rõ xác suất mưa, giờ mưa; nếu hỏi trang phục thì gợi ý cụ thể; nếu hỏi cả tuần thì tóm tắt dự báo từng ngày.
+- Độ dài phù hợp với câu hỏi: câu hỏi đơn giản 1-2 câu, câu hỏi phức tạp 3-5 câu.
+- KHÔNG đề cập đến "tool", "get_weather", "API", "dữ liệu" hay bất kỳ chi tiết kỹ thuật nào.
 - Ngôn ngữ: tiếng Việt (hoặc tiếng Anh nếu user dùng tiếng Anh).`
 
 const WEATHER_TOOL: Anthropic.Tool = {
@@ -57,13 +59,35 @@ async function runWeatherTool(locationName: string): Promise<string> {
 
     const place = places[0]
     const weather = await fetchWeather(place.latitude, place.longitude)
-    const info = wmoInfo(weather.current.weatherCode)
     const label = [place.name, place.admin1, place.country].filter(Boolean).join(', ')
 
-    const hourlyRain = weather.hourly.slice(0, 12).filter((h) => h.precipitationProbability >= 60).length
-    const rainNote = hourlyRain >= 3 ? `Khả năng mưa cao trong ${hourlyRain}h tới.` : 'Không mưa đáng kể.'
+    // Current conditions
+    const cur = weather.current
+    const curInfo = wmoInfo(cur.weatherCode)
+    const current = [
+      `Địa điểm: ${label}`,
+      `Nhiệt độ: ${Math.round(cur.temperature)}°C (cảm giác ${Math.round(cur.apparentTemperature)}°C)`,
+      `Tình trạng: ${curInfo.label}`,
+      `Độ ẩm: ${Math.round(cur.humidity)}%`,
+      `Gió: ${Math.round(cur.windSpeed)} km/h (giật ${Math.round(cur.windGusts)} km/h)`,
+      `UV: ${Math.round(cur.uvIndex)}`,
+      `Tầm nhìn: ${Math.round(cur.visibility / 1000)} km`,
+      `Lượng mưa hiện tại: ${cur.precipitation} mm`,
+    ].join('\n')
 
-    return `Thời tiết tại ${label}: ${Math.round(weather.current.temperature)}°C, ${info.label}. Cao ${Math.round(weather.daily[0]?.tempMax ?? weather.current.temperature)}°C / thấp ${Math.round(weather.daily[0]?.tempMin ?? weather.current.temperature)}°C. Độ ẩm ${Math.round(weather.current.humidity)}%, gió ${Math.round(weather.current.windSpeed)} km/h. ${rainNote}`
+    // Hourly forecast next 12h
+    const hourlyLines = weather.hourly.slice(0, 12).map((h, i) => {
+      const hInfo = wmoInfo(h.weatherCode)
+      return `+${i + 1}h: ${Math.round(h.temperature)}°C, ${hInfo.label}, mưa ${h.precipitationProbability}%`
+    }).join('\n')
+
+    // Daily forecast next 5 days
+    const dailyLines = weather.daily.slice(0, 5).map((d) => {
+      const dInfo = wmoInfo(d.weatherCode)
+      return `${d.date}: cao ${Math.round(d.tempMax)}°C / thấp ${Math.round(d.tempMin)}°C, ${dInfo.label}, mưa ${d.precipitationProbability}%, gió tối đa ${Math.round(d.windSpeedMax)} km/h`
+    }).join('\n')
+
+    return `=== THỜI TIẾT ${label.toUpperCase()} ===\n\n[Hiện tại]\n${current}\n\n[Dự báo theo giờ (12h tới)]\n${hourlyLines}\n\n[Dự báo 5 ngày]\n${dailyLines}`
   } catch {
     return `Không lấy được dữ liệu thời tiết cho "${locationName}".`
   }
@@ -97,7 +121,7 @@ export async function POST(req: NextRequest) {
           // Phase 1: non-streaming call with tool so Claude can fetch weather
           const phase1 = await client.messages.create({
             model: CLAUDE_MODEL,
-            max_tokens: 1024,
+            max_tokens: 2048,
             thinking: { type: 'adaptive' },
             tools: [WEATHER_TOOL],
             system: systemBlocks,
@@ -131,7 +155,7 @@ export async function POST(req: NextRequest) {
 
               const streamResponse = client.messages.stream({
                 model: CLAUDE_MODEL,
-                max_tokens: 1024,
+                max_tokens: 2048,
                 thinking: { type: 'adaptive' },
                 system: systemBlocks,
                 messages: phase2Messages,
@@ -176,8 +200,8 @@ export async function POST(req: NextRequest) {
     extraCtx = '\n\n' + (await runWeatherTool(places[0].name).catch(() => ''))
   }
 
-  const fallbackPrompt = `${STATIC_SYSTEM}\n\n${currentCtx}${extraCtx}\n\nNgười dùng hỏi: ${lastUser.content}\nTrả lời tối đa 2 câu ngắn, không markdown:`
-  const result = await aiGenerate(fallbackPrompt, { maxOutputTokens: 200 })
+  const fallbackPrompt = `${STATIC_SYSTEM}\n\n${currentCtx}${extraCtx}\n\nNgười dùng hỏi: ${lastUser.content}\nTrả lời đầy đủ, không markdown:`
+  const result = await aiGenerate(fallbackPrompt, { maxOutputTokens: 400 })
   const text = result?.text ?? 'Xin lỗi, dịch vụ AI tạm thời không khả dụng.'
 
   return new Response(text, { headers: { 'Content-Type': 'text/plain; charset=utf-8' } })
