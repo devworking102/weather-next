@@ -37,8 +37,8 @@ export function SettingsMenu() {
     { key: 'ms',  label: 'm/s'  },
   ]
   const LOCALES: Array<{ key: Locale; label: string }> = [
-    { key: 'vi', label: '🇻🇳 Tiếng Việt' },
-    { key: 'en', label: '🇬🇧 English'     },
+    { key: 'vi', label: 'Tiếng Việt' },
+    { key: 'en', label: 'English'     },
   ]
 
   useEffect(() => {

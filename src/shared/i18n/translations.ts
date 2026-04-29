@@ -167,6 +167,7 @@ const vi = {
     clothes:   'Mặc gì hôm nay?',
     food:      'Ăn gì hợp lý?',
     activity:  'Đi đâu chơi?',
+    places:    'Địa điểm gần đây?',
   },
   // News
   news: {
@@ -429,6 +430,7 @@ const en = {
     clothes:   "What to wear today?",
     food:      'What to eat?',
     activity:  'Where to go?',
+    places:    'Nearby destinations?',
   },
   news: {
     loadFailed: 'Could not load news.',

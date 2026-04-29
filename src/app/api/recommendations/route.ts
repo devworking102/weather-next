@@ -16,6 +16,7 @@ export interface Recommendations {
   food: string[]
   activity: string[]
   clothes: string[]
+  places: string[]
   source: AiSource | 'fallback'
 }
 
@@ -26,9 +27,9 @@ export async function POST(req: NextRequest) {
   const locLabel = [body.locationName, body.admin1, body.country].filter(Boolean).join(', ')
   const lang = body.locale === 'en' ? 'English' : 'Vietnamese'
   const prompt = `I am at ${locLabel}. Current temperature is ${Math.round(body.temperature)}°C, WMO weather code ${body.weatherCode}.
-Act as a local assistant and suggest exactly 4 local specialty/popular foods suitable for this weather (with emoji), 4 reasonable activities (with emoji), and 4 clothing items to wear (with emoji). All text must be in ${lang}.
+Act as a local assistant and suggest exactly 4 local specialty/popular foods suitable for this weather (with emoji), 4 reasonable activities (with emoji), 4 clothing items to wear (with emoji), and 4 nearby travel/tourist destinations or resorts worth visiting near ${locLabel} (with emoji). All text must be in ${lang}.
 Return ONLY a JSON with this exact structure:
-{"title":"1 short weather comment","food":["...","...","...","..."],"activity":["...","...","...","..."],"clothes":["...","...","...","..."]}`
+{"title":"1 short weather comment","food":["...","...","...","..."],"activity":["...","...","...","..."],"clothes":["...","...","...","..."],"places":["...","...","...","..."]}`
 
   const result = await aiGenerate(prompt, {
     temperature: 0.7,
@@ -42,7 +43,8 @@ Return ONLY a JSON with this exact structure:
       parsed &&
       Array.isArray(parsed.food) && parsed.food.length >= 4 &&
       Array.isArray(parsed.activity) && parsed.activity.length >= 4 &&
-      Array.isArray(parsed.clothes) && parsed.clothes.length >= 4
+      Array.isArray(parsed.clothes) && parsed.clothes.length >= 4 &&
+      Array.isArray(parsed.places) && parsed.places.length >= 4
     ) {
       return NextResponse.json({ ...parsed, source: result.source } satisfies Recommendations)
     }
@@ -68,33 +70,38 @@ function buildFallback(b: Payload): Recommendations {
     food: pickRandom(bank.food, 4),
     activity: pickRandom(bank.activity, 4),
     clothes: pickRandom(bank.clothes, 4),
+    places: pickRandom(bank.places, 4),
     source: 'fallback',
   }
 }
 
-const FALLBACK: Record<'hot' | 'cold' | 'rain' | 'nice', { title: string; food: string[]; activity: string[]; clothes: string[] }> = {
+const FALLBACK: Record<'hot' | 'cold' | 'rain' | 'nice', { title: string; food: string[]; activity: string[]; clothes: string[]; places: string[] }> = {
   hot: {
     title: 'Nóng ẩm đặc trưng ☀️',
     food: ['Nước dừa/Nước mía mát lạnh 🥥', 'Chè thái/Chè bưởi 🍧', 'Bún thịt nướng/Gỏi cuốn 🥗', 'Hải sản tươi sống 🦐', 'Trái cây nhiệt đới 🥭', 'Trà chanh/Trà đào 🍹'],
     activity: ['Đi bơi hoặc đi biển 🏊', 'Trú ẩn trong TTTM ☕', 'Cà phê máy lạnh ☕', 'Dạo phố khi tắt nắng 🌃', 'Đi công viên nước 💦'],
     clothes: ['Quần áo cotton/lanh 👕', 'Dép lê/sandal xỏ ngón 🩴', 'Mũ rộng vành, kính râm 🕶️', 'Áo chống nắng mỏng 🧥', 'Quần short/cộc tay 🩳'],
+    places: ['Bãi biển gần nhất 🏖️', 'Công viên nước địa phương 💦', 'Trung tâm thương mại 🛍️', 'Khu resort ven biển 🌴'],
   },
   cold: {
     title: 'Se lạnh dễ chịu ❄️',
     food: ['Lẩu Thái/Lẩu nấm 🍲', 'Thịt nướng xiên que 🍢', 'Ngô/khoai lang nướng 🍠', 'Sữa đậu nành nóng 🥛', 'Phở/Bún bò nóng 🍜', 'Cháo sườn nóng 🥣'],
     activity: ['Trekking/hiking 🏞️', 'Đốt lửa trại 🏕️', 'Cà phê view núi ☕', 'Săn mây sáng sớm ☁️', 'Tắm suối khoáng nóng ♨️'],
     clothes: ['Áo khoác gió/len 🧥', 'Quần dài, quần kaki 👖', 'Giày thể thao/boots 👟', 'Khăn choàng cổ 🧣', 'Áo giữ nhiệt bên trong 👕'],
+    places: ['Khu suối khoáng nóng ♨️', 'Làng văn hóa dân tộc 🏘️', 'Đỉnh núi ngắm mây ⛰️', 'Khu du lịch sinh thái 🌿'],
   },
   rain: {
     title: 'Mưa rào thất thường 🌧️',
     food: ['Lẩu Thái chua cay 🍲', 'Bánh xèo/bánh khọt 🌮', 'Cháo trắng hột vịt muối 🥣', 'Mì tôm trứng xúc xích 🍜', 'Bánh mì chảo nóng hổi 🍳', 'Ốc luộc/xào 🐌'],
     activity: ['Cày phim Netflix 🎬', 'Massage/spa thư giãn 💆', 'Cafe boardgame 🎲', 'Đọc sách/Podcast 🎧', 'Lượn lờ TTTM 🛍️'],
     clothes: ['Áo mưa/ô (dù) ☔', 'Dép nhựa/giày chống nước 🩴', 'Túi/balo chống nước 🎒', 'Quần áo mau khô 👖', 'Áo khoác mỏng 🧥'],
+    places: ['Spa/Wellness center 💆', 'Bảo tàng địa phương 🏛️', 'Trung tâm thương mại 🛍️', 'Cà phê phong cách 🎨'],
   },
   nice: {
     title: 'Thời tiết thật tuyệt vời 🌤️',
     food: ['BBQ/Picnic 🍖', 'Bún chả/Phở 🍜', 'Bánh mì Việt Nam 🥖', 'Salad tươi mát 🥗', 'Sushi/Sashimi 🍣', 'Cơm nhà làm 🍚'],
     activity: ['Dã ngoại (picnic) 🧺', 'Đạp xe dạo phố 🚴', 'Chụp ảnh ngoài trời 📸', 'Cà phê vỉa hè ☕', 'Cắm trại cuối tuần 🏕️'],
     clothes: ['Trang phục thoải mái 👟', 'Áo phông + jeans 👖', 'Váy hoa/Sơ mi 👗', 'Kính râm/mũ lưỡi trai 🧢', 'Quần short ống rộng 🩳'],
+    places: ['Công viên/vườn hoa 🌸', 'Phố đi bộ/khu phố cổ 🏛️', 'Điểm check-in nổi tiếng 📸', 'Khu nghỉ dưỡng ngoại ô 🏡'],
   },
 }

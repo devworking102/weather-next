@@ -17,8 +17,8 @@ export function RecommendationsCard({ location, weather }: Props) {
 
   if (isLoading || !data) {
     return (
-      <div className="grid gap-4 md:grid-cols-3">
-        {[0, 1, 2].map((i) => (
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+        {[0, 1, 2, 3].map((i) => (
           <Skeleton key={i} className="h-56 rounded-2xl" />
         ))}
       </div>
@@ -26,7 +26,7 @@ export function RecommendationsCard({ location, weather }: Props) {
   }
 
   return (
-    <div className="grid animate-fade-in gap-4 md:grid-cols-3">
+    <div className="grid animate-fade-in gap-4 md:grid-cols-2 lg:grid-cols-4">
       <Column
         icon="👕"
         title={t.recommendations.clothes}
@@ -53,6 +53,15 @@ export function RecommendationsCard({ location, weather }: Props) {
         tone="from-emerald-50 to-teal-50 border-emerald-100 text-emerald-900 dark:from-emerald-500/10 dark:to-teal-500/10 dark:border-emerald-500/20 dark:text-emerald-100"
         bullet="★"
         bulletColor="text-emerald-500"
+      />
+      <Column
+        icon="📍"
+        title={t.recommendations.places}
+        subtitle={data.title}
+        items={data.places}
+        tone="from-violet-50 to-purple-50 border-violet-100 text-violet-900 dark:from-violet-500/10 dark:to-purple-500/10 dark:border-violet-500/20 dark:text-violet-100"
+        bullet="★"
+        bulletColor="text-violet-500"
       />
     </div>
   )
