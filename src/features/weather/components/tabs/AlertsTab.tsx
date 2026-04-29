@@ -1,7 +1,7 @@
 'use client'
 
 import { useMemo } from 'react'
-import { AlertTriangle, Info, CheckCircle } from 'lucide-react'
+import { AlertTriangle, Info, CheckCircle, Bot } from 'lucide-react'
 import { Card } from '@/shared/ui/Card'
 import { useAirQuality } from '@/features/weather/hooks/useWeather'
 import { useLocationStore } from '@/features/geocoding/store/location-store'
@@ -12,6 +12,8 @@ import type { WeatherBundle } from '@/features/weather/types'
 import { cn } from '@/shared/lib/cn'
 import { useT } from '@/shared/hooks/useT'
 import { useUiStore } from '@/shared/store/ui-store'
+import { useAiInsight } from '@/shared/hooks/useAiInsight'
+import type { AlertSummaryResponse } from '@/app/api/alert-summary/route'
 
 const levelStyles = {
   info: 'border-sky-200 bg-sky-50 text-sky-900 dark:border-sky-500/30 dark:bg-sky-500/10 dark:text-sky-100',
@@ -35,8 +37,24 @@ export function AlertsTab({ weather }: Props) {
     [weather, aqi, quakes, locale],
   )
 
+  const alertIds = alerts.map((a) => a.id).join(',')
+  const { data: aiSummary } = useAiInsight<
+    { alerts: { level: string; title: string; message: string }[]; locale: string },
+    AlertSummaryResponse
+  >(
+    '/api/alert-summary',
+    alerts.length > 0 ? { alerts: alerts.map((a) => ({ level: a.level, title: a.title, message: a.message })), locale } : null,
+    [alertIds, locale],
+  )
+
   return (
     <div className="space-y-4">
+      {aiSummary?.summary && (
+        <Card className="flex items-start gap-3 p-4">
+          <Bot size={18} className="mt-0.5 shrink-0 text-indigo-500" />
+          <p className="text-sm leading-relaxed text-slate-700 dark:text-slate-300">{aiSummary.summary}</p>
+        </Card>
+      )}
       {alerts.length === 0 ? (
         <Card className="flex items-center gap-3 p-5">
           <CheckCircle size={20} className="shrink-0 text-emerald-500" />

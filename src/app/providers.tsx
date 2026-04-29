@@ -4,6 +4,7 @@ import { QueryClientProvider } from '@tanstack/react-query'
 import { ReactNode, useEffect } from 'react'
 import { getQueryClient } from '@/shared/lib/query-client'
 import { useUiStore } from '@/shared/store/ui-store'
+import { ChatWidget } from '@/features/weather/components/ChatWidget'
 
 export function Providers({ children }: { children: ReactNode }) {
   const queryClient = getQueryClient()
@@ -24,5 +25,10 @@ export function Providers({ children }: { children: ReactNode }) {
     return () => mq.removeEventListener('change', apply)
   }, [theme])
 
-  return <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+  return (
+    <QueryClientProvider client={queryClient}>
+      {children}
+      <ChatWidget />
+    </QueryClientProvider>
+  )
 }

@@ -2,6 +2,10 @@ import { cn } from '@/shared/lib/cn'
 import type { AiSource } from '@/shared/lib/ai'
 
 const CONFIG: Record<AiSource, { label: string; className: string }> = {
+  claude: {
+    label: 'Claude',
+    className: 'bg-orange-100 text-orange-600 dark:bg-orange-500/15 dark:text-orange-400',
+  },
   gemini: {
     label: 'Gemini',
     className: 'bg-blue-100 text-blue-600 dark:bg-blue-500/15 dark:text-blue-400',
