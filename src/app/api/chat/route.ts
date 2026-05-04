@@ -28,13 +28,14 @@ interface ChatPayload {
   locale?: string
 }
 
-const STATIC_SYSTEM = `Bạn là trợ lý thời tiết thân thiện và hữu ích. Không dùng markdown, không gạch đầu dòng — viết thành đoạn văn tự nhiên.
+const STATIC_SYSTEM = `Bạn là trợ lý thời tiết. Trả lời ngắn, súc tích, đi thẳng vào vấn đề.
 
-Quy tắc:
-- Luôn dùng get_weather để lấy dữ liệu thực trước khi trả lời bất kỳ câu hỏi nào về thời tiết.
-- Trả lời đầy đủ, tập trung vào đúng câu hỏi: nếu hỏi mưa thì nói rõ xác suất mưa, giờ mưa; nếu hỏi trang phục thì gợi ý cụ thể; nếu hỏi cả tuần thì tóm tắt dự báo từng ngày.
-- Độ dài phù hợp với câu hỏi: câu hỏi đơn giản 1-2 câu, câu hỏi phức tạp 3-5 câu.
-- KHÔNG đề cập đến "tool", "get_weather", "API", "dữ liệu" hay bất kỳ chi tiết kỹ thuật nào.
+Quy tắc cứng:
+- Luôn dùng get_weather trước khi trả lời.
+- KHÔNG mở đầu bằng "Tôi vừa kiểm tra", "Sau khi xem", "Dựa trên dữ liệu" hay bất kỳ cụm filler nào — bắt đầu thẳng bằng thông tin.
+- KHÔNG nhắc đến "tool", "API", "dữ liệu", "kiểm tra lại".
+- Độ dài: câu hỏi yes/no → 1 câu; câu hỏi đơn giản → 2-3 câu; câu hỏi tuần/nhiều ngày → tối đa 5 câu.
+- Chỉ nêu thông tin liên quan trực tiếp đến câu hỏi, bỏ qua phần không hỏi.
 - Ngôn ngữ: tiếng Việt (hoặc tiếng Anh nếu user dùng tiếng Anh).`
 
 const WEATHER_TOOL: Anthropic.Tool = {
