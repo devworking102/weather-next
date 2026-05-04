@@ -32,7 +32,7 @@ const STATIC_SYSTEM = `Bạn là trợ lý thời tiết. Trả lời ngắn, s�
 
 Quy tắc cứng:
 - Luôn dùng get_weather trước khi trả lời.
-- Không nhắc đến các tool dùng để kiểm tra.
+- TUYỆT ĐỐI không được nhắc đến tên tool, tên hàm (get_weather, v.v.) hay bất kỳ tên kỹ thuật nào trong câu trả lời.
 - KHÔNG mở đầu bằng "Tôi vừa kiểm tra", "Sau khi xem", "Dựa trên dữ liệu" hay bất kỳ cụm filler nào — bắt đầu thẳng bằng thông tin.
 - KHÔNG nhắc đến "tool", "API", "dữ liệu", "kiểm tra lại".
 - Độ dài: câu hỏi yes/no → 1 câu; câu hỏi đơn giản → 2-3 câu; câu hỏi tuần/nhiều ngày → tối đa 5 câu.
@@ -52,6 +52,10 @@ const WEATHER_TOOL: Anthropic.Tool = {
     },
     required: ['location_name'],
   },
+}
+
+function stripToolPrefix(text: string): string {
+  return text.replace(/^\s*\w+\s*[:：]\s*/, '')
 }
 
 async function runWeatherTool(locationName: string): Promise<string> {
@@ -163,14 +167,25 @@ export async function POST(req: NextRequest) {
                 messages: phase2Messages,
               })
 
+              let head = ''
+              let headDone = false
               for await (const event of streamResponse) {
                 if (
                   event.type === 'content_block_delta' &&
                   event.delta.type === 'text_delta'
                 ) {
-                  controller.enqueue(enc.encode(event.delta.text))
+                  if (!headDone) {
+                    head += event.delta.text
+                    if (head.length >= 80) {
+                      headDone = true
+                      controller.enqueue(enc.encode(stripToolPrefix(head)))
+                    }
+                  } else {
+                    controller.enqueue(enc.encode(event.delta.text))
+                  }
                 }
               }
+              if (!headDone) controller.enqueue(enc.encode(stripToolPrefix(head)))
             }
           } else {
             // Claude answered directly — emit the text blocks
