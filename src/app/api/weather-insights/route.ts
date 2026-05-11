@@ -46,11 +46,11 @@ ${aqi != null ? `EU AQI ~${aqi}` : 'AQI unknown'}. ${pm != null ? `PM2.5 ~${pm} 
 Return ONLY JSON (no markdown) with keys: summary, outfit, health, travel, mood, severe.
 Rules:
 - All human text must be in ${lang}, short clauses for mobile (1–2 sentences per field where natural).
-- summary: factual + helpful overview for the next hours.
+- summary: factual + helpful overview for the next hours; lead with what matters today (mưa nắng, nóng, lạnh, AQI).
 - outfit: what to wear today.
 - health: AQI + UV + humidity in practical advice (sensitive groups if AQI high).
 - travel: one concrete suggestion for going out / commute / timing.
-- mood: one playful emotional line about the sky (not cheesy).
+- mood: one memorable emotional line about the day/sky — if Vietnamese: giọng thân thiện, hóm hỉnh nhẹ (có thể ví von đời thường), không sến, không toxic, không chính trị/tôn giáo; tránh chỉ lặp lại con số đã có ở summary.
 - severe: if thunderstorms (code>=95), heavy rain (>=82), snow storms, or extreme heat/cold risk, 1–2 sentences warning + "follow official alerts"; else "" (empty string).
 `
 
@@ -122,14 +122,25 @@ function buildFallback(b: WeatherInsightsRequest): WeatherInsightsResponse {
         : 'Thời tiết thuận cho đi làm và dạo phố; kiểm tra radar nếu đi xa.'
 
   const mood =
-    wmo.label.includes('Mưa') || wmo.label.includes('mưa')
-      ? 'Trời đổ mưa — nhịp chậm lại một chút.'
-      : wmo.label.includes('Nắng') || code <= 1
-        ? 'Nắng nhẹ — năng lượng dễ chịu.'
-        : 'Mây vần vũ — không khí có chiều sâu.'
+    t >= 34
+      ? 'Trời oi bức — nhớ uống nước và tìm bóng râm khi ra đường.'
+      : t <= 16
+        ? 'Không khí se se — hợp một ly nóng và nhịp chậm.'
+        : wmo.label.includes('Mưa') || wmo.label.includes('mưa')
+          ? 'Mưa rào ngoài kia — cứ để nhịp thành phố chậm lại một chút.'
+          : wmo.label.includes('Nắng') || code <= 1
+            ? 'Nắng dịu — kiểu ngày dễ chịu để thở sâu.'
+            : 'Mây lửng lờ — tâm trạng cũng theo mà thảnh thơi.'
+
+  const summaryLead =
+    aqi != null && aqi > 100
+      ? `Chất lượng không khí đang kém tại ${b.locationName}; ưu tiên sức khỏe khi ra ngoài.`
+      : storm || heavyRain
+        ? `${b.locationName}: thời tiết có thể “ồn ào” vài tiếng tới — theo dõi cảnh báo địa phương.`
+        : `Hôm nay tại ${b.locationName}: ${t}°C, ${wmo.label}. Gió ${Math.round(b.windSpeed)} km/h.`
 
   return {
-    summary: `${b.locationName}: ${t}°C, ${wmo.label}. Gió ${Math.round(b.windSpeed)} km/h.`,
+    summary: summaryLead,
     outfit,
     health,
     travel,

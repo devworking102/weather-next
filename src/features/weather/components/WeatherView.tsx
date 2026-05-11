@@ -1,6 +1,7 @@
 'use client'
 
 import dynamic from 'next/dynamic'
+import { useCallback } from 'react'
 import { useUiStore } from '@/shared/store/ui-store'
 import { useT } from '@/shared/hooks/useT'
 import { useWeather, useAirQuality } from '@/features/weather/hooks/useWeather'
@@ -20,6 +21,7 @@ import { FavoritesBar } from '@/features/favorites/components/FavoritesBar'
 import { AlertsBanner } from '@/features/alerts/components/AlertsBanner'
 import { PushAlertsCard } from '@/features/notifications/components/PushAlertsCard'
 import { useNotificationScanner } from '@/features/notifications/hooks/useNotifications'
+import { usePullToRefresh } from '@/shared/hooks/usePullToRefresh'
 import { Card } from '@/shared/ui/Card'
 import { Skeleton } from '@/shared/ui/Skeleton'
 import { dynamicChart } from './chart-loader'
@@ -74,8 +76,33 @@ export function WeatherView() {
 
   useNotificationScanner(data, aqi, quakes, location?.name)
 
+  const onPullRefresh = useCallback(async () => {
+    await refetch()
+  }, [refetch])
+  const { pullDistance, refreshing } = usePullToRefresh(onPullRefresh, 72)
+
   return (
-    <div className="space-y-6">
+    <div className="relative space-y-6">
+      {(pullDistance > 0 || refreshing) && location && data ? (
+        <>
+          <div
+            className="pointer-events-none fixed inset-x-0 top-0 z-[35] h-0.5 overflow-hidden bg-black/10 dark:bg-white/10"
+            aria-hidden
+          >
+            <div
+              className="h-full origin-left bg-sky-500 transition-[transform] duration-150 ease-out"
+              style={{
+                transform: `scaleX(${refreshing ? 1 : Math.min(1, pullDistance / 72)})`,
+              }}
+            />
+          </div>
+          {refreshing ? (
+            <p className="pointer-events-none fixed left-0 right-0 top-2 z-[35] text-center text-xs font-medium text-sky-600 dark:text-sky-400">
+              {t.today.pullRefreshing}
+            </p>
+          ) : null}
+        </>
+      ) : null}
       <div className="space-y-3">
         <SearchBar />
         <RecentLocationsRow />
@@ -111,17 +138,17 @@ export function WeatherView() {
               className={cn('space-y-6', tab !== 'today' && 'hidden')}
               aria-hidden={tab !== 'today'}
             >
-              {/* § 1 — Hourly strip */}
-              <HourlyStrip hourly={data.hourly} />
-
-              {/* § Retention Loop: Push Alerts Banner */}
+              {/* § Retention: push — an toàn trước */}
               <PushAlertsCard />
 
-              {/* § 2 — Rain prediction: answers "will it rain soon?" */}
-              <NextRainCard weather={data} />
-
-              {/* § 3 — Unified AI insights (summary, outfit, health, travel, mood, severe) */}
+              {/* § 1 — AI: “hôm nay ra sao?” ngay sau hero + cảnh báo */}
               <WeatherInsightsPanel location={location} weather={data} aqi={aqi} />
+
+              {/* § 2 — Hourly strip */}
+              <HourlyStrip hourly={data.hourly} />
+
+              {/* § 3 — Rain prediction */}
+              <NextRainCard weather={data} />
 
               {/* § 4 — 7-day preview */}
               <DailyPreviewRow

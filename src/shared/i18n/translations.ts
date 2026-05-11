@@ -128,6 +128,7 @@ const vi = {
     maxWind:       'Gió lớn nhất',
     uvIndex:       'Tia UV',
     newsTitle:     'Tin tức thiên tai & môi trường',
+    pullRefreshing: 'Đang làm mới dự báo…',
   },
   /** Mưa sắp tới — chỉ từ hourly (miễn phí, không API ngoài). */
   nextRain: {
@@ -504,6 +505,7 @@ const en = {
     maxWind:    'Max wind',
     uvIndex:    'UV index',
     newsTitle:  'Disaster & environment news',
+    pullRefreshing: 'Refreshing forecast…',
   },
   nextRain: {
     title:      'Rain ahead',

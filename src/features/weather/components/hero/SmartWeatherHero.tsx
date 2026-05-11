@@ -75,7 +75,7 @@ export function SmartWeatherHero({ location, weather, aqi }: Props) {
     const line = `${location.name}: ${formatTemp(current.temperature, tempUnit)} · ${info.label}`
     try {
       if (typeof navigator !== 'undefined' && navigator.share) {
-        await navigator.share({ title: 'Weather', text: line, url })
+        await navigator.share({ title: 'Trời Hôm Nay', text: line, url })
       } else if (typeof navigator !== 'undefined' && navigator.clipboard?.writeText) {
         await navigator.clipboard.writeText(`${line} ${url}`)
         setShareHint(t.smartHeroShare.copied)
@@ -92,7 +92,7 @@ export function SmartWeatherHero({ location, weather, aqi }: Props) {
 
   return (
     <motion.section
-      className="relative isolate overflow-hidden rounded-3xl p-5 text-white shadow-xl sm:p-8"
+      className="relative isolate overflow-hidden rounded-3xl p-5 text-white shadow-xl ring-1 ring-white/20 sm:p-8"
       {...(!reduceMotion
         ? {
             initial: { opacity: 0, y: 10 },
@@ -118,7 +118,7 @@ export function SmartWeatherHero({ location, weather, aqi }: Props) {
           <div className="flex flex-wrap items-end justify-between gap-3">
             <div>
               <p className="text-sm text-white/85">{info.label}</p>
-              <div className="mt-0.5 text-6xl font-extralight leading-none tracking-tighter sm:text-7xl md:text-8xl">
+              <div className="mt-0.5 text-6xl font-extralight leading-none tracking-tighter drop-shadow-[0_2px_24px_rgba(0,0,0,0.35)] sm:text-7xl md:text-8xl">
                 {formatTemp(current.temperature, tempUnit)}
               </div>
               <p className="mt-2 text-sm text-white/85">
@@ -137,7 +137,7 @@ export function SmartWeatherHero({ location, weather, aqi }: Props) {
             </div>
           </div>
 
-          <div className="rounded-xl bg-white/10 px-3 py-3 backdrop-blur-sm sm:rounded-2xl sm:px-4 sm:py-3.5">
+          <div className="rounded-xl border border-white/15 bg-white/10 px-3 py-3 shadow-inner backdrop-blur-sm sm:rounded-2xl sm:px-4 sm:py-3.5">
             {ai.isPending && !ai.data ? (
               <div className="flex items-start gap-2" aria-busy aria-label={t.smartHero.aiLoading}>
                 <Sparkles size={13} className="mt-0.5 shrink-0 text-amber-300/60" aria-hidden />
@@ -169,7 +169,13 @@ export function SmartWeatherHero({ location, weather, aqi }: Props) {
             {rainPct != null ? (
               <span className="rounded-full bg-white/15 px-3 py-2 backdrop-blur">☔ {t.smartHero.rainChance(rainPct)}</span>
             ) : null}
-            <span className="rounded-full bg-white/15 px-3 py-2 backdrop-blur">
+            <span
+              className={
+                eu != null && eu > 100
+                  ? 'rounded-full bg-amber-400/25 px-3 py-2 font-semibold text-white shadow-md ring-2 ring-amber-200/70 backdrop-blur'
+                  : 'rounded-full bg-white/15 px-3 py-2 backdrop-blur'
+              }
+            >
               🌬 {aqiName ? t.smartHero.aqiLine(aqiName) : t.smartHero.aqiMissing}
             </span>
             {uvWord ? (

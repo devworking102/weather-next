@@ -13,6 +13,7 @@ const STATIC = [
   '/earthquakes',
   '/calendar',
   '/alerts',
+  '/canh-bao',
   '/widget',
 ]
 
@@ -47,6 +48,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       lastModified: new Date(),
       changeFrequency: 'daily',
       priority: 0.78,
+    })
+    entries.push({
+      url: `${base}/canh-bao/${slug}`,
+      lastModified: new Date(),
+      changeFrequency: 'daily',
+      priority: 0.76,
     })
   }
 
