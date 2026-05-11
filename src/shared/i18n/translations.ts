@@ -359,6 +359,19 @@ const vi = {
     androidNote:  'Cần Chrome/Edge mới và trang HTTPS.',
     dismiss:      'Đã hiểu',
   },
+  expandDetails: {
+    title:    'Biểu đồ & Chi tiết',
+    showMore: 'Xem thêm',
+    showLess: 'Ẩn bớt',
+  },
+  dailyPreview: {
+    title:   (n: number) => `${n} ngày tới`,
+    viewAll: 'Xem chi tiết',
+  },
+  statsGrid: {
+    showMore: 'Xem thêm chỉ số',
+    showLess: 'Ẩn bớt',
+  },
 } as const
 
 const en = {
@@ -701,6 +714,19 @@ const en = {
     androidSteps: ['Open the ⋮ menu in your browser', 'Select "Install app" / "Add to Home Screen"', 'Confirm to install'] as string[],
     androidNote:  'Requires recent Chrome/Edge and HTTPS.',
     dismiss:      'Got it',
+  },
+  expandDetails: {
+    title:    'Charts & Details',
+    showMore: 'Show more',
+    showLess: 'Show less',
+  },
+  dailyPreview: {
+    title:   (n: number) => `${n}-day forecast`,
+    viewAll: 'View all',
+  },
+  statsGrid: {
+    showMore: 'More conditions',
+    showLess: 'Show less',
   },
 } as const
 

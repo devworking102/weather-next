@@ -11,7 +11,10 @@
       "Skill(claude-api)",
       "Skill(claude-api:*)",
       "Bash(npm install *)",
-      "Bash(npm run *)"
+      "Bash(npm run *)",
+      "PowerShell(Get-ChildItem -Path \"c:\\\\Dev\\\\Test\\\\weather-next\" -Recurse -Directory | Select-Object -ExpandProperty FullName | ForEach-Object { $_ -replace [regex]::Escape\\(\"c:\\\\Dev\\\\Test\\\\weather-next\"\\), \".\" } | Sort-Object)",
+      "Bash(cat)",
+      "Read(//tmp/**)"
     ]
   }
 }

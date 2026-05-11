@@ -137,23 +137,31 @@ export function SmartWeatherHero({ location, weather, aqi }: Props) {
             </div>
           </div>
 
-          <div className="rounded-2xl border border-white/15 bg-black/20 p-4 backdrop-blur-md sm:p-5">
-            <div className="mb-2 flex flex-wrap items-center gap-2 text-[11px] font-semibold uppercase tracking-wide text-white/70">
-              <Sparkles size={14} className="text-amber-200" aria-hidden />
-              <span>{t.smartHero.aiBadge}</span>
-              {ai.data?.source && ai.data.source !== 'heuristic' && <AiBadge source={ai.data.source} />}
-            </div>
+          <div className="rounded-xl bg-white/10 px-3 py-3 backdrop-blur-sm sm:rounded-2xl sm:px-4 sm:py-3.5">
             {ai.isPending && !ai.data ? (
-              <div className="space-y-2" aria-busy>
-                <p className="text-xs text-white/60">{t.smartHero.aiLoading}</p>
-                <div className="h-3.5 w-full rounded bg-white/10" />
-                <div className="h-3.5 w-[92%] rounded bg-white/10" />
-                <div className="h-3.5 w-3/4 max-w-[75%] rounded bg-white/10" />
+              <div className="flex items-start gap-2" aria-busy aria-label={t.smartHero.aiLoading}>
+                <Sparkles size={13} className="mt-0.5 shrink-0 text-amber-300/60" aria-hidden />
+                <div className="flex-1 space-y-2">
+                  <div className="h-3 w-full animate-pulse rounded-full bg-white/20" />
+                  <div className="h-3 w-4/5 animate-pulse rounded-full bg-white/15" />
+                  <div className="h-3 w-3/5 animate-pulse rounded-full bg-white/10" />
+                </div>
               </div>
             ) : ai.data ? (
-              <p className="text-sm leading-relaxed text-white/95 sm:text-base">{ai.data.summary}</p>
+              <div className="flex items-start gap-2">
+                <Sparkles size={13} className="mt-0.5 shrink-0 text-amber-300/80" aria-hidden />
+                <p className="min-w-0 flex-1 text-sm leading-relaxed text-white/90 sm:text-[15px]">
+                  {ai.data.summary}
+                </p>
+                {ai.data.source !== 'heuristic' && (
+                  <AiBadge source={ai.data.source} />
+                )}
+              </div>
             ) : (
-              <p className="text-sm text-white/70">{t.smartHero.aiFailed}</p>
+              <div className="flex items-center gap-2">
+                <Sparkles size={13} className="shrink-0 text-amber-300/40" aria-hidden />
+                <p className="text-sm text-white/60">{t.smartHero.aiFailed}</p>
+              </div>
             )}
           </div>
 

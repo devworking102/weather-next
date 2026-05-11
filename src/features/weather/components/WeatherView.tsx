@@ -21,6 +21,8 @@ import { AlertsBanner } from '@/features/alerts/components/AlertsBanner'
 import { useNotificationScanner } from '@/features/notifications/hooks/useNotifications'
 import { Card } from '@/shared/ui/Card'
 import { dynamicChart } from './chart-loader'
+import { DailyPreviewRow } from './DailyPreviewRow'
+import { ExpandableSection } from './ExpandableSection'
 
 import { HourlyTab } from './tabs/HourlyTab'
 import { DailyTab } from './tabs/DailyTab'
@@ -48,6 +50,7 @@ export function WeatherView() {
   const t = useT()
   const tempUnit = unit === 'f' ? 'fahrenheit' : 'celsius'
   const tab = useUiStore((s) => s.weatherTab)
+  const setTab = useUiStore((s) => s.setWeatherTab)
 
   const { data, isLoading, isError, error, refetch } = useWeather(
     location?.latitude,
@@ -85,30 +88,62 @@ export function WeatherView() {
           </div>
 
           <div>
-            {/* Giữ mount để tránh tải lại chart + query mỗi lần đổi tab; ẩn bằng CSS khi không xem "Hôm nay". */}
+            {/*
+              TODAY — flowing scroll layout.
+              Kept mounted (hidden via CSS) so charts and queries survive tab switches.
+              New content order follows the 3-second decision hierarchy:
+                1. Hourly  — what happens in the next few hours?
+                2. Rain    — will it rain?
+                3. Weekly  — what does the rest of the week look like?
+                4. Conditions — key stats (compact, expandable)
+                5. Details — charts, sun/moon, historical (hidden by default)
+                6. Recommendations
+            */}
             <div
               className={cn('space-y-4', tab !== 'today' && 'hidden')}
               aria-hidden={tab !== 'today'}
             >
-              <NextRainCard weather={data} />
-              <TodaySummary daily={data.daily} />
-              <StatsGrid weather={data} />
+              {/* § 1 — Hourly strip: most time-sensitive info, first thing after hero */}
               <HourlyStrip hourly={data.hourly} />
-              <div className="grid gap-6 lg:grid-cols-2">
-                <TemperatureChart hourly={data.hourly} />
-                <RainProbabilityChart hourly={data.hourly} />
-              </div>
-              {data.daily[0] && (
-                <SunMoonCard sunrise={data.daily[0].sunrise} sunset={data.daily[0].sunset} />
-              )}
-              <LunarHoursCard />
-              <HistoricalCompareCard
-                lat={location.latitude}
-                lon={location.longitude}
-                todayMax={data.daily[0]?.tempMax ?? data.current.temperature}
+
+              {/* § 2 — Rain prediction */}
+              <NextRainCard weather={data} />
+
+              {/* § 3 — 7-day preview: quick week overview */}
+              <DailyPreviewRow
+                weather={data}
+                days={7}
+                onViewAll={() => setTab('week')}
               />
+
+              {/* § 4 — Key conditions: 4 actionable stats, expand for all 8 */}
+              <StatsGrid weather={data} compact />
+
+              {/* § 5 — Charts & details: collapsed by default to reduce visual noise */}
+              <ExpandableSection>
+                <TodaySummary daily={data.daily} />
+                <div className="grid gap-4 lg:grid-cols-2">
+                  <TemperatureChart hourly={data.hourly} />
+                  <RainProbabilityChart hourly={data.hourly} />
+                </div>
+                {data.daily[0] && (
+                  <SunMoonCard
+                    sunrise={data.daily[0].sunrise}
+                    sunset={data.daily[0].sunset}
+                  />
+                )}
+                <LunarHoursCard />
+                <HistoricalCompareCard
+                  lat={location.latitude}
+                  lon={location.longitude}
+                  todayMax={data.daily[0]?.tempMax ?? data.current.temperature}
+                />
+              </ExpandableSection>
+
+              {/* § 6 — Personalized recommendations */}
               <RecommendationsCard location={location} weather={data} />
             </div>
+
             {tab === 'hourly' && <HourlyTab weather={data} hours={48} />}
             {tab === 'week' && <DailyTab weather={data} days={7} />}
             {tab === 'daily' && <DailyTab weather={data} days={16} />}

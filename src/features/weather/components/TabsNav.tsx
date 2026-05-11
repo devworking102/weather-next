@@ -8,9 +8,6 @@ import type { WeatherTabId } from '@/shared/store/ui-store'
 export type { WeatherTabId }
 
 const TAB_IDS: WeatherTabId[] = ['today', 'hourly', 'week', 'daily', 'month']
-const TAB_ICONS: Record<string, string> = {
-  today: '🌡', hourly: '⏱', week: '📅', daily: '📅', month: '🗓️',
-}
 
 interface Props {
   value: WeatherTabId
@@ -25,7 +22,6 @@ export function TabsNav({ value, onChange }: Props) {
 
   const tabs = TAB_IDS.map((id) => ({
     id,
-    icon: TAB_ICONS[id],
     label: t.tabs[id as keyof typeof t.tabs],
   }))
 
@@ -35,45 +31,43 @@ export function TabsNav({ value, onChange }: Props) {
     if (!btn || !nav) return
     const { left: btnL, right: btnR } = btn.getBoundingClientRect()
     const { left: navL, right: navR } = nav.getBoundingClientRect()
-    if (btnL < navL + 8) {
-      nav.scrollBy({ left: btnL - navL - 8, behavior: 'smooth' })
-    } else if (btnR > navR - 8) {
-      nav.scrollBy({ left: btnR - navR + 8, behavior: 'smooth' })
-    }
+    if (btnL < navL + 8) nav.scrollBy({ left: btnL - navL - 8, behavior: 'smooth' })
+    else if (btnR > navR - 8) nav.scrollBy({ left: btnR - navR + 8, behavior: 'smooth' })
   }, [value])
 
   return (
     <div className="relative">
+      {/* Fade-out hint at right edge */}
       <div
-        className="pointer-events-none absolute inset-y-0 right-0 w-10 bg-gradient-to-l from-[color:var(--background)] to-transparent z-10"
+        className="pointer-events-none absolute inset-y-0 right-0 z-10 w-8 bg-gradient-to-l from-[color:var(--background)] to-transparent"
         aria-hidden
       />
       <nav
         ref={navRef}
         className="scrollbar-thin -mx-4 overflow-x-auto px-4"
-        aria-label="Tab navigation"
+        aria-label="Forecast range"
       >
-        <div className="flex gap-1.5 whitespace-nowrap pb-1">
+        <div className="flex gap-1 whitespace-nowrap pb-1">
           {tabs.map((tab) => {
             const active = value === tab.id
             return (
               <button
                 key={tab.id}
-                ref={(el) => { if (el) btnRefs.current.set(tab.id, el); else btnRefs.current.delete(tab.id) }}
+                ref={(el) => {
+                  if (el) btnRefs.current.set(tab.id, el)
+                  else btnRefs.current.delete(tab.id)
+                }}
                 onClick={() => onChange(tab.id)}
-                className={cn(
-                  'relative flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-sm font-medium transition-all duration-200',
-                  active
-                    ? 'border-slate-900 bg-slate-900 text-white dark:border-white dark:bg-white dark:text-slate-900'
-                    : 'border-black/10 bg-white text-slate-600 hover:bg-slate-50 dark:border-white/10 dark:bg-slate-900/60 dark:text-slate-300 dark:hover:bg-white/5',
-                )}
                 type="button"
                 aria-pressed={active}
+                className={cn(
+                  'rounded-full px-3.5 py-1.5 text-sm font-medium transition-all duration-200',
+                  active
+                    ? 'bg-slate-900 text-white shadow-sm dark:bg-white dark:text-slate-900'
+                    : 'text-slate-500 hover:bg-slate-100 hover:text-slate-800 dark:text-slate-400 dark:hover:bg-white/8 dark:hover:text-slate-200',
+                )}
               >
-                <span>{tab.icon}</span>
-                <span className={cn('md:inline', active ? 'inline' : 'hidden')}>
-                  {tab.label}
-                </span>
+                {tab.label}
               </button>
             )
           })}
