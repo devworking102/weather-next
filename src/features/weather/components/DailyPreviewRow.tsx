@@ -34,8 +34,8 @@ export function DailyPreviewRow({ weather, days = 7, onViewAll }: Props) {
 
   return (
     <Card className="overflow-hidden p-0">
-      <div className="flex items-center justify-between border-b border-black/5 px-4 py-3 dark:border-white/5">
-        <h3 className="text-sm font-semibold text-slate-500 dark:text-slate-400">
+      <div className="flex items-center justify-between px-5 pt-4 pb-1">
+        <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
           {t.dailyPreview.title(days)}
         </h3>
         {onViewAll && (
@@ -59,8 +59,8 @@ export function DailyPreviewRow({ weather, days = 7, onViewAll }: Props) {
           return (
             <div
               key={d.date}
-              className={`flex items-center gap-2 px-4 py-2.5 ${
-                i === 0 ? 'bg-sky-50/50 dark:bg-sky-500/5' : ''
+              className={`flex items-center gap-3 px-5 py-3 transition-colors ${
+                i === 0 ? 'bg-sky-50/40 dark:bg-sky-900/10' : 'hover:bg-slate-50/50 dark:hover:bg-white/[0.02]'
               }`}
             >
               {/* Day name */}

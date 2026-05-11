@@ -46,6 +46,7 @@ const SunMoonCard         = dynamic(() => import('./today/SunMoonCard').then(m =
 const LunarHoursCard      = dynamic(() => import('./today/LunarHoursCard').then(m => ({ default: m.LunarHoursCard })), { ssr: false })
 const HistoricalCompareCard = dynamic(() => import('./today/HistoricalCompareCard').then(m => ({ default: m.HistoricalCompareCard })), { ssr: false })
 const RecommendationsCard = dynamic(() => import('@/features/recommendations/components/RecommendationsCard').then(m => ({ default: m.RecommendationsCard })), { ssr: false })
+const RadarPreviewCard    = dynamic(() => import('./today/RadarPreviewCard').then(m => ({ default: m.RadarPreviewCard })), { ssr: false, loading: tabFallback })
 
 const TemperatureChart    = dynamicChart('temperature')
 const RainProbabilityChart = dynamicChart('rain')
@@ -119,9 +120,12 @@ export function WeatherView() {
                 onViewAll={() => setTab('week')}
               />
 
-              {/* § 4 — All secondary detail: collapsed by default to keep page scannable */}
+              {/* § 4 — Radar preview */}
+              <RadarPreviewCard location={location} />
+
+              {/* § 5 — All secondary detail: collapsed by default to keep page scannable */}
               <ExpandableSection>
-                <StatsGrid weather={data} />
+                <StatsGrid weather={data} compact />
                 <TodaySummary daily={data.daily} />
                 <div className="grid gap-4 lg:grid-cols-2">
                   <TemperatureChart hourly={data.hourly} />

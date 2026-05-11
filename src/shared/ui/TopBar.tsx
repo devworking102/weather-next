@@ -7,11 +7,16 @@ import { SettingsMenu } from './SettingsMenu'
 import { InstallButton } from '@/features/pwa/components/InstallButton'
 import { useT } from '@/shared/hooks/useT'
 import { cn } from '@/shared/lib/cn'
+import { useLocationStore } from '@/features/geocoding/store/location-store'
+import { Star } from 'lucide-react'
 
 export function TopBar() {
   const pathname = usePathname()
   const [open, setOpen] = useState(false)
   const t = useT()
+  const pinned = useLocationStore((s) => s.pinned)
+  const currentLoc = useLocationStore((s) => s.current)
+  const setCurrent = useLocationStore((s) => s.setCurrent)
 
   const navItems = [
     { href: '/weather',     label: t.nav.weather     },
@@ -124,6 +129,41 @@ export function TopBar() {
         </div>
 
         <nav className="flex-1 overflow-y-auto py-3">
+          {/* Personalization: Favorite Locations */}
+          {pinned && pinned.length > 0 && (
+            <div className="mb-4 px-3">
+              <div className="mb-2 px-2 text-xs font-bold uppercase tracking-wider text-slate-400">
+                {t.favorites.title}
+              </div>
+              <div className="space-y-1">
+                {pinned.map((loc) => {
+                  const isActive = currentLoc?.id === loc.id
+                  return (
+                    <button
+                      key={loc.id}
+                      onClick={() => {
+                        setCurrent(loc)
+                        setOpen(false)
+                      }}
+                      className={cn(
+                        'flex w-full items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium transition-colors text-left',
+                        isActive
+                          ? 'bg-sky-50 text-sky-600 dark:bg-sky-500/10 dark:text-sky-300'
+                          : 'text-slate-600 hover:bg-slate-50 dark:text-slate-300 dark:hover:bg-white/5',
+                      )}
+                    >
+                      <Star size={16} className={isActive ? 'fill-current' : ''} />
+                      <span className="truncate">{loc.name}</span>
+                    </button>
+                  )
+                })}
+              </div>
+            </div>
+          )}
+
+          <div className="mb-2 px-5 text-xs font-bold uppercase tracking-wider text-slate-400">
+            Menu
+          </div>
           {navItems.map(({ href, label }) => {
             const active = pathname?.startsWith(href)
             return (

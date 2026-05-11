@@ -42,15 +42,15 @@ export function HourlyStrip({ hourly, hoursAhead = 24 }: Props) {
 
   return (
     <Card className="p-0 overflow-hidden">
-      <div className="flex items-center justify-between border-b border-black/5 px-5 py-3 dark:border-white/5">
-        <h3 className="text-sm font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
+      <div className="flex items-center justify-between px-5 pt-4 pb-1">
+        <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
           {t.hourlyStrip.title}
         </h3>
         <span className="text-xs text-slate-400">{rows.length}h</span>
       </div>
 
       <div className="scrollbar-thin overflow-x-auto">
-        <div className="flex gap-0.5 px-2 py-3">
+        <div className="flex gap-2 px-3 py-3">
           {rows.map((h, i) => {
             const info = wmoInfo(h.weatherCode)
             const isNow = i === 0
@@ -64,7 +64,7 @@ export function HourlyStrip({ hourly, hoursAhead = 24 }: Props) {
                 className={[
                   'relative flex min-w-[68px] flex-col items-center gap-1.5 rounded-2xl px-1.5 py-3 text-center transition-colors',
                   isNow
-                    ? 'bg-sky-50 ring-1 ring-sky-200/60 dark:bg-sky-500/10 dark:ring-sky-500/20'
+                    ? 'bg-sky-50 ring-1 ring-sky-200/60 dark:bg-sky-400/10 dark:ring-sky-400/20'
                     : 'hover:bg-slate-50 dark:hover:bg-white/5',
                 ].join(' ')}
               >

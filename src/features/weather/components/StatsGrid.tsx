@@ -37,7 +37,7 @@ export function StatsGrid({ weather, compact = false }: Props) {
 
   return (
     <section className="space-y-2">
-      <div className={cn('grid gap-3', compact ? 'grid-cols-2 sm:grid-cols-4' : 'grid-cols-2 sm:grid-cols-4')}>
+      <div className="grid gap-4 grid-cols-2 sm:grid-cols-4">
         {visibleItems.map(({ icon: Icon, label, value, hint, hintColor }) => (
           <Card key={label} className="flex flex-col gap-1.5 p-4">
             <div className="flex items-center gap-2 text-xs font-medium uppercase tracking-wide text-slate-500 dark:text-slate-400">
