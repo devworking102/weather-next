@@ -1,11 +1,14 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
+import { cache } from 'react'
 import { notFound } from 'next/navigation'
 import { getSeoCity, listSeoCitySlugs } from '@/data/seo-cities'
 import { fetchWeather } from '@/features/weather/services/weather'
 import { wmoInfo } from '@/features/weather/utils/wmo'
 import { getSiteUrl } from '@/shared/lib/site-url'
 import { TopBar } from '@/shared/ui/TopBar'
+
+const getCachedWeather = cache(fetchWeather)
 
 export function generateStaticParams() {
   return listSeoCitySlugs().map((slug) => ({ slug }))
@@ -19,7 +22,7 @@ export async function generateMetadata({
   const { slug } = await params
   const city = getSeoCity(slug)
   if (!city) return {}
-  const w = await fetchWeather(city.lat, city.lon, 'celsius')
+  const w = await getCachedWeather(city.lat, city.lon, 'celsius')
   const label = wmoInfo(w.current.weatherCode).label
   const t = Math.round(w.current.temperature)
   const base = getSiteUrl()
@@ -44,7 +47,7 @@ export default async function SeoWeatherCityPage({ params }: { params: Promise<{
   const city = getSeoCity(slug)
   if (!city) notFound()
 
-  const w = await fetchWeather(city.lat, city.lon, 'celsius')
+  const w = await getCachedWeather(city.lat, city.lon, 'celsius')
   const info = wmoInfo(w.current.weatherCode)
   const tcur = Math.round(w.current.temperature)
   const tmax = w.daily[0] ? Math.round(w.daily[0].tempMax) : tcur

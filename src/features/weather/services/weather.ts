@@ -35,9 +35,14 @@ export async function fetchWeather(
   })
 
   const url = `https://api.open-meteo.com/v1/forecast?${params.toString()}`
-  const res = await fetch(url, { next: { revalidate: 300 } })
-  if (!res.ok) {
-    throw new Error(`Open-Meteo error: ${res.status}`)
+  let res: Response | undefined
+  for (let attempt = 0; attempt < 4; attempt++) {
+    if (attempt > 0) await new Promise((r) => setTimeout(r, 2 ** (attempt - 1) * 1500))
+    res = await fetch(url, { next: { revalidate: 300 } })
+    if (res.status !== 429) break
+  }
+  if (!res || !res.ok) {
+    throw new Error(`Open-Meteo error: ${res?.status ?? 'unknown'}`)
   }
   const raw = (await res.json()) as OpenMeteoResponse
   return normalizeWeather(raw)
