@@ -11,7 +11,9 @@ export function Providers({ children }: { children: ReactNode }) {
   const queryClient = getQueryClient()
   const pathname = usePathname()
   const theme = useUiStore((s) => s.theme)
-  const showChat = !pathname?.startsWith('/widget')
+  // Chỉ ẩn chat trong trang iframe nhúng (`/widget/embed`), không ẩn ở `/widget` (trang lấy mã).
+  const path = pathname?.replace(/\/+$/, '') ?? ''
+  const showChat = path !== '/widget/embed'
 
   // Áp dụng class `dark` lên <html> theo theme + media query hệ thống
   useEffect(() => {
