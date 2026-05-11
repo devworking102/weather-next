@@ -3,7 +3,7 @@ import { TopBar } from '@/shared/ui/TopBar'
 import { WeatherView } from '@/features/weather/components/WeatherView'
 import { WeatherTabsBar } from '@/features/weather/components/WeatherTabsBar'
 
-export const metadata: Metadata = { title: 'Thời tiết hôm nay' }
+export const metadata: Metadata = { title: 'Dự báo hôm nay' }
 
 export default function WeatherPage() {
   return (

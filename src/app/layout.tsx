@@ -8,14 +8,14 @@ const geistMono = Geist_Mono({ variable: '--font-geist-mono', subsets: ['latin']
 
 export const metadata: Metadata = {
   title: {
-    default: 'Thời tiết — Dự báo chính xác',
-    template: '%s · Thời tiết',
+    default: 'Trời Hôm Nay — Dự báo thời tiết thông minh',
+    template: '%s · Trời Hôm Nay',
   },
   description:
-    'Dự báo thời tiết chính xác, cảnh báo thiên tai, chất lượng không khí và gợi ý sinh hoạt theo thời gian thực.',
-  applicationName: 'Weather Next',
+    'Dự báo thời tiết thông minh, cập nhật theo thời gian thực. Chất lượng không khí, cảnh báo thiên tai, radar mưa và gợi ý sinh hoạt được hỗ trợ bởi AI.',
+  applicationName: 'Trời Hôm Nay',
   manifest: '/manifest.json',
-  appleWebApp: { capable: true, statusBarStyle: 'black-translucent', title: 'Weather' },
+  appleWebApp: { capable: true, statusBarStyle: 'black-translucent', title: 'Trời Hôm Nay' },
   icons: { icon: [{ url: '/icon.svg', type: 'image/svg+xml' }, { url: '/favicon.ico' }] },
 }
 
@@ -23,7 +23,7 @@ export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
   themeColor: [
-    { media: '(prefers-color-scheme: light)', color: '#f5f7fb' },
+    { media: '(prefers-color-scheme: light)', color: '#4F8CFF' },
     { media: '(prefers-color-scheme: dark)', color: '#070b14' },
   ],
 }

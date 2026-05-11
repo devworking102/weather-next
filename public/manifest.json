@@ -1,20 +1,20 @@
 {
-  "name": "Weather Next",
-  "short_name": "Weather",
-  "description": "Dự báo thời tiết, chất lượng không khí và cảnh báo thiên tai theo thời gian thực.",
+  "name": "Trời Hôm Nay",
+  "short_name": "Trời Hôm Nay",
+  "description": "Dự báo thời tiết thông minh, hỗ trợ bởi AI. Cập nhật theo thời gian thực.",
   "start_url": "/weather",
   "scope": "/",
   "display": "standalone",
   "background_color": "#070b14",
-  "theme_color": "#0ea5e9",
+  "theme_color": "#4F8CFF",
   "lang": "vi",
   "categories": ["weather", "utilities"],
   "icons": [
     { "src": "/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
   ],
   "shortcuts": [
-    { "name": "Thời tiết", "short_name": "Weather", "url": "/weather", "description": "Dự báo đầy đủ" },
-    { "name": "Radar mưa", "short_name": "Radar", "url": "/radar", "description": "Radar Windy" },
-    { "name": "AQI", "short_name": "AQI", "url": "/aqi", "description": "Chất lượng không khí" }
+    { "name": "Thời tiết",  "short_name": "Thời tiết", "url": "/weather", "description": "Dự báo đầy đủ" },
+    { "name": "Radar mưa",  "short_name": "Radar",     "url": "/radar",   "description": "Radar Windy" },
+    { "name": "Không khí",  "short_name": "AQI",       "url": "/aqi",     "description": "Chất lượng không khí" }
   ]
 }

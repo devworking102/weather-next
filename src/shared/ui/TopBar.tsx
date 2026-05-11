@@ -36,8 +36,11 @@ export function TopBar() {
       <header className="sticky top-0 z-40 border-b border-black/5 bg-[color:var(--background)]/85 backdrop-blur dark:border-white/5">
         <div className="mx-auto flex container items-center justify-between gap-4 px-4 py-3 md:px-6">
           <Link href="/" className="inline-flex items-center gap-2 font-bold tracking-tight">
-            <span className="text-xl" aria-hidden>🌤️</span>
-            <span>Weather</span>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/icon.svg" alt="" width={28} height={28} className="rounded-lg" aria-hidden />
+            <span className="bg-gradient-to-r from-[#4F8CFF] to-[#56E0FF] bg-clip-text text-transparent">
+              Trời Hôm Nay
+            </span>
           </Link>
 
           <nav className="hidden lg:flex items-center gap-1 overflow-x-auto whitespace-nowrap">
@@ -99,8 +102,11 @@ export function TopBar() {
       >
         <div className="flex items-center justify-between border-b border-black/5 px-5 py-4 dark:border-white/5">
           <Link href="/" className="inline-flex items-center gap-2 font-bold tracking-tight" onClick={() => setOpen(false)}>
-            <span className="text-xl" aria-hidden>🌤️</span>
-            <span>Weather</span>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/icon.svg" alt="" width={26} height={26} className="rounded-lg" aria-hidden />
+            <span className="bg-gradient-to-r from-[#4F8CFF] to-[#56E0FF] bg-clip-text text-transparent whitespace-nowrap">
+              Trời Hôm Nay
+            </span>
           </Link>
           <button
             type="button"
