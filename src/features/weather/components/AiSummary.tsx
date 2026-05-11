@@ -1,5 +1,6 @@
 'use client'
 
+import { useMemo } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { Sparkles } from 'lucide-react'
 import { Card } from '@/shared/ui/Card'
@@ -9,6 +10,11 @@ import { useUiStore } from '@/shared/store/ui-store'
 import type { AiSource } from '@/shared/lib/ai'
 import type { WeatherBundle } from '@/features/weather/types'
 import type { GeoLocation } from '@/features/geocoding/types'
+import {
+  buildDailyOutlookDigest,
+  buildHourlyRainDigest,
+  digestFingerprint,
+} from '@/features/weather/utils/ai-summary-digest'
 
 type AiSummaryPayload = { summary: string; source: AiSource | 'heuristic' }
 
@@ -16,8 +22,9 @@ function aiSummaryQueryKey(
   locationId: number,
   weatherTime: string,
   locale: string,
+  digestKey: string,
 ) {
-  return ['ai-summary', locationId, weatherTime, locale] as const
+  return ['ai-summary', locationId, weatherTime, locale, digestKey] as const
 }
 
 interface Props {
@@ -28,8 +35,18 @@ interface Props {
 export function AiSummary({ location, weather }: Props) {
   const t = useT()
   const locale = useUiStore((s) => s.locale)
+  const { hourlyDigest, dailyDigest, digestKey } = useMemo(() => {
+    const hourlyDigest = buildHourlyRainDigest(weather.hourly, weather.timezone, locale)
+    const dailyDigest = buildDailyOutlookDigest(weather.daily, weather.timezone, locale)
+    return {
+      hourlyDigest,
+      dailyDigest,
+      digestKey: digestFingerprint(hourlyDigest, dailyDigest),
+    }
+  }, [weather.hourly, weather.daily, weather.timezone, locale])
+
   const { data, isPending, isError } = useQuery<AiSummaryPayload, Error>({
-    queryKey: aiSummaryQueryKey(location.id, weather.current.time, locale),
+    queryKey: aiSummaryQueryKey(location.id, weather.current.time, locale, digestKey),
     queryFn: async () => {
       const res = await fetch('/api/ai-summary', {
         method: 'POST',
@@ -42,7 +59,10 @@ export function AiSummary({ location, weather }: Props) {
           weatherCode: weather.current.weatherCode,
           humidity: weather.current.humidity,
           windSpeed: weather.current.windSpeed,
+          uvIndex: weather.current.uvIndex,
           locale,
+          hourlyForecastDigest: hourlyDigest,
+          dailyOutlookDigest: dailyDigest,
         }),
       })
       if (!res.ok) throw new Error('ai_failed')

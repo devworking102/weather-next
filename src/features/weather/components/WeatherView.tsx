@@ -30,6 +30,7 @@ import { AlertsTab } from './tabs/AlertsTab'
 import { WindTab } from './tabs/WindTab'
 import { WidgetTab } from './tabs/WidgetTab'
 
+import { NextRainCard } from './today/NextRainCard'
 import { TodaySummary } from './today/TodaySummary'
 import { SunMoonCard } from './today/SunMoonCard'
 import { LunarHoursCard } from './today/LunarHoursCard'
@@ -89,6 +90,7 @@ export function WeatherView() {
               aria-hidden={tab !== 'today'}
             >
               <AiSummary location={location} weather={data} />
+              <NextRainCard weather={data} />
               <TodaySummary daily={data.daily} />
               <StatsGrid weather={data} />
               <HourlyStrip hourly={data.hourly} />

@@ -113,6 +113,28 @@ const vi = {
     uvIndex:       'Tia UV',
     newsTitle:     'Tin tức thiên tai & môi trường',
   },
+  /** Mưa sắp tới — chỉ từ hourly (miễn phí, không API ngoài). */
+  nextRain: {
+    title:      'Mưa sắp tới',
+    badge:      'Miễn phí · từ hourly',
+    sourceNote:
+      'Tính trên máy bạn từ dữ liệu hourly (Open-Meteo qua máy chủ app). Không iframe, không thêm dịch vụ trả phí.',
+    noneTitle:  '48 giờ tới: ít khả năng mưa đáng kể',
+    noneHint:
+      'Không thấy khung giờ mưa rõ theo ngưỡng dự báo. Vẫn nên xem biểu đồ % mưa khi ra đường lâu.',
+    imminent:   'Trong khoảng 1 giờ tới có thể có mưa (hoặc mưa đang đến gần) theo dự báo giờ.',
+    inAboutHours: (h: number) =>
+      `Ước tính khoảng ${h} giờ nữa có thể vào đợt mưa đầu tiên trong cửa sổ dự báo.`,
+    windowLabel: 'Khung giờ (địa phương):',
+    maxChance: (p: number) => `Xác suất mưa theo giờ cao nhất trong khung ~${p}%.`,
+    peakHourlyMm: (mm: number) => `Mưa theo giờ tối đa ~${mm} mm/h`,
+    tipUmbrella: 'Nên mang áo mưa hoặc ô nếu ra ngoài trong khung giờ này.',
+    tipLight:    'Mưa có thể nhẹ hoặc rải rác — xem thêm tab Theo giờ.',
+    tipHeavy:
+      'Mưa có thể khá nặng trong khung này — hạn chế đi xa hoặc vùng dễ ngập nếu không cần thiết.',
+    disclaimer:
+      'Dự báo có sai số theo mô hình và thời điểm cập nhật; không thay thế cảnh báo chính thức từ cơ quan nhà nước.',
+  },
   // Sun & moon card
   sunMoon: {
     title:   'Mặt trời & Mặt trăng',
@@ -382,6 +404,26 @@ const en = {
     maxWind:    'Max wind',
     uvIndex:    'UV index',
     newsTitle:  'Disaster & environment news',
+  },
+  nextRain: {
+    title:      'Rain ahead',
+    badge:      'Free · from hourly data',
+    sourceNote:
+      'Computed on your device from hourly forecast (Open-Meteo via this app). No extra APIs, no third-party embeds.',
+    noneTitle:  'Next 48h: little significant rain',
+    noneHint:
+      'No clear rain window passed the threshold. Still check the hourly rain chart before long trips.',
+    imminent:   'Rain is possible within about the next hour (or arriving soon) per the hourly model.',
+    inAboutHours: (h: number) =>
+      `About ${h} hour${h === 1 ? '' : 's'} until the first likely rain window in the forecast horizon.`,
+    windowLabel: 'Local time window:',
+    maxChance: (p: number) => `Peak hourly rain probability in this window ~${p}%.`,
+    peakHourlyMm: (mm: number) => `Peak hourly rainfall ~${mm} mm/h`,
+    tipUmbrella: 'Bring a raincoat or umbrella if you go out during this window.',
+    tipLight:    'Rain may be light or patchy — check the Hourly tab for detail.',
+    tipHeavy:    'Rain may be heavy — avoid long trips or flood-prone routes if you can.',
+    disclaimer:
+      'Forecasts have model error and timing uncertainty; not a replacement for official government warnings.',
   },
   sunMoon: {
     title:    'Sun & Moon',
