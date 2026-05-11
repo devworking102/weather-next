@@ -20,6 +20,9 @@ export function ChatWidget() {
   const [streaming, setStreaming] = useState(false)
   const bottomRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
+  /** Gộp chunk stream theo frame để giảm re-render khi model trả nhiều token nhỏ. */
+  const streamBufferRef = useRef('')
+  const streamRafRef = useRef<number | null>(null)
 
   const location = useLocationStore((s) => s.current)
   const unit = useUiStore((s) => s.unit)
@@ -27,6 +30,7 @@ export function ChatWidget() {
   const tempUnit = unit === 'f' ? 'fahrenheit' : 'celsius'
   const { data: weather } = useWeather(location?.latitude, location?.longitude, tempUnit)
   const { data: aqi } = useAirQuality(location?.latitude, location?.longitude)
+  const aqiCurrent = aqi?.current
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
@@ -35,6 +39,32 @@ export function ChatWidget() {
   useEffect(() => {
     if (open) inputRef.current?.focus()
   }, [open])
+
+  useEffect(() => {
+    return () => {
+      if (streamRafRef.current != null) cancelAnimationFrame(streamRafRef.current)
+    }
+  }, [])
+
+  /** Một frame tối đa một lần setState; mọi chunk trong buffer được gộp. */
+  const flushPendingStream = useCallback(() => {
+    streamRafRef.current = null
+    const delta = streamBufferRef.current
+    streamBufferRef.current = ''
+    if (!delta) return
+    setMessages((prev) => {
+      const next = [...prev]
+      const i = next.length - 1
+      if (i < 0 || next[i]?.role !== 'assistant') return prev
+      next[i] = { role: 'assistant', content: next[i]!.content + delta }
+      return next
+    })
+  }, [])
+
+  const scheduleStreamFlush = useCallback(() => {
+    if (streamRafRef.current != null) return
+    streamRafRef.current = requestAnimationFrame(flushPendingStream)
+  }, [flushPendingStream])
 
   const send = useCallback(async () => {
     const text = input.trim()
@@ -45,6 +75,7 @@ export function ChatWidget() {
     setMessages((prev) => [...prev, userMsg, assistantMsg])
     setInput('')
     setStreaming(true)
+    streamBufferRef.current = ''
 
     const context = {
       locationName: location.name,
@@ -52,7 +83,7 @@ export function ChatWidget() {
       weatherCondition: wmoInfo(weather.current.weatherCode).label,
       humidity: weather.current.humidity,
       windSpeed: weather.current.windSpeed,
-      aqi: aqi?.current.europeanAqi,
+      aqi: aqiCurrent?.europeanAqi,
       tempMax: weather.daily[0]?.tempMax ?? weather.current.temperature,
       tempMin: weather.daily[0]?.tempMin ?? weather.current.temperature,
     }
@@ -69,6 +100,11 @@ export function ChatWidget() {
       })
 
       if (!res.ok || !res.body) {
+        if (streamRafRef.current != null) {
+          cancelAnimationFrame(streamRafRef.current)
+          streamRafRef.current = null
+        }
+        streamBufferRef.current = ''
         setMessages((prev) => {
           const next = [...prev]
           next[next.length - 1] = { role: 'assistant', content: 'Xin lỗi, có lỗi xảy ra. Vui lòng thử lại.' }
@@ -84,16 +120,32 @@ export function ChatWidget() {
         const { done, value } = await reader.read()
         if (done) break
         const chunk = decoder.decode(value, { stream: true })
+        if (!chunk) continue
+        streamBufferRef.current += chunk
+        scheduleStreamFlush()
+      }
+
+      if (streamRafRef.current != null) {
+        cancelAnimationFrame(streamRafRef.current)
+        streamRafRef.current = null
+      }
+      const tail = streamBufferRef.current
+      streamBufferRef.current = ''
+      if (tail) {
         setMessages((prev) => {
           const next = [...prev]
-          next[next.length - 1] = {
-            role: 'assistant',
-            content: next[next.length - 1].content + chunk,
-          }
+          const i = next.length - 1
+          if (i < 0 || next[i]?.role !== 'assistant') return prev
+          next[i] = { role: 'assistant', content: next[i]!.content + tail }
           return next
         })
       }
     } catch {
+      if (streamRafRef.current != null) {
+        cancelAnimationFrame(streamRafRef.current)
+        streamRafRef.current = null
+      }
+      streamBufferRef.current = ''
       setMessages((prev) => {
         const next = [...prev]
         next[next.length - 1] = { role: 'assistant', content: 'Xin lỗi, có lỗi xảy ra. Vui lòng thử lại.' }
@@ -102,7 +154,7 @@ export function ChatWidget() {
     } finally {
       setStreaming(false)
     }
-  }, [input, streaming, weather, location, aqi, messages, locale])
+  }, [input, streaming, weather, location, aqiCurrent, messages, locale, scheduleStreamFlush])
 
   const onKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {

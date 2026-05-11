@@ -1,8 +1,7 @@
 'use client'
 
-import { useMutation } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 import { Sparkles } from 'lucide-react'
-import { useEffect } from 'react'
 import { Card } from '@/shared/ui/Card'
 import { AiBadge } from '@/shared/ui/AiBadge'
 import { useT } from '@/shared/hooks/useT'
@@ -10,6 +9,16 @@ import { useUiStore } from '@/shared/store/ui-store'
 import type { AiSource } from '@/shared/lib/ai'
 import type { WeatherBundle } from '@/features/weather/types'
 import type { GeoLocation } from '@/features/geocoding/types'
+
+type AiSummaryPayload = { summary: string; source: AiSource | 'heuristic' }
+
+function aiSummaryQueryKey(
+  locationId: number,
+  weatherTime: string,
+  locale: string,
+) {
+  return ['ai-summary', locationId, weatherTime, locale] as const
+}
 
 interface Props {
   location: GeoLocation
@@ -19,8 +28,9 @@ interface Props {
 export function AiSummary({ location, weather }: Props) {
   const t = useT()
   const locale = useUiStore((s) => s.locale)
-  const mutation = useMutation<{ summary: string; source: AiSource | 'heuristic' }, Error>({
-    mutationFn: async () => {
+  const { data, isPending, isError } = useQuery<AiSummaryPayload, Error>({
+    queryKey: aiSummaryQueryKey(location.id, weather.current.time, locale),
+    queryFn: async () => {
       const res = await fetch('/api/ai-summary', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -36,35 +46,30 @@ export function AiSummary({ location, weather }: Props) {
         }),
       })
       if (!res.ok) throw new Error('ai_failed')
-      return res.json()
+      return res.json() as Promise<AiSummaryPayload>
     },
+    staleTime: 30 * 60 * 1000,
+    gcTime: 60 * 60 * 1000,
   })
-
-  useEffect(() => {
-    mutation.mutate()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [location.id, weather.current.time, locale])
 
   return (
     <Card className="border-sky-100 bg-gradient-to-br from-sky-50 to-white dark:border-sky-500/20 dark:from-sky-500/10 dark:to-slate-900/60">
       <div className="flex items-center gap-2 text-sm font-semibold uppercase tracking-wide text-sky-700 dark:text-sky-300">
         <Sparkles size={14} />
         {t.summary.title}
-        {mutation.data?.source && mutation.data.source !== 'heuristic' && (
-          <AiBadge source={mutation.data.source} />
-        )}
+        {data?.source && data.source !== 'heuristic' && <AiBadge source={data.source} />}
       </div>
-      {mutation.isPending && !mutation.data ? (
+      {isPending && !data ? (
         <div className="mt-3 space-y-2">
           <div className="shimmer h-3.5 w-full rounded" />
           <div className="shimmer h-3.5 w-11/12 rounded" />
           <div className="shimmer h-3.5 w-9/12 rounded" />
         </div>
-      ) : mutation.data ? (
+      ) : data ? (
         <p className="mt-2 text-sm leading-relaxed text-slate-700 dark:text-slate-200">
-          {mutation.data.summary}
+          {data.summary}
         </p>
-      ) : mutation.isError ? (
+      ) : isError ? (
         <p className="mt-2 text-sm text-slate-500">{t.summary.failed}</p>
       ) : null}
     </Card>

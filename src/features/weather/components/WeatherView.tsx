@@ -1,12 +1,12 @@
 'use client'
 
-import { useMemo } from 'react'
 import { useUiStore } from '@/shared/store/ui-store'
 import { useT } from '@/shared/hooks/useT'
 import { useWeather, useAirQuality } from '@/features/weather/hooks/useWeather'
 import { useLocationStore } from '@/features/geocoding/store/location-store'
 import { useAutoLocation } from '@/features/geocoding/hooks/useAutoLocation'
 import { useEarthquakes } from '@/features/earthquakes/hooks/useEarthquakes'
+import { cn } from '@/shared/lib/cn'
 import { HeroCard } from './HeroCard'
 import { StatsGrid } from './StatsGrid'
 import { HourlyStrip } from './HourlyStrip'
@@ -18,7 +18,6 @@ import { SearchBar } from '@/features/geocoding/components/SearchBar'
 import { FavoritesBar } from '@/features/favorites/components/FavoritesBar'
 import { AiSummary } from './AiSummary'
 import { AlertsBanner } from '@/features/alerts/components/AlertsBanner'
-import { computeAlerts } from '@/features/alerts/utils/compute'
 import { useNotificationScanner } from '@/features/notifications/hooks/useNotifications'
 import { Card } from '@/shared/ui/Card'
 import { dynamicChart } from './chart-loader'
@@ -45,7 +44,6 @@ export function WeatherView() {
   useAutoLocation()
   const location = useLocationStore((s) => s.current)
   const unit = useUiStore((s) => s.unit)
-  const locale = useUiStore((s) => s.locale)
   const t = useT()
   const tempUnit = unit === 'f' ? 'fahrenheit' : 'celsius'
   const tab = useUiStore((s) => s.weatherTab)
@@ -59,11 +57,6 @@ export function WeatherView() {
   const { data: quakes } = useEarthquakes(location?.latitude, location?.longitude)
 
   useNotificationScanner(data, aqi, quakes, location?.name)
-
-  const alertCount = useMemo(
-    () => computeAlerts(data, aqi, quakes, locale).length,
-    [data, aqi, quakes, locale],
-  )
 
   return (
     <div className="space-y-6">
@@ -90,31 +83,30 @@ export function WeatherView() {
           </div>
 
           <div>
-            {tab === 'today' && (
-              <div className="space-y-4">
-                <AiSummary location={location} weather={data} />
-                <TodaySummary daily={data.daily} />
-                <StatsGrid weather={data} />
-                <HourlyStrip hourly={data.hourly} />
-                <div className="grid gap-6 lg:grid-cols-2">
-                  <TemperatureChart hourly={data.hourly} />
-                  <RainProbabilityChart hourly={data.hourly} />
-                </div>
-                {data.daily[0] && (
-                  <SunMoonCard
-                    sunrise={data.daily[0].sunrise}
-                    sunset={data.daily[0].sunset}
-                  />
-                )}
-                <LunarHoursCard />
-                <HistoricalCompareCard
-                  lat={location.latitude}
-                  lon={location.longitude}
-                  todayMax={data.daily[0]?.tempMax ?? data.current.temperature}
-                />
-                <RecommendationsCard location={location} weather={data} />
+            {/* Giữ mount để tránh tải lại chart + query mỗi lần đổi tab; ẩn bằng CSS khi không xem "Hôm nay". */}
+            <div
+              className={cn('space-y-4', tab !== 'today' && 'hidden')}
+              aria-hidden={tab !== 'today'}
+            >
+              <AiSummary location={location} weather={data} />
+              <TodaySummary daily={data.daily} />
+              <StatsGrid weather={data} />
+              <HourlyStrip hourly={data.hourly} />
+              <div className="grid gap-6 lg:grid-cols-2">
+                <TemperatureChart hourly={data.hourly} />
+                <RainProbabilityChart hourly={data.hourly} />
               </div>
-            )}
+              {data.daily[0] && (
+                <SunMoonCard sunrise={data.daily[0].sunrise} sunset={data.daily[0].sunset} />
+              )}
+              <LunarHoursCard />
+              <HistoricalCompareCard
+                lat={location.latitude}
+                lon={location.longitude}
+                todayMax={data.daily[0]?.tempMax ?? data.current.temperature}
+              />
+              <RecommendationsCard location={location} weather={data} />
+            </div>
             {tab === 'hourly' && <HourlyTab weather={data} hours={48} />}
             {tab === 'week' && <DailyTab weather={data} days={7} />}
             {tab === 'daily' && <DailyTab weather={data} days={16} />}

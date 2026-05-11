@@ -7,7 +7,8 @@ function makeQueryClient() {
         staleTime: 5 * 60 * 1000,
         gcTime: 30 * 60 * 1000,
         retry: 2,
-        refetchOnWindowFocus: true,
+        // Tránh refetch hàng loạt khi alt-tab — gây giật và tải lại không cần thiết (đã có staleTime).
+        refetchOnWindowFocus: false,
       },
     },
   })
