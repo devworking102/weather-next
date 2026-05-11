@@ -131,11 +131,11 @@ export function TopBar() {
         <nav className="flex-1 overflow-y-auto py-3">
           {/* Personalization: Favorite Locations */}
           {Array.isArray(pinned) && pinned.length > 0 && (
-            <div className="mb-4 px-3">
+            <div className="mb-4 px-2">
               <div className="mb-2 px-2 text-xs font-bold uppercase tracking-wider text-slate-400">
                 {t.favorites.title}
               </div>
-              <div className="space-y-1">
+              <div className="flex gap-2 overflow-x-auto snap-x snap-mandatory scrollbar-none pb-2 px-2">
                 {pinned.map((loc) => {
                   const isActive = currentLoc?.id === loc.id
                   return (
@@ -146,14 +146,17 @@ export function TopBar() {
                         setOpen(false)
                       }}
                       className={cn(
-                        'flex w-full items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium transition-colors text-left',
+                        'snap-center shrink-0 flex w-[120px] flex-col items-start gap-1.5 rounded-2xl p-3 text-sm font-medium transition-colors border text-left',
                         isActive
-                          ? 'bg-sky-50 text-sky-600 dark:bg-sky-500/10 dark:text-sky-300'
-                          : 'text-slate-600 hover:bg-slate-50 dark:text-slate-300 dark:hover:bg-white/5',
+                          ? 'border-sky-200 bg-sky-50 text-sky-700 dark:border-sky-500/30 dark:bg-sky-500/10 dark:text-sky-300'
+                          : 'border-black/5 bg-white text-slate-600 hover:bg-slate-50 dark:border-white/5 dark:bg-slate-800/50 dark:text-slate-300 dark:hover:bg-white/5',
                       )}
                     >
-                      <Star size={16} className={isActive ? 'fill-current' : ''} />
-                      <span className="truncate">{loc.name}</span>
+                      <div className="flex w-full items-center justify-between">
+                        <Star size={14} className={isActive ? 'fill-current text-sky-500' : 'text-slate-400'} />
+                        {isActive && <span className="h-1.5 w-1.5 rounded-full bg-sky-500" />}
+                      </div>
+                      <span className="w-full truncate">{loc.name}</span>
                     </button>
                   )
                 })}

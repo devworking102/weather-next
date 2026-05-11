@@ -18,6 +18,7 @@ import { SearchBar } from '@/features/geocoding/components/SearchBar'
 import { RecentLocationsRow } from '@/features/geocoding/components/RecentLocationsRow'
 import { FavoritesBar } from '@/features/favorites/components/FavoritesBar'
 import { AlertsBanner } from '@/features/alerts/components/AlertsBanner'
+import { PushAlertsCard } from '@/features/notifications/components/PushAlertsCard'
 import { useNotificationScanner } from '@/features/notifications/hooks/useNotifications'
 import { Card } from '@/shared/ui/Card'
 import { Skeleton } from '@/shared/ui/Skeleton'
@@ -104,26 +105,32 @@ export function WeatherView() {
                 4. Details — everything else, collapsed by default
             */}
             <div
-              className={cn('space-y-4', tab !== 'today' && 'hidden')}
+              className={cn('space-y-6', tab !== 'today' && 'hidden')}
               aria-hidden={tab !== 'today'}
             >
               {/* § 1 — Hourly strip */}
               <HourlyStrip hourly={data.hourly} />
 
+              {/* § Retention Loop: Push Alerts Banner */}
+              <PushAlertsCard />
+
               {/* § 2 — Rain prediction: answers "will it rain soon?" */}
               <NextRainCard weather={data} />
 
-              {/* § 3 — 7-day preview */}
+              {/* § 3 — Lifestyle insights: answers "what should I prepare?" */}
+              <RecommendationsCard location={location} weather={data} />
+
+              {/* § 4 — 7-day preview */}
               <DailyPreviewRow
                 weather={data}
                 days={7}
                 onViewAll={() => setTab('week')}
               />
 
-              {/* § 4 — Radar preview */}
+              {/* § 5 — Radar preview */}
               <RadarPreviewCard location={location} />
 
-              {/* § 5 — All secondary detail: collapsed by default to keep page scannable */}
+              {/* § 6 — All secondary detail: collapsed by default to keep page scannable */}
               <ExpandableSection>
                 <StatsGrid weather={data} compact />
                 <TodaySummary daily={data.daily} />
@@ -143,7 +150,6 @@ export function WeatherView() {
                   lon={location.longitude}
                   todayMax={data.daily[0]?.tempMax ?? data.current.temperature}
                 />
-                <RecommendationsCard location={location} weather={data} />
               </ExpandableSection>
             </div>
 

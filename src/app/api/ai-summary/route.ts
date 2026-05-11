@@ -32,12 +32,13 @@ export async function POST(req: NextRequest) {
 Write exactly 2–3 short sentences in ${lang}. Total length: under 60 words.
 
 Tone rules:
-- Sound like a thoughtful friend texting before someone leaves home, NOT a weather report.
-- Lead with ONE specific, immediately actionable tip (what to bring, wear, avoid, or time).
+- Act as a deeply caring, highly empathetic friend texting advice before someone leaves home. Absolutely NO formal weather reporting.
+- Lead with ONE specific, immediately actionable lifestyle tip (what to bring, wear, avoid, or best time to go out).
 - If rain is predicted, mention the approximate window and suggest gear or timing. Do NOT invent hours not in the digest.
 - If UV ≥7 or humidity ≥75%, add a brief comfort/health nudge.
 - If the weekly outlook has a notably nice or wet pattern, mention it in one short phrase.
 - For Vietnam context: think motorbike commuters, outdoor vendors, schoolchildren walking — practical, grounded advice.
+- Use a soft, affectionate tone (e.g., in Vietnamese use words like "nha", "nhé", "nè", "nhen").
 
 Bad (never write like this):
 - "Độ ẩm hiện tại là 82%." (data-report style)
@@ -45,9 +46,9 @@ Bad (never write like this):
 - "Có 60% khả năng mưa." (robotic probability)
 
 Good (write like this):
-- "Chiều nay nhiều khả năng mưa rào, nếu đi về sau 17h nên mang áo mưa."
-- "Hôm nay nắng gắt và UV cao, nhớ che nắng kỹ nếu ra ngoài từ 10 giờ."
-- "Trời oi bức, uống nhiều nước và hạn chế đứng ngoài nắng lâu."
+- "Chiều nay có khả năng mưa rào đấy, nếu bạn đi làm về sau 17h nhớ mang theo áo mưa nhé."
+- "Nắng hôm nay khá gắt, bạn nhớ bôi kem chống nắng và che chắn kỹ nếu phải ra ngoài tầm trưa nha."
+- "Trời hôm nay hơi oi bức một chút, nhớ uống nhiều nước kẻo mệt nhé."
 
 Weather facts:
 Location: ${body.locationName}${body.country ? ', ' + body.country : ''}
@@ -91,18 +92,18 @@ function buildHeuristicSummary(b: Payload): string {
 
   // Vietnamese lifestyle-first fallback
   const rain = hasRain
-    ? ' Trong vài giờ tới có khả năng mưa — mang áo mưa nếu ra đường lâu.'
+    ? ' Hình như sắp có mưa đấy, bạn nhớ mang theo áo mưa nếu đi đâu lâu nhé.'
     : ''
   const heat = t >= 32
-    ? ' Trời nắng nóng, uống nhiều nước và hạn chế đứng ngoài nắng.'
+    ? ' Trời khá là nóng bức, bạn nhớ uống thật nhiều nước và hạn chế ở ngoài nắng quá lâu nha.'
     : t >= 28
-      ? diff >= 3 ? ' Trời oi, cảm giác nóng hơn thực tế — chọn đồ thoáng mát.' : ' Thời tiết ấm, mặc thoáng là ổn.'
+      ? diff >= 3 ? ' Trời hơi oi bức một chút, bạn nên chọn đồ thoáng mát để thoải mái hơn.' : ' Thời tiết khá ấm áp, mặc đồ thoáng mát là đẹp.'
       : t <= 20
-        ? ' Khá mát, nên khoác thêm áo khi ra ngoài.'
-        : ' Thời tiết dễ chịu, trang phục thoải mái là phù hợp.'
-  const uvNote = uv != null && uv >= 8 ? ' UV rất cao — đội mũ và dùng kem chống nắng nếu ra ngoài.'
-    : uv != null && uv >= 6 ? ' UV khá mạnh — nên che nắng kỹ từ 10–14 giờ.' : ''
-  const humNote = hum >= 78 && !rain ? ' Độ ẩm cao, không khí oi bức — nhớ uống nước và nghỉ ngơi đủ.' : ''
+        ? ' Trời hơi se lạnh, ra ngoài bạn nhớ khoác thêm một chiếc áo mỏng nhé.'
+        : ' Thời tiết hôm nay cực kỳ dễ chịu, mặc gì cũng đẹp hết.'
+  const uvNote = uv != null && uv >= 8 ? ' Nắng hôm nay khá gắt, đừng quên bôi kem chống nắng và đội mũ nha.'
+    : uv != null && uv >= 6 ? ' Tia UV đang ở mức khá, ra đường tầm trưa nhớ che chắn cẩn thận nhé.' : ''
+  const humNote = hum >= 78 && !rain ? ' Không khí hơi ẩm nên có thể thấy oi ả, nhớ nghỉ ngơi và uống nước đều đặn nha.' : ''
 
-  return `${info.label} tại ${b.locationName}.${heat}${rain}${uvNote}${humNote}`.trim()
+  return `${info.label} tại ${b.locationName} nè.${heat}${rain}${uvNote}${humNote}`.trim()
 }

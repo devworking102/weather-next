@@ -49,8 +49,8 @@ export function HourlyStrip({ hourly, hoursAhead = 24 }: Props) {
         <span className="text-xs text-slate-400">{rows.length}h</span>
       </div>
 
-      <div className="scrollbar-thin overflow-x-auto">
-        <div className="flex gap-2 px-3 py-3">
+      <div className="scrollbar-thin overflow-x-auto snap-x snap-mandatory">
+        <div className="flex gap-2 px-3 py-3 after:w-2 after:shrink-0">
           {rows.map((h, i) => {
             const info = wmoInfo(h.weatherCode)
             const isNow = i === 0
@@ -62,7 +62,7 @@ export function HourlyStrip({ hourly, hoursAhead = 24 }: Props) {
               <div
                 key={h.time}
                 className={[
-                  'relative flex min-w-[68px] flex-col items-center gap-1.5 rounded-2xl px-1.5 py-3 text-center transition-colors',
+                  'snap-center relative flex min-w-[68px] flex-col items-center gap-1.5 rounded-2xl px-1.5 py-3 text-center transition-colors',
                   isNow
                     ? 'bg-sky-50 ring-1 ring-sky-200/60 dark:bg-sky-400/10 dark:ring-sky-400/20'
                     : 'hover:bg-slate-50 dark:hover:bg-white/5',

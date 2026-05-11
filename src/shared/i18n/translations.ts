@@ -333,6 +333,11 @@ const vi = {
     testFailed:      'Gửi thử thất bại.',
     testResult:      (sent: number, failed: number) => `Đã gửi: ${sent}, lỗi: ${failed}.`,
   },
+  pushCard: {
+    title: 'Nhận cảnh báo thời tiết',
+    desc: 'Cho phép ứng dụng gửi thông báo cho bạn khi sắp có mưa lớn hoặc chất lượng không khí (AQI) chuyển biến xấu.',
+    btn: 'Bật thông báo ngay',
+  },
   favorites: {
     title:       'Yêu thích',
     save:        'Lưu địa điểm',
@@ -688,6 +693,11 @@ const en = {
       'Production: POST /api/push/test with header x-weather-push-test matching PUSH_TEST_SECRET (see .env.example).',
     testFailed:      'Test send failed.',
     testResult:      (sent: number, failed: number) => `Sent: ${sent}, failed: ${failed}.`,
+  },
+  pushCard: {
+    title: 'Enable Weather Alerts',
+    desc: 'Allow the app to send you notifications when heavy rain is expected or air quality (AQI) becomes poor.',
+    btn: 'Enable Notifications',
   },
   favorites: {
     title:       'Favorites',
