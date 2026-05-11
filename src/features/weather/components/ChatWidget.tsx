@@ -170,7 +170,7 @@ export function ChatWidget() {
       {/* Toggle button */}
       <button
         onClick={() => setOpen((o) => !o)}
-        className="fixed bottom-5 right-5 z-50 flex h-12 w-12 items-center justify-center rounded-full bg-indigo-600 text-white shadow-lg transition hover:bg-indigo-700 active:scale-95"
+        className="fixed bottom-[calc(5rem+env(safe-area-inset-bottom,0px))] right-5 z-50 flex h-12 w-12 items-center justify-center rounded-full bg-indigo-600 text-white shadow-lg transition hover:bg-indigo-700 active:scale-95 md:bottom-5"
         aria-label="Mở chat thời tiết"
       >
         {open ? <X size={20} /> : <MessageSquare size={20} />}
@@ -178,7 +178,7 @@ export function ChatWidget() {
 
       {/* Chat panel */}
       {open && (
-        <div className="fixed bottom-20 right-5 z-50 flex h-[480px] w-[340px] flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl dark:border-slate-700 dark:bg-slate-900">
+        <div className="fixed bottom-[calc(8.5rem+env(safe-area-inset-bottom,0px))] right-5 z-50 flex h-[min(480px,70vh)] w-[min(340px,92vw)] flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl dark:border-slate-700 dark:bg-slate-900 md:bottom-20">
           {/* Header */}
           <div className="flex items-center gap-2.5 bg-indigo-600 px-4 py-3 text-white">
             <Bot size={18} className="shrink-0" />

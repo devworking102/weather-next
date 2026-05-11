@@ -1,7 +1,7 @@
 'use client'
 
 import { useQuery } from '@tanstack/react-query'
-import { apiFetch } from '@/shared/lib/fetcher'
+import { fetchAirQualityBundle, fetchWeatherBundle } from '@/services/weather/weather-api'
 import type { AirQualityBundle, TempUnit, WeatherBundle } from '@/features/weather/types'
 
 export function weatherQueryKey(lat?: number, lon?: number, unit: TempUnit = 'celsius') {
@@ -11,8 +11,7 @@ export function weatherQueryKey(lat?: number, lon?: number, unit: TempUnit = 'ce
 export function useWeather(lat?: number, lon?: number, unit: TempUnit = 'celsius') {
   return useQuery<WeatherBundle>({
     queryKey: weatherQueryKey(lat, lon, unit),
-    queryFn: () =>
-      apiFetch<WeatherBundle>(`/api/weather?lat=${lat}&lon=${lon}&unit=${unit}`),
+    queryFn: () => fetchWeatherBundle(lat!, lon!, unit),
     enabled: Number.isFinite(lat) && Number.isFinite(lon),
     staleTime: 5 * 60 * 1000,
   })
@@ -21,7 +20,7 @@ export function useWeather(lat?: number, lon?: number, unit: TempUnit = 'celsius
 export function useAirQuality(lat?: number, lon?: number) {
   return useQuery<AirQualityBundle>({
     queryKey: ['aqi', lat, lon],
-    queryFn: () => apiFetch<AirQualityBundle>(`/api/aqi?lat=${lat}&lon=${lon}`),
+    queryFn: () => fetchAirQualityBundle(lat!, lon!),
     enabled: Number.isFinite(lat) && Number.isFinite(lon),
     staleTime: 10 * 60 * 1000,
   })

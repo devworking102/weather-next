@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react'
 import { Settings as Gear } from 'lucide-react'
 import { useUiStore, type WindUnit, type TempUnit, type ThemeMode, type Locale } from '@/shared/store/ui-store'
 import { useNotifications } from '@/features/notifications/hooks/useNotifications'
+import { WebPushSetup } from '@/features/pwa/components/WebPushSetup'
 import { useT } from '@/shared/hooks/useT'
 import { cn } from '@/shared/lib/cn'
 
@@ -72,7 +73,7 @@ export function SettingsMenu() {
         <Gear size={16} />
       </button>
       {open ? (
-        <div className="absolute right-0 top-11 z-50 w-64 rounded-2xl border border-black/10 bg-white p-4 shadow-xl dark:border-white/10 dark:bg-slate-900">
+        <div className="absolute right-0 top-11 z-50 w-[min(22rem,calc(100vw-2rem))] max-h-[85vh] overflow-y-auto rounded-2xl border border-black/10 bg-white p-4 shadow-xl dark:border-white/10 dark:bg-slate-900">
           <Section title={t.settings.appearance}>
             <Row>
               {THEMES.map((th) => (
@@ -141,6 +142,9 @@ export function SettingsMenu() {
                 {t.settings.notifyDetail}
               </p>
             ) : null}
+          </Section>
+          <Section title={t.push.sectionTitle}>
+            <WebPushSetup />
           </Section>
         </div>
       ) : null}

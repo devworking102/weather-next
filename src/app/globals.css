@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import "ol/ol.css";
 
 /* Kích hoạt dark mode dựa trên class `.dark` trên <html> (do Providers quản lý). */
 @custom-variant dark (&:where(.dark, .dark *));

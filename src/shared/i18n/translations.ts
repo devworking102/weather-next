@@ -9,6 +9,7 @@ const vi = {
     aqi:         '💨 Không khí',
     health:      '❤️ Sức khỏe',
     wind:        '🗺️ Bản đồ gió',
+    radar:       '🌧️ Radar mưa',
     alerts:      '⚠️ Cảnh báo',
     widget:      '🔗 Nhúng',
     openMenu:    'Mở menu',
@@ -102,7 +103,7 @@ const vi = {
     uvModerate: 'Trung bình',
     uvHigh:     'Cao',
     uvVeryHigh: 'Rất cao',
-    radarCta:   'Bản đồ gió',
+    radarCta:   'Radar mưa',
     hourlyCta:  '24h tới',
   },
   // Stats grid
@@ -226,6 +227,42 @@ const vi = {
     loadFailed:   'Không tải được dữ liệu bão.',
     noTyphoons:   'Hiện không có bão hoạt động trong khu vực.',
   },
+  radar: {
+    pageTitle:    'Radar mưa',
+    pageSubtitle: 'Theo vị trí bạn đang chọn trong app (embed Windy — miễn phí).',
+    usingLocation: 'Vị trí:',
+    fullscreen:   'Toàn màn hình',
+    exitFs:        'Thu nhỏ',
+    attribution:
+      'Bản đồ do Windy.com cung cấp qua iframe. Có độ trễ và giới hạn theo điều khoản Windy; không thay thế cảnh báo chính thức.',
+  },
+  bottomNav: {
+    weather: 'Thời tiết',
+    radar:   'Radar',
+    aqi:     'AQI',
+    wind:    'Gió',
+  },
+  recent: {
+    title: 'Gần đây',
+  },
+  smartHeroShare: {
+    label: 'Chia sẻ',
+    copied: 'Đã sao chép liên kết',
+    fail:   'Không chia sẻ được trên thiết bị này',
+  },
+  seoCity: {
+    openApp:    'Mở đầy đủ trong app',
+    aqiTitle:   'Chất lượng không khí',
+    faqTitle:   'Câu hỏi thường gặp',
+    faq1q:      'Dữ liệu từ đâu?',
+    faq1a:      'Dự báo thời tiết từ Open-Meteo; AQI từ API chất lượng không khí Open-Meteo.',
+    faq2q:      'Có chính xác tuyệt đối không?',
+    faq2a:      'Không — luôn có sai số mô hình. Dùng kèm cảnh báo chính thức khi thời tiết nguy hiểm.',
+  },
+  voice: {
+    title: 'Đọc thời tiết (sắp có)',
+    hint:  'Tính năng giọng nói / TTS sẽ được bổ sung sau khi tích hợp nhà cung cấp.',
+  },
   // Widget tab
   widget: {
     configTitle:    'Tùy chỉnh widget',
@@ -282,6 +319,20 @@ const vi = {
     aqiBad:      { title: 'Không khí rất kém',          message: (aqi: number) => `AQI ${aqi}. Hạn chế hoạt động ngoài trời, đóng cửa sổ.` },
     quake:       { title: (mag: string) => `Động đất M${mag} gần đây`, message: (place: string, dist: string) => `${place}. Cách vị trí hiện tại ~${dist} km.` },
   },
+  push: {
+    sectionTitle:    'Push máy chủ (VAPID)',
+    subscribeServer: 'Đăng ký nhận push từ máy chủ',
+    vapidMissing:
+      'Chưa cấu hình VAPID. Chạy npm run generate-vapid và thêm NEXT_PUBLIC_VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY, VAPID_SUBJECT vào .env.local.',
+    notSupported:    'Trình duyệt không hỗ trợ Web Push.',
+    subscribeFailed: 'Đăng ký push thất bại.',
+    subscribed:      'Đã lưu subscription trên máy chủ (bản nhớ process — production nên dùng Redis/DB).',
+    sendTestDev:     'Gửi tin thử (chỉ dev)',
+    testProdHint:
+      'Production: gọi POST /api/push/test với header x-weather-push-test = PUSH_TEST_SECRET (xem .env.example).',
+    testFailed:      'Gửi thử thất bại.',
+    testResult:      (sent: number, failed: number) => `Đã gửi: ${sent}, lỗi: ${failed}.`,
+  },
   favorites: {
     title:       'Yêu thích',
     save:        'Lưu địa điểm',
@@ -319,6 +370,7 @@ const en = {
     aqi:         '💨 Air Quality',
     health:      '❤️ Health',
     wind:        '🗺️ Wind Map',
+    radar:       '🌧️ Rain radar',
     alerts:      '⚠️ Alerts',
     widget:      '🔗 Widget',
     openMenu:    'Open menu',
@@ -411,7 +463,7 @@ const en = {
     uvModerate: 'Moderate',
     uvHigh:     'High',
     uvVeryHigh: 'Very high',
-    radarCta:   'Wind map',
+    radarCta:   'Rain radar',
     hourlyCta:  'Next 24h',
   },
   stats: {
@@ -521,6 +573,42 @@ const en = {
     loadFailed: 'Could not load typhoon data.',
     noTyphoons: 'No active typhoons in the area.',
   },
+  radar: {
+    pageTitle:    'Rain radar',
+    pageSubtitle: 'Uses your selected location in the app (Windy embed — free).',
+    usingLocation: 'Location:',
+    fullscreen:   'Fullscreen',
+    exitFs:        'Exit fullscreen',
+    attribution:
+      'Map by Windy.com via iframe. Latency and limits apply per Windy terms; not an official warning.',
+  },
+  bottomNav: {
+    weather: 'Weather',
+    radar:   'Radar',
+    aqi:     'AQI',
+    wind:    'Wind',
+  },
+  recent: {
+    title: 'Recent',
+  },
+  smartHeroShare: {
+    label: 'Share',
+    copied: 'Link copied',
+    fail:   'Sharing is not available on this device',
+  },
+  seoCity: {
+    openApp:    'Open full app',
+    aqiTitle:   'Air quality',
+    faqTitle:   'FAQ',
+    faq1q:      'Where does the data come from?',
+    faq1a:      'Weather from Open-Meteo; air quality from Open-Meteo air-quality API.',
+    faq2q:      'Is it perfectly accurate?',
+    faq2a:      'No — models have error margins. Follow official warnings in dangerous conditions.',
+  },
+  voice: {
+    title: 'Voice weather (coming soon)',
+    hint:  'Text-to-speech will be added after we integrate a provider.',
+  },
   widget: {
     configTitle:    'Customize widget',
     themeLabel:     'Theme',
@@ -573,6 +661,20 @@ const en = {
     aqiHazard:   { title: 'Hazardous Air Quality', message: (aqi: number) => `EU AQI ${aqi}. Avoid going outside; wear N95 mask if necessary.` },
     aqiBad:      { title: 'Very Poor Air Quality', message: (aqi: number) => `AQI ${aqi}. Limit outdoor activity and keep windows closed.` },
     quake:       { title: (mag: string) => `Recent M${mag} Earthquake`, message: (place: string, dist: string) => `${place}. Approximately ${dist} km from your location.` },
+  },
+  push: {
+    sectionTitle:    'Server push (VAPID)',
+    subscribeServer: 'Subscribe to server push',
+    vapidMissing:
+      'VAPID not configured. Run npm run generate-vapid and set NEXT_PUBLIC_VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY, VAPID_SUBJECT in .env.local.',
+    notSupported:    'This browser does not support Web Push.',
+    subscribeFailed: 'Push subscribe failed.',
+    subscribed:      'Subscription saved on the server (in-memory — use Redis/DB in production).',
+    sendTestDev:     'Send test (dev only)',
+    testProdHint:
+      'Production: POST /api/push/test with header x-weather-push-test matching PUSH_TEST_SECRET (see .env.example).',
+    testFailed:      'Test send failed.',
+    testResult:      (sent: number, failed: number) => `Sent: ${sent}, failed: ${failed}.`,
   },
   favorites: {
     title:       'Favorites',

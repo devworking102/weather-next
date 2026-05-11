@@ -1,7 +1,8 @@
 'use client'
 
 import Link from 'next/link'
-import { MapPin, Sparkles } from 'lucide-react'
+import { useState } from 'react'
+import { MapPin, Share2, Sparkles } from 'lucide-react'
 import { motion, useReducedMotion } from 'framer-motion'
 import type { AirQualityBundle, WeatherBundle } from '@/features/weather/types'
 import type { GeoLocation } from '@/features/geocoding/types'
@@ -52,6 +53,7 @@ export function SmartWeatherHero({ location, weather, aqi }: Props) {
   const locale = useUiStore((s) => s.locale)
   const setTab = useUiStore((s) => s.setWeatherTab)
   const reduceMotion = useReducedMotion()
+  const [shareHint, setShareHint] = useState<string | null>(null)
 
   const tempUnit = unit === 'f' ? 'fahrenheit' : 'celsius'
   const { current } = weather
@@ -66,6 +68,27 @@ export function SmartWeatherHero({ location, weather, aqi }: Props) {
   const uvWord = uvCategory(t, current.uvIndex)
 
   const ai = useWeatherAiSummary(location, weather, locale)
+
+  async function shareWeather() {
+    const origin = typeof window !== 'undefined' ? window.location.origin : ''
+    const url = `${origin}/weather`
+    const line = `${location.name}: ${formatTemp(current.temperature, tempUnit)} · ${info.label}`
+    try {
+      if (typeof navigator !== 'undefined' && navigator.share) {
+        await navigator.share({ title: 'Weather', text: line, url })
+      } else if (typeof navigator !== 'undefined' && navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(`${line} ${url}`)
+        setShareHint(t.smartHeroShare.copied)
+        setTimeout(() => setShareHint(null), 2200)
+      } else {
+        setShareHint(t.smartHeroShare.fail)
+        setTimeout(() => setShareHint(null), 2200)
+      }
+    } catch {
+      setShareHint(t.smartHeroShare.fail)
+      setTimeout(() => setShareHint(null), 2200)
+    }
+  }
 
   return (
     <motion.section
@@ -146,9 +169,9 @@ export function SmartWeatherHero({ location, weather, aqi }: Props) {
             ) : null}
           </div>
 
-          <div className="flex flex-wrap gap-2 pt-1">
+          <div className="flex flex-wrap items-center gap-2 pt-1">
             <Link
-              href="/wind"
+              href="/radar"
               className="inline-flex min-h-11 min-w-[44px] items-center justify-center rounded-full bg-white/95 px-4 py-2.5 text-sm font-semibold text-slate-900 shadow-md transition hover:bg-white active:scale-[0.98] dark:bg-white dark:text-slate-900"
             >
               {t.smartHero.radarCta}
@@ -160,6 +183,15 @@ export function SmartWeatherHero({ location, weather, aqi }: Props) {
             >
               {t.smartHero.hourlyCta}
             </button>
+            <button
+              type="button"
+              onClick={() => void shareWeather()}
+              className="inline-flex min-h-11 min-w-[44px] items-center justify-center gap-1.5 rounded-full border border-white/40 bg-white/10 px-4 py-2.5 text-sm font-semibold text-white backdrop-blur transition hover:bg-white/20 active:scale-[0.98]"
+            >
+              <Share2 size={16} aria-hidden />
+              {t.smartHeroShare.label}
+            </button>
+            {shareHint ? <span className="w-full text-xs text-white/80 sm:w-auto">{shareHint}</span> : null}
           </div>
         </div>
       </div>

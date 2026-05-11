@@ -14,6 +14,7 @@ export function SearchBar() {
   const rootRef = useRef<HTMLDivElement>(null)
   const setCurrent = useLocationStore((s) => s.setCurrent)
   const setPinned = useLocationStore((s) => s.setPinned)
+  const addRecentLocation = useLocationStore((s) => s.addRecentLocation)
   const t = useT()
 
   const { data, isFetching } = usePlaceAutocomplete(query)
@@ -21,6 +22,7 @@ export function SearchBar() {
   function onPick(loc: GeoLocation) {
     setCurrent(loc)
     setPinned(true)
+    addRecentLocation(loc)
     setQuery('')
     setOpen(false)
   }
@@ -29,13 +31,15 @@ export function SearchBar() {
     if (typeof navigator === 'undefined' || !navigator.geolocation) return
     navigator.geolocation.getCurrentPosition(
       (pos) => {
-        setCurrent({
+        const loc = {
           id: Date.now(),
           name: t.search.currentLocation,
           latitude: pos.coords.latitude,
           longitude: pos.coords.longitude,
           country: '',
-        })
+        }
+        setCurrent(loc)
+        addRecentLocation(loc)
         setPinned(false)
       },
       () => {},

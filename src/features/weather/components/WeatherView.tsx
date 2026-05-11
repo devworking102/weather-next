@@ -15,6 +15,7 @@ import { WeatherError } from './WeatherError'
 import { WeatherEmpty } from './WeatherEmpty'
 import { FavoriteStar } from '@/features/favorites/components/FavoriteStar'
 import { SearchBar } from '@/features/geocoding/components/SearchBar'
+import { RecentLocationsRow } from '@/features/geocoding/components/RecentLocationsRow'
 import { FavoritesBar } from '@/features/favorites/components/FavoritesBar'
 import { AlertsBanner } from '@/features/alerts/components/AlertsBanner'
 import { useNotificationScanner } from '@/features/notifications/hooks/useNotifications'
@@ -62,6 +63,7 @@ export function WeatherView() {
     <div className="space-y-6">
       <div className="space-y-3">
         <SearchBar />
+        <RecentLocationsRow />
         <FavoritesBar />
       </div>
 

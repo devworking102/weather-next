@@ -21,6 +21,7 @@ export function TopBar() {
     { href: '/aqi',         label: t.nav.aqi         },
     { href: '/health',      label: t.nav.health      },
     { href: '/wind',        label: t.nav.wind        },
+    { href: '/radar',       label: t.nav.radar       },
     { href: '/alerts',      label: t.nav.alerts      },
     { href: '/widget',      label: t.nav.widget      },
   ]

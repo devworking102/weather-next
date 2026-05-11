@@ -6,6 +6,8 @@ import { usePathname } from 'next/navigation'
 import { getQueryClient } from '@/shared/lib/query-client'
 import { useUiStore } from '@/shared/store/ui-store'
 import { ChatWidget } from '@/features/weather/components/ChatWidget'
+import { ServiceWorkerRegister } from '@/features/pwa/components/ServiceWorkerRegister'
+import { MobileBottomNav } from '@/shared/ui/MobileBottomNav'
 
 export function Providers({ children }: { children: ReactNode }) {
   const queryClient = getQueryClient()
@@ -32,7 +34,9 @@ export function Providers({ children }: { children: ReactNode }) {
 
   return (
     <QueryClientProvider client={queryClient}>
-      {children}
+      <ServiceWorkerRegister />
+      <div className="pb-[calc(4.75rem+env(safe-area-inset-bottom,0px))] md:pb-0">{children}</div>
+      <MobileBottomNav />
       {showChat ? <ChatWidget /> : null}
     </QueryClientProvider>
   )
