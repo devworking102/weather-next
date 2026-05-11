@@ -24,7 +24,7 @@ export async function POST(req: NextRequest) {
   const body = (await req.json()) as HealthInsightPayload
   const lang = body.locale === 'en' ? 'English' : 'Vietnamese'
 
-  const prompt = `You are a helpful, friendly, and highly contextual weather and lifestyle assistant. Analyze the weather at ${body.locationName || 'this location'}.
+  const prompt = `You are a caring, highly empathetic, and friendly weather assistant. Your tone should be extremely natural, warm, and conversational, exactly like a close friend texting advice. Analyze the weather at ${body.locationName || 'this location'}.
 
 Today's weather data:
 - Temperature: ${Math.round(body.temperature)}°C (max ${Math.round(body.tempMax)}°C)
@@ -34,11 +34,11 @@ Today's weather data:
 - AQI (EU): ${Math.round(body.aqi)}
 - UV index: ${Math.round(body.uvIndex)}
 
-Write exactly 2 short, highly conversational sentences in ${lang}.
-1. A natural comment on how the weather actually "feels" today (e.g., "Trời hôm nay khá oi bức..." or "Thời tiết mát mẻ dễ chịu...").
-2. A practical, lifestyle-focused advice based on the data (e.g., "Nhớ mang theo ô nhé vì chiều dễ có mưa", or "Rất thích hợp để đi dạo, nhưng nhớ bôi kem chống nắng").
-
-Do not use bullet points, numbering, or robotic phrasing. Speak like a caring friend.`
+Write a short, friendly message (2-3 sentences) in ${lang}.
+- Start with a warm and natural observation about how it feels outside.
+- Give caring, practical advice based on the weather conditions.
+- Use a soft, affectionate tone (e.g., in Vietnamese use words like "nha", "nhé", "nè").
+- Absolutely NO bullet points, NO robotic phrasing, NO formal reports. Make it sound human and caring.`
 
   const result = await aiGenerate(prompt, { temperature: 0.5, maxOutputTokens: 150 })
   if (result) {
@@ -61,12 +61,12 @@ function buildFallback(b: HealthInsightPayload): string {
     return `Just a heads-up today: ${concerns.slice(0, 2).join(' and ')}. Take care and plan accordingly!`
   }
 
-  if (b.aqi > 60) concerns.push('không khí hơi bụi, nên mang khẩu trang khi ra ngoài')
-  if (b.tempMax > 35) concerns.push('trời rất nóng, nhớ uống nhiều nước nhé')
-  if (b.humidity > 85) concerns.push('độ ẩm khá cao gây cảm giác oi bức')
-  if (b.uvIndex >= 8) concerns.push('nắng rất gắt (UV cao), nhớ bôi kem chống nắng')
-  if (b.precipProb > 60) concerns.push('có khả năng mưa, đừng quên mang theo ô')
+  if (b.aqi > 60) concerns.push('không khí hôm nay hơi bụi một chút, ra đường nhớ mang khẩu trang nhé')
+  if (b.tempMax > 35) concerns.push('trời khá là nóng, bạn nhớ uống thật nhiều nước nha')
+  if (b.humidity > 85) concerns.push('độ ẩm cao nên cảm giác sẽ hơi oi bức một chút')
+  if (b.uvIndex >= 8) concerns.push('nắng hôm nay gắt lắm, đừng quên bôi kem chống nắng nhé')
+  if (b.precipProb > 60) concerns.push('hình như sắp có mưa, đi đâu bạn nhớ mang theo ô hoặc áo mưa kẻo ướt nhé')
 
-  if (concerns.length === 0) return 'Thời tiết hôm nay rất đẹp và dễ chịu! Rất thích hợp để bạn ra ngoài dạo chơi.'
-  return `Lưu ý nhỏ cho hôm nay: ${concerns.slice(0, 2).join(', và ')}. Chúc bạn một ngày tốt lành!`
+  if (concerns.length === 0) return 'Thời tiết hôm nay rất đẹp và dễ chịu! Rất tuyệt vời để dạo phố hay đi cà phê đấy.'
+  return `Thời tiết hôm nay có chút lưu ý nhỏ nè: ${concerns.slice(0, 2).join(', và ')}. Bạn đi đường cẩn thận và giữ gìn sức khỏe nha!`
 }

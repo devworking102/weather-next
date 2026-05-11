@@ -130,7 +130,7 @@ export function TopBar() {
 
         <nav className="flex-1 overflow-y-auto py-3">
           {/* Personalization: Favorite Locations */}
-          {pinned && pinned.length > 0 && (
+          {Array.isArray(pinned) && pinned.length > 0 && (
             <div className="mb-4 px-3">
               <div className="mb-2 px-2 text-xs font-bold uppercase tracking-wider text-slate-400">
                 {t.favorites.title}
