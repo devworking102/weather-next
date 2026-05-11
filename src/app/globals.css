@@ -96,3 +96,31 @@ textarea {
 .scrollbar-thin::-webkit-scrollbar { height: 6px; width: 6px; }
 .scrollbar-thin::-webkit-scrollbar-track { background: transparent; }
 .scrollbar-thin::-webkit-scrollbar-thumb { background: rgba(100, 116, 139, 0.35); border-radius: 9999px; }
+
+/* Atmospheric weather overlays — used by DynamicBackground */
+@keyframes atmo-sunny-pulse {
+  0%   { opacity: 0.22; transform: scale(1); }
+  100% { opacity: 0.38; transform: scale(1.08); }
+}
+@keyframes atmo-rain-fall {
+  0%   { background-position: 0 0; }
+  100% { background-position: -60px 120px; }
+}
+@keyframes atmo-fog-drift {
+  0%   { transform: translateX(-6px); opacity: 0.22; }
+  100% { transform: translateX(6px);  opacity: 0.34; }
+}
+@keyframes atmo-storm-flicker {
+  0%, 100% { opacity: 0.12; }
+  50%       { opacity: 0.28; }
+}
+@keyframes atmo-night-shimmer {
+  0%   { opacity: 0.18; }
+  100% { opacity: 0.32; }
+}
+
+.atmo-sunny-pulse  { animation: atmo-sunny-pulse  4s ease-in-out infinite alternate; }
+.atmo-rain-fall    { animation: atmo-rain-fall     1.4s linear infinite; }
+.atmo-fog-drift    { animation: atmo-fog-drift     9s ease-in-out infinite alternate; }
+.atmo-storm-flicker{ animation: atmo-storm-flicker 2.8s ease-in-out infinite; }
+.atmo-night-shimmer{ animation: atmo-night-shimmer 6s ease-in-out infinite alternate; }

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { SettingsMenu } from './SettingsMenu'
@@ -11,31 +11,54 @@ import { cn } from '@/shared/lib/cn'
 export function TopBar() {
   const pathname = usePathname()
   const [open, setOpen] = useState(false)
+  const [moreOpen, setMoreOpen] = useState(false)
+  const moreRef = useRef<HTMLDivElement>(null)
   const t = useT()
 
-  const nav = [
-    { href: '/weather',     label: t.nav.weather     },
+  // Core 5 items always visible in desktop nav
+  const primaryNav = [
+    { href: '/weather', label: t.nav.weather },
+    { href: '/radar',   label: t.nav.radar   },
+    { href: '/aqi',     label: t.nav.aqi     },
+    { href: '/alerts',  label: t.nav.alerts  },
+    { href: '/health',  label: t.nav.health  },
+  ]
+
+  // Secondary items tucked behind "Thêm"
+  const secondaryNav = [
     { href: '/news',        label: t.nav.news        },
     { href: '/earthquakes', label: t.nav.earthquakes },
     { href: '/calendar',    label: t.nav.calendar    },
-    { href: '/aqi',         label: t.nav.aqi         },
-    { href: '/health',      label: t.nav.health      },
     { href: '/wind',        label: t.nav.wind        },
-    { href: '/radar',       label: t.nav.radar       },
-    { href: '/alerts',      label: t.nav.alerts      },
     { href: '/widget',      label: t.nav.widget      },
   ]
+
+  // All items for the mobile drawer
+  const allNav = [...primaryNav, ...secondaryNav]
+
+  // Close "Thêm" when clicking outside
+  useEffect(() => {
+    function onPointerDown(e: PointerEvent) {
+      if (moreRef.current && !moreRef.current.contains(e.target as Node)) {
+        setMoreOpen(false)
+      }
+    }
+    if (moreOpen) document.addEventListener('pointerdown', onPointerDown)
+    return () => document.removeEventListener('pointerdown', onPointerDown)
+  }, [moreOpen])
 
   useEffect(() => {
     document.body.style.overflow = open ? 'hidden' : ''
     return () => { document.body.style.overflow = '' }
-  }, [open]) 
+  }, [open])
+
+  const isSecondaryActive = secondaryNav.some(({ href }) => pathname?.startsWith(href))
 
   return (
     <>
       <header className="sticky top-0 z-40 border-b border-black/5 bg-[color:var(--background)]/85 backdrop-blur dark:border-white/5">
         <div className="mx-auto flex container items-center justify-between gap-4 px-4 py-3 md:px-6">
-          <Link href="/" className="inline-flex items-center gap-2 font-bold tracking-tight">
+          <Link href="/" className="inline-flex items-center gap-2 font-bold tracking-tight shrink-0">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src="/icon.svg" alt="" width={28} height={28} className="rounded-lg" aria-hidden />
             <span className="bg-gradient-to-r from-[#4F8CFF] to-[#56E0FF] bg-clip-text text-transparent">
@@ -43,8 +66,9 @@ export function TopBar() {
             </span>
           </Link>
 
+          {/* Desktop nav: 5 core items + "Thêm" dropdown */}
           <nav className="hidden lg:flex items-center gap-1 overflow-x-auto whitespace-nowrap">
-            {nav.map(({ href, label }) => {
+            {primaryNav.map(({ href, label }) => {
               const active = pathname?.startsWith(href)
               return (
                 <Link
@@ -61,6 +85,49 @@ export function TopBar() {
                 </Link>
               )
             })}
+
+            {/* "Thêm" dropdown for secondary items */}
+            <div ref={moreRef} className="relative">
+              <button
+                type="button"
+                onClick={() => setMoreOpen((v) => !v)}
+                aria-expanded={moreOpen}
+                className={cn(
+                  'inline-flex items-center gap-1 rounded-full px-3 py-1.5 text-sm transition-colors',
+                  isSecondaryActive
+                    ? 'bg-slate-900 text-white dark:bg-white dark:text-slate-900'
+                    : 'text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-white/5',
+                )}
+              >
+                Thêm
+                <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden className={cn('transition-transform duration-200', moreOpen && 'rotate-180')}>
+                  <path d="M2 4l4 4 4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </button>
+
+              {moreOpen && (
+                <div className="absolute right-0 top-full mt-1.5 min-w-[160px] rounded-2xl border border-black/5 bg-[color:var(--surface)] py-1.5 shadow-xl dark:border-white/8 dark:shadow-black/40">
+                  {secondaryNav.map(({ href, label }) => {
+                    const active = pathname?.startsWith(href)
+                    return (
+                      <Link
+                        key={href}
+                        href={href}
+                        onClick={() => setMoreOpen(false)}
+                        className={cn(
+                          'flex items-center gap-2 px-4 py-2 text-sm transition-colors',
+                          active
+                            ? 'bg-slate-100 font-medium text-slate-900 dark:bg-white/10 dark:text-white'
+                            : 'text-slate-600 hover:bg-slate-50 dark:text-slate-300 dark:hover:bg-white/5',
+                        )}
+                      >
+                        {label}
+                      </Link>
+                    )
+                  })}
+                </div>
+              )}
+            </div>
           </nav>
 
           <div className="flex items-center gap-2">
@@ -83,6 +150,7 @@ export function TopBar() {
         </div>
       </header>
 
+      {/* Mobile drawer backdrop */}
       <div
         aria-hidden
         onClick={() => setOpen(false)}
@@ -92,6 +160,7 @@ export function TopBar() {
         )}
       />
 
+      {/* Mobile drawer */}
       <aside
         aria-label="Navigation menu"
         className={cn(
@@ -121,7 +190,7 @@ export function TopBar() {
         </div>
 
         <nav className="flex-1 overflow-y-auto py-3">
-          {nav.map(({ href, label }) => {
+          {allNav.map(({ href, label }) => {
             const active = pathname?.startsWith(href)
             return (
               <Link
