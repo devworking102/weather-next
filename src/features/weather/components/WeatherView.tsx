@@ -46,9 +46,11 @@ const TodaySummary        = dynamic(() => import('./today/TodaySummary').then(m 
 const SunMoonCard         = dynamic(() => import('./today/SunMoonCard').then(m => ({ default: m.SunMoonCard })), { ssr: false })
 const LunarHoursCard      = dynamic(() => import('./today/LunarHoursCard').then(m => ({ default: m.LunarHoursCard })), { ssr: false })
 const HistoricalCompareCard = dynamic(() => import('./today/HistoricalCompareCard').then(m => ({ default: m.HistoricalCompareCard })), { ssr: false })
-const RecommendationsCard = dynamic(() => import('@/features/recommendations/components/RecommendationsCard').then(m => ({ default: m.RecommendationsCard })), { ssr: false })
+const WeatherInsightsPanel = dynamic(
+  () => import('./WeatherInsightsPanel').then((m) => ({ default: m.WeatherInsightsPanel })),
+  { ssr: false, loading: tabFallback },
+)
 const RadarPreviewCard    = dynamic(() => import('./today/RadarPreviewCard').then(m => ({ default: m.RadarPreviewCard })), { ssr: false, loading: tabFallback })
-const ChatWidget          = dynamic(() => import('./ChatWidget').then(m => ({ default: m.ChatWidget })), { ssr: false })
 
 const TemperatureChart    = dynamicChart('temperature')
 const RainProbabilityChart = dynamicChart('rain')
@@ -118,8 +120,8 @@ export function WeatherView() {
               {/* § 2 — Rain prediction: answers "will it rain soon?" */}
               <NextRainCard weather={data} />
 
-              {/* § 3 — Lifestyle insights: answers "what should I prepare?" */}
-              <RecommendationsCard location={location} weather={data} />
+              {/* § 3 — Unified AI insights (summary, outfit, health, travel, mood, severe) */}
+              <WeatherInsightsPanel location={location} weather={data} aqi={aqi} />
 
               {/* § 4 — 7-day preview */}
               <DailyPreviewRow
@@ -175,9 +177,6 @@ export function WeatherView() {
             )}
             {tab === 'widget' && <WidgetTab />}
           </div>
-
-          {/* Global AI Chat Assistant */}
-          <ChatWidget />
         </>
       )}
     </div>

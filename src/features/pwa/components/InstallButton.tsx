@@ -3,6 +3,13 @@
 import { useEffect, useState } from 'react'
 import { Download } from 'lucide-react'
 import { useT } from '@/shared/hooks/useT'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from '@/shared/ui/Dialog'
 
 interface BIPEvent extends Event {
   prompt: () => Promise<void>
@@ -16,7 +23,9 @@ export function InstallButton() {
   const [ua, setUa] = useState('')
 
   useEffect(() => {
-    setUa(typeof navigator !== 'undefined' ? navigator.userAgent : '')
+    queueMicrotask(() => {
+      setUa(typeof navigator !== 'undefined' ? navigator.userAgent : '')
+    })
     function onPrompt(e: Event) {
       e.preventDefault()
       setDeferred(e as BIPEvent)
@@ -70,42 +79,47 @@ export function InstallButton() {
         <span className="hidden sm:inline">{t.install.buttonLabel}</span>
       </button>
 
-      {hint ? (
-        <div
-          className="fixed inset-0 z-[60] flex items-end justify-center bg-black/60 p-4 sm:items-center"
-          onClick={(e) => {
-            if (e.target === e.currentTarget) setHint(null)
-          }}
+      <Dialog open={hint !== null} onOpenChange={(open) => !open && setHint(null)}>
+        <DialogContent
+          hideClose
+          className="top-auto bottom-0 left-1/2 max-h-[min(90dvh,640px)] w-[calc(100%-1.25rem)] max-w-sm -translate-x-1/2 translate-y-0 rounded-2xl rounded-b-none border-t border-t-white/20 pb-[max(1rem,env(safe-area-inset-bottom))] pt-5 sm:bottom-auto sm:top-1/2 sm:max-h-[min(90vh,720px)] sm:w-full sm:max-w-lg sm:-translate-y-1/2 sm:rounded-2xl sm:border-t-0 sm:pb-6 sm:pt-6"
         >
-          <div className="w-full max-w-sm rounded-2xl bg-white p-6 text-slate-800 shadow-2xl dark:bg-slate-900 dark:text-slate-100">
-            {hint === 'ios' ? (
-              <>
-                <h3 className="mb-3 flex items-center gap-2 text-lg font-bold">
-                  {t.install.iosTitle}
-                </h3>
-                <ol className="list-inside list-decimal space-y-2 text-sm leading-relaxed">
-                  {t.install.iosSteps.map((step, i) => <li key={i}>{step}</li>)}
-                </ol>
-                <p className="mt-3 text-xs text-slate-500">{t.install.iosNote}</p>
-              </>
-            ) : (
-              <>
-                <h3 className="mb-3 flex items-center gap-2 text-lg font-bold">{t.install.androidTitle}</h3>
-                <ol className="list-inside list-decimal space-y-2 text-sm leading-relaxed">
-                  {t.install.androidSteps.map((step, i) => <li key={i}>{step}</li>)}
-                </ol>
-                <p className="mt-3 text-xs text-slate-500">{t.install.androidNote}</p>
-              </>
-            )}
-            <button
-              onClick={() => setHint(null)}
-              className="mt-4 w-full rounded-xl bg-sky-600 py-2 font-semibold text-white hover:bg-sky-700"
-            >
-              {t.install.dismiss}
-            </button>
-          </div>
-        </div>
-      ) : null}
+          {hint === 'ios' ? (
+            <>
+              <DialogHeader>
+                <DialogTitle className="text-left">{t.install.iosTitle}</DialogTitle>
+                <DialogDescription className="sr-only">Hướng dẫn thêm Trời Hôm Nay vào màn hình chính trên iOS.</DialogDescription>
+              </DialogHeader>
+              <ol className="list-inside list-decimal space-y-2 text-sm leading-relaxed text-slate-700 dark:text-slate-200">
+                {t.install.iosSteps.map((step, i) => (
+                  <li key={i}>{step}</li>
+                ))}
+              </ol>
+              <p className="text-xs text-slate-500 dark:text-slate-400">{t.install.iosNote}</p>
+            </>
+          ) : hint === 'android' ? (
+            <>
+              <DialogHeader>
+                <DialogTitle className="text-left">{t.install.androidTitle}</DialogTitle>
+                <DialogDescription className="sr-only">Hướng dẫn thêm Trời Hôm Nay vào màn hình chính trên Android.</DialogDescription>
+              </DialogHeader>
+              <ol className="list-inside list-decimal space-y-2 text-sm leading-relaxed text-slate-700 dark:text-slate-200">
+                {t.install.androidSteps.map((step, i) => (
+                  <li key={i}>{step}</li>
+                ))}
+              </ol>
+              <p className="text-xs text-slate-500 dark:text-slate-400">{t.install.androidNote}</p>
+            </>
+          ) : null}
+          <button
+            type="button"
+            onClick={() => setHint(null)}
+            className="mt-2 w-full rounded-xl bg-sky-600 py-2.5 text-sm font-semibold text-white hover:bg-sky-700"
+          >
+            {t.install.dismiss}
+          </button>
+        </DialogContent>
+      </Dialog>
     </>
   )
 }

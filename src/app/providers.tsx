@@ -8,10 +8,12 @@ import { useUiStore } from '@/shared/store/ui-store'
 import { ChatWidget } from '@/features/weather/components/ChatWidget'
 import { ServiceWorkerRegister } from '@/features/pwa/components/ServiceWorkerRegister'
 import { MobileBottomNav } from '@/shared/ui/MobileBottomNav'
+import { usePrefetchAppRoutes } from '@/shared/hooks/usePrefetchAppRoutes'
 
 export function Providers({ children }: { children: ReactNode }) {
   const queryClient = getQueryClient()
   const pathname = usePathname()
+  usePrefetchAppRoutes()
   const theme = useUiStore((s) => s.theme)
   // Chỉ ẩn chat trong trang iframe nhúng (`/widget/embed`), không ẩn ở `/widget` (trang lấy mã).
   const path = pathname?.replace(/\/+$/, '') ?? ''
@@ -35,7 +37,13 @@ export function Providers({ children }: { children: ReactNode }) {
   return (
     <QueryClientProvider client={queryClient}>
       <ServiceWorkerRegister />
-      <div className="pb-[calc(4.75rem+env(safe-area-inset-bottom,0px))] md:pb-0">{children}</div>
+      <div
+        id="__content"
+        tabIndex={-1}
+        className="outline-none pb-[calc(4.75rem+env(safe-area-inset-bottom,0px))] md:pb-0"
+      >
+        {children}
+      </div>
       <MobileBottomNav />
       {showChat ? <ChatWidget /> : null}
     </QueryClientProvider>

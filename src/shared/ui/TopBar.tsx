@@ -38,7 +38,7 @@ export function TopBar() {
 
   return (
     <>
-      <header className="sticky top-0 z-40 border-b border-black/5 bg-[color:var(--background)]/85 backdrop-blur dark:border-white/5">
+      <header className="sticky top-0 z-40 border-b border-white/40 bg-white/60 backdrop-blur-2xl backdrop-saturate-150 dark:border-white/10 dark:bg-[#1C1C1E]/70 transition-colors duration-300">
         <div className="mx-auto flex container items-center justify-between gap-4 px-4 py-3 md:px-6">
           <Link href="/" className="inline-flex items-center gap-2 font-bold tracking-tight shrink-0">
             {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -57,10 +57,10 @@ export function TopBar() {
                   key={href}
                   href={href}
                   className={cn(
-                    'inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm transition-colors',
+                    'inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-medium transition-all duration-300',
                     active
-                      ? 'bg-slate-900 text-white dark:bg-white dark:text-slate-900'
-                      : 'text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-white/5',
+                      ? 'bg-black/5 text-sky-600 dark:bg-white/10 dark:text-sky-400'
+                      : 'text-slate-500 hover:bg-black/5 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-white/5 dark:hover:text-slate-200',
                   )}
                 >
                   {label}
@@ -77,7 +77,7 @@ export function TopBar() {
               aria-label={t.nav.openMenu}
               aria-expanded={open}
               onClick={() => setOpen(true)}
-              className="lg:hidden inline-flex items-center justify-center rounded-lg p-2 text-slate-600 transition-colors hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-white/5"
+              className="lg:hidden inline-flex items-center justify-center rounded-xl p-2 text-slate-600 transition-colors hover:bg-black/5 dark:text-slate-300 dark:hover:bg-white/5"
             >
               <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden>
                 <rect y="3" width="20" height="2" rx="1" fill="currentColor" />
@@ -94,7 +94,7 @@ export function TopBar() {
         aria-hidden
         onClick={() => setOpen(false)}
         className={cn(
-          'fixed inset-0 z-50 bg-black/40 backdrop-blur-sm transition-opacity duration-300 lg:hidden',
+          'fixed inset-0 z-50 bg-black/20 backdrop-blur-md transition-opacity duration-300 lg:hidden dark:bg-black/50',
           open ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none',
         )}
       />
@@ -103,7 +103,7 @@ export function TopBar() {
       <aside
         aria-label="Navigation menu"
         className={cn(
-          'fixed left-0 top-0 z-50 h-full w-72 bg-[color:var(--background)] shadow-2xl transition-transform duration-300 ease-in-out lg:hidden',
+          'fixed left-0 top-0 z-50 h-full w-72 bg-white/80 backdrop-blur-2xl backdrop-saturate-200 shadow-2xl transition-transform duration-300 ease-in-out lg:hidden dark:bg-[#1C1C1E]/90 dark:border-r dark:border-white/10',
           'flex flex-col',
           open ? 'translate-x-0' : '-translate-x-full',
         )}
@@ -148,8 +148,8 @@ export function TopBar() {
                       className={cn(
                         'snap-center shrink-0 flex w-[120px] flex-col items-start gap-1.5 rounded-2xl p-3 text-sm font-medium transition-colors border text-left',
                         isActive
-                          ? 'border-sky-200 bg-sky-50 text-sky-700 dark:border-sky-500/30 dark:bg-sky-500/10 dark:text-sky-300'
-                          : 'border-black/5 bg-white text-slate-600 hover:bg-slate-50 dark:border-white/5 dark:bg-slate-800/50 dark:text-slate-300 dark:hover:bg-white/5',
+                          ? 'border-sky-200 bg-sky-50 text-sky-700 dark:border-sky-500/30 dark:bg-sky-500/20 dark:text-sky-300 shadow-sm'
+                          : 'border-black/5 bg-white/50 text-slate-600 hover:bg-white dark:border-white/10 dark:bg-black/20 dark:text-slate-300 dark:hover:bg-white/5',
                       )}
                     >
                       <div className="flex w-full items-center justify-between">

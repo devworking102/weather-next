@@ -3,11 +3,21 @@
  * SW_CACHE_VERSION — tăng khi đổi chiến lược cache (C).
  * Đăng ký SW từ app với ?v=... cùng giá trị NEXT_PUBLIC_SW_CACHE_VERSION.
  */
-const SW_CACHE_VERSION = 'weather-sw-v4'
+const SW_CACHE_VERSION = 'weather-sw-v6'
 const WEATHER_API_CACHE = `${SW_CACHE_VERSION}-weather-get`
+const AQI_API_CACHE = `${SW_CACHE_VERSION}-aqi-get`
+const SHELL_CACHE = `${SW_CACHE_VERSION}-shell`
+
+const PRECACHE_URLS = ['/offline.html', '/icon.svg', '/manifest.json']
 
 self.addEventListener('install', (event) => {
-  event.waitUntil(self.skipWaiting())
+  event.waitUntil(
+    caches
+      .open(SHELL_CACHE)
+      .then((cache) => cache.addAll(PRECACHE_URLS))
+      .then(() => self.skipWaiting())
+      .catch(() => self.skipWaiting()),
+  )
 })
 
 self.addEventListener('activate', (event) => {
@@ -25,35 +35,73 @@ self.addEventListener('activate', (event) => {
   )
 })
 
-/** GET /api/weather — network-first, fallback cache (offline). */
+/** GET API — network-first, cache bản thành công để dùng offline. */
+function networkFirstGet(request, cacheName, offlineBody) {
+  return (async () => {
+    const cache = await caches.open(cacheName)
+    try {
+      const res = await fetch(request)
+      if (res.ok) await cache.put(request, res.clone())
+      return res
+    } catch {
+      const hit = await cache.match(request)
+      if (hit) return hit
+      return new Response(JSON.stringify(offlineBody), {
+        status: 503,
+        headers: { 'Content-Type': 'application/json' },
+      })
+    }
+  })()
+}
+
 self.addEventListener('fetch', (event) => {
   const { request } = event
   if (request.method !== 'GET') return
   const url = new URL(request.url)
   if (url.origin !== self.location.origin) return
-  if (url.pathname !== '/api/weather') return
 
-  event.respondWith(
-    (async () => {
-      const cache = await caches.open(WEATHER_API_CACHE)
-      try {
-        const res = await fetch(request)
-        if (res.ok) await cache.put(request, res.clone())
-        return res
-      } catch {
-        const hit = await cache.match(request)
-        if (hit) return hit
-        return new Response(JSON.stringify({ error: 'offline', message: 'no_cached_weather' }), {
-          status: 503,
-          headers: { 'Content-Type': 'application/json' },
-        })
-      }
-    })(),
-  )
+  /** Trang HTML: lỗi mạng → offline shell (không cache bản online để tránh HTML cũ). */
+  if (request.mode === 'navigate') {
+    event.respondWith(
+      (async () => {
+        try {
+          return await fetch(request)
+        } catch {
+          const shell = await caches.open(SHELL_CACHE)
+          const offline = await shell.match('/offline.html')
+          if (offline) return offline
+          return new Response(
+            '<!doctype html><meta charset="utf-8"><title>Offline</title><p>Không có mạng.</p><p><a href="/weather">Về dự báo</a></p>',
+            { status: 503, headers: { 'Content-Type': 'text/html; charset=utf-8' } },
+          )
+        }
+      })(),
+    )
+    return
+  }
+
+  if (url.pathname === '/api/weather') {
+    event.respondWith(
+      networkFirstGet(request, WEATHER_API_CACHE, {
+        error: 'offline',
+        message: 'no_cached_weather',
+      }),
+    )
+    return
+  }
+  if (url.pathname === '/api/aqi') {
+    event.respondWith(
+      networkFirstGet(request, AQI_API_CACHE, {
+        error: 'offline',
+        message: 'no_cached_aqi',
+      }),
+    )
+    return
+  }
 })
 
 self.addEventListener('push', (event) => {
-  let data = { title: 'Weather Next', body: '', url: '/weather' }
+  let data = { title: 'Trời Hôm Nay', body: '', url: '/weather' }
   try {
     if (event.data) data = { ...data, ...event.data.json() }
   } catch {

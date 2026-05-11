@@ -15,16 +15,16 @@ export function ThemeToggle() {
   const setTheme = useUiStore((s) => s.setTheme)
 
   return (
-    <div className="inline-flex rounded-full border border-black/10 bg-white p-1 text-xs dark:border-white/10 dark:bg-slate-900/60">
+    <div className="inline-flex rounded-full border border-black/5 bg-black/5 p-1 text-xs backdrop-blur-xl dark:border-white/10 dark:bg-white/5">
       {options.map(({ key, label, icon: Icon }) => (
         <button
           key={key}
           onClick={() => setTheme(key)}
           className={cn(
-            'inline-flex h-7 items-center gap-1 rounded-full px-2.5 font-medium transition-colors',
+            'inline-flex h-7 items-center gap-1.5 rounded-full px-3 font-medium transition-all duration-300',
             theme === key
-              ? 'bg-slate-900 text-white dark:bg-white dark:text-slate-900'
-              : 'text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white',
+              ? 'bg-white text-slate-900 shadow-sm dark:bg-slate-800 dark:text-white'
+              : 'text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-200 hover:bg-black/5 dark:hover:bg-white/5',
           )}
           aria-label={label}
           type="button"

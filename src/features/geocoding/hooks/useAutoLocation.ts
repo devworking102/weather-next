@@ -47,7 +47,8 @@ export function useAutoLocation() {
   useEffect(() => {
     if (geoRanRef.current) return
     if (pinned && current) {
-      setStep('done')
+      geoRanRef.current = true
+      queueMicrotask(() => setStep('done'))
       return
     }
     geoRanRef.current = true
@@ -95,7 +96,7 @@ export function useAutoLocation() {
       // Fallback cứng để UI luôn có dữ liệu hiển thị
       setCurrent(DEFAULT_FALLBACK)
     }
-    setStep('done')
+    queueMicrotask(() => setStep('done'))
   }, [step, ipQuery.isLoading, ipQuery.isFetching, ipQuery.data, setCurrent])
 
   // Background upgrade tên qua reverse geocode nếu vị trí hiện tại còn tên mặc định.

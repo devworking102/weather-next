@@ -42,6 +42,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: 'daily',
       priority: 0.82,
     })
+    entries.push({
+      url: `${base}/alerts/${slug}`,
+      lastModified: new Date(),
+      changeFrequency: 'daily',
+      priority: 0.78,
+    })
   }
 
   return entries

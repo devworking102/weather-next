@@ -25,24 +25,20 @@ export function HealthTab({ weather }: Props) {
 
   const indices = useMemo(() => computeHealthIndices(weather, aqi ?? undefined, locale), [weather, aqi, locale])
 
-  const insightPayload = useMemo<HealthInsightPayload | null>(
-    () =>
-      location
-        ? {
-            locationName: location.name,
-            temperature: weather.current.temperature,
-            tempMax: weather.daily[0]?.tempMax ?? weather.current.temperature,
-            humidity: weather.current.humidity,
-            windSpeed: weather.current.windSpeed,
-            cloudCover: weather.current.cloudCover,
-            precipProb: weather.daily[0]?.precipitationProbability ?? 0,
-            aqi: aqi?.current.europeanAqi ?? 0,
-            uvIndex: weather.current.uvIndex,
-            locale,
-          }
-        : null,
-    [location, weather, aqi, locale],
-  )
+  const insightPayload: HealthInsightPayload | null = location
+    ? {
+        locationName: location.name,
+        temperature: weather.current.temperature,
+        tempMax: weather.daily[0]?.tempMax ?? weather.current.temperature,
+        humidity: weather.current.humidity,
+        windSpeed: weather.current.windSpeed,
+        cloudCover: weather.current.cloudCover,
+        precipProb: weather.daily[0]?.precipitationProbability ?? 0,
+        aqi: aqi?.current.europeanAqi ?? 0,
+        uvIndex: weather.current.uvIndex,
+        locale,
+      }
+    : null
 
   const { data: insight, isLoading: insightLoading } = useAiInsight<HealthInsightPayload, HealthInsightResponse>(
     '/api/health-insight',

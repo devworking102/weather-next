@@ -1,20 +1,28 @@
 {
+  "id": "/",
   "name": "Trời Hôm Nay",
   "short_name": "Trời Hôm Nay",
   "description": "Dự báo thời tiết thông minh, hỗ trợ bởi AI. Cập nhật theo thời gian thực.",
   "start_url": "/weather",
   "scope": "/",
   "display": "standalone",
+  "display_override": ["standalone", "minimal-ui", "browser"],
+  "orientation": "portrait-primary",
   "background_color": "#070b14",
   "theme_color": "#4F8CFF",
   "lang": "vi",
-  "categories": ["weather", "utilities"],
+  "dir": "ltr",
+  "categories": ["weather", "utilities", "lifestyle"],
   "icons": [
-    { "src": "/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+    { "src": "/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" },
+    { "src": "/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "maskable" }
   ],
   "shortcuts": [
-    { "name": "Thời tiết",  "short_name": "Thời tiết", "url": "/weather", "description": "Dự báo đầy đủ" },
-    { "name": "Radar mưa",  "short_name": "Radar",     "url": "/radar",   "description": "Radar Windy" },
-    { "name": "Không khí",  "short_name": "AQI",       "url": "/aqi",     "description": "Chất lượng không khí" }
+    { "name": "Thời tiết", "short_name": "Thời tiết", "url": "/weather", "description": "Dự báo đầy đủ" },
+    { "name": "Radar mưa", "short_name": "Radar", "url": "/radar", "description": "Radar RainViewer & Windy" },
+    { "name": "Không khí", "short_name": "AQI", "url": "/aqi", "description": "Chất lượng không khí" },
+    { "name": "Cảnh báo", "short_name": "Cảnh báo", "url": "/alerts", "description": "Cảnh báo thời tiết" },
+    { "name": "Sức khỏe", "short_name": "Sức khỏe", "url": "/health", "description": "Chỉ số sức khỏe & thời tiết" },
+    { "name": "Lịch âm", "short_name": "Lịch", "url": "/calendar", "description": "Âm lịch & tiết khí" }
   ]
 }

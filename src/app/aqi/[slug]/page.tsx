@@ -1,10 +1,13 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
+import { cache } from 'react'
 import { getSeoCity, listSeoCitySlugs } from '@/data/seo-cities'
 import { fetchAirQuality } from '@/features/weather/services/air-quality'
 import { getSiteUrl } from '@/shared/lib/site-url'
 import { TopBar } from '@/shared/ui/TopBar'
+
+const getCachedAirQuality = cache(fetchAirQuality)
 
 export function generateStaticParams() {
   return listSeoCitySlugs().map((slug) => ({ slug }))
@@ -18,11 +21,11 @@ export async function generateMetadata({
   const { slug } = await params
   const city = getSeoCity(slug)
   if (!city) return {}
-  const aq = await fetchAirQuality(city.lat, city.lon)
-  const eu = Math.round(aq.current.europeanAqi)
   const base = getSiteUrl()
   const title = `AQI ${city.nameVi}`
-  const description = `Chất lượng không khí ${city.nameVi}: chỉ số EU AQI khoảng ${eu}. PM2.5 & dự báo trong app.`
+  const description = `Chất lượng không khí ${city.nameVi}: EU AQI & PM2.5 trong ứng dụng Trời Hôm Nay (Open-Meteo Air Quality).`
+  const ogTitle = encodeURIComponent(`AQI ${city.nameVi}`)
+  const ogLine2 = encodeURIComponent('Mở app để xem chỉ số thực · dự báo 24h')
   return {
     title,
     description,
@@ -33,6 +36,19 @@ export async function generateMetadata({
       url: `${base}/aqi/${slug}`,
       locale: 'vi_VN',
       type: 'website',
+      images: [
+        {
+          url: `/api/og?type=aqi&title=${ogTitle}&line2=${ogLine2}`,
+          width: 1200,
+          height: 630,
+        },
+      ],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
+      images: [`/api/og?type=aqi&title=${ogTitle}&line2=${ogLine2}`],
     },
   }
 }
@@ -42,9 +58,15 @@ export default async function SeoAqiCityPage({ params }: { params: Promise<{ slu
   const city = getSeoCity(slug)
   if (!city) notFound()
 
-  const aq = await fetchAirQuality(city.lat, city.lon)
-  const eu = Math.round(aq.current.europeanAqi)
-  const pm = Math.round(aq.current.pm25)
+  let aq: Awaited<ReturnType<typeof fetchAirQuality>> | null = null
+  try {
+    aq = await getCachedAirQuality(city.lat, city.lon)
+  } catch {
+    aq = null
+  }
+
+  const eu = aq != null ? Math.round(aq.current.europeanAqi) : null
+  const pm = aq != null ? Math.round(aq.current.pm25) : null
 
   const faqLd = {
     '@context': 'https://schema.org',
@@ -55,7 +77,10 @@ export default async function SeoAqiCityPage({ params }: { params: Promise<{ slu
         name: `AQI tại ${city.nameVi} là gì?`,
         acceptedAnswer: {
           '@type': 'Answer',
-          text: `Chỉ số EU AQI tham chiếu khoảng ${eu} tại thời điểm tạo trang; PM2.5 khoảng ${pm} µg/m³ theo Open-Meteo.`,
+          text:
+            eu != null && pm != null
+              ? `Chỉ số EU AQI tham chiếu khoảng ${eu} tại thời điểm tạo trang; PM2.5 khoảng ${pm} µg/m³ theo Open-Meteo.`
+              : `Chỉ số EU AQI và PM2.5 cho ${city.nameVi} có trong ứng dụng Trời Hôm Nay (Open-Meteo Air Quality).`,
         },
       },
     ],
@@ -73,9 +98,20 @@ export default async function SeoAqiCityPage({ params }: { params: Promise<{ slu
           Số liệu tham chiếu từ Open-Meteo Air Quality API (EU AQI).
         </p>
         <div className="rounded-2xl border border-black/5 bg-white p-6 dark:border-white/10 dark:bg-slate-900/40">
-          <p className="text-sm text-slate-500">EU AQI (ước lượng)</p>
-          <p className="mt-1 text-5xl font-light text-slate-900 dark:text-white">{eu}</p>
-          <p className="mt-2 text-sm text-slate-600 dark:text-slate-300">PM2.5 ~ {pm} µg/m³</p>
+          {eu != null && pm != null ? (
+            <>
+              <p className="text-sm text-slate-500">EU AQI (ước lượng)</p>
+              <p className="mt-1 text-5xl font-light text-slate-900 dark:text-white">{eu}</p>
+              <p className="mt-2 text-sm text-slate-600 dark:text-slate-300">PM2.5 ~ {pm} µg/m³</p>
+            </>
+          ) : (
+            <div className="text-sm text-slate-600 dark:text-slate-300">
+              <p className="font-medium text-slate-800 dark:text-slate-100">
+                Tạm thời không tải được số liệu Open-Meteo Air Quality (giới hạn API hoặc mạng).
+              </p>
+              <p className="mt-2">Mở trang AQI trong app để xem EU AQI và PM2.5 theo thời gian thực.</p>
+            </div>
+          )}
         </div>
         <Link
           href="/aqi"

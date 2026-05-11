@@ -36,8 +36,12 @@ export async function fetchWeather(
 
   const url = `https://api.open-meteo.com/v1/forecast?${params.toString()}`
   let res: Response | undefined
-  for (let attempt = 0; attempt < 4; attempt++) {
-    if (attempt > 0) await new Promise((r) => setTimeout(r, 2 ** (attempt - 1) * 1500))
+  for (let attempt = 0; attempt < 8; attempt++) {
+    if (attempt > 0) {
+      const base = 2 ** (attempt - 1) * 1800
+      const jitter = Math.floor(Math.random() * 400)
+      await new Promise((r) => setTimeout(r, base + jitter))
+    }
     res = await fetch(url, { next: { revalidate: 300 } })
     if (res.status !== 429) break
   }

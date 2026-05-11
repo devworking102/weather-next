@@ -22,12 +22,11 @@ export async function generateMetadata({
   const { slug } = await params
   const city = getSeoCity(slug)
   if (!city) return {}
-  const w = await getCachedWeather(city.lat, city.lon, 'celsius')
-  const label = wmoInfo(w.current.weatherCode).label
-  const t = Math.round(w.current.temperature)
   const base = getSiteUrl()
   const title = `Thời tiết ${city.nameVi}`
-  const description = `${city.nameVi}: hiện tại ${t}°C, ${label}. Dự báo theo giờ & nhiều ngày.`
+  const description = `${city.nameVi}: dự báo theo giờ, mưa nắng và chỉ số trong ứng dụng Trời Hôm Nay (Open-Meteo).`
+  const ogTitle = encodeURIComponent(`Thời tiết ${city.nameVi}`)
+  const ogLine2 = encodeURIComponent('Mở app để xem nhiệt độ')
   return {
     title,
     description,
@@ -38,6 +37,19 @@ export async function generateMetadata({
       url: `${base}/weather/${slug}`,
       locale: 'vi_VN',
       type: 'website',
+      images: [
+        {
+          url: `/api/og?type=weather&title=${ogTitle}&line2=${ogLine2}`,
+          width: 1200,
+          height: 630,
+        },
+      ],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
+      images: [`/api/og?type=weather&title=${ogTitle}&line2=${ogLine2}`],
     },
   }
 }
@@ -47,12 +59,18 @@ export default async function SeoWeatherCityPage({ params }: { params: Promise<{
   const city = getSeoCity(slug)
   if (!city) notFound()
 
-  const w = await getCachedWeather(city.lat, city.lon, 'celsius')
-  const info = wmoInfo(w.current.weatherCode)
-  const tcur = Math.round(w.current.temperature)
-  const tmax = w.daily[0] ? Math.round(w.daily[0].tempMax) : tcur
-  const tmin = w.daily[0] ? Math.round(w.daily[0].tempMin) : tcur
-  const rain = w.daily[0] ? Math.round(w.daily[0].precipitationProbability) : 0
+  let w: Awaited<ReturnType<typeof fetchWeather>> | null = null
+  try {
+    w = await getCachedWeather(city.lat, city.lon, 'celsius')
+  } catch {
+    w = null
+  }
+
+  const info = w ? wmoInfo(w.current.weatherCode) : null
+  const tcur = w ? Math.round(w.current.temperature) : null
+  const tmax = w?.daily[0] ? Math.round(w.daily[0].tempMax) : tcur
+  const tmin = w?.daily[0] ? Math.round(w.daily[0].tempMin) : tcur
+  const rain = w?.daily[0] ? Math.round(w.daily[0].precipitationProbability) : null
 
   const faqLd = {
     '@context': 'https://schema.org',
@@ -90,23 +108,36 @@ export default async function SeoWeatherCityPage({ params }: { params: Promise<{
             Cập nhật theo mô hình dự báo — tham khảo nhanh cho {city.nameEn}.
           </p>
           <dl className="mt-8 grid gap-4 rounded-2xl border border-black/5 bg-white p-6 dark:border-white/10 dark:bg-slate-900/40">
-            <div>
-              <dt className="text-xs font-semibold uppercase tracking-wide text-slate-400">Hiện tại</dt>
-              <dd className="text-4xl font-light text-slate-900 dark:text-white">{tcur}°C</dd>
-              <dd className="text-sm text-slate-600 dark:text-slate-300">{info.label}</dd>
-            </div>
-            <div className="grid grid-cols-2 gap-3 text-sm">
-              <div>
-                <dt className="text-slate-400">Cao / Thấp hôm nay</dt>
-                <dd className="font-semibold text-slate-900 dark:text-white">
-                  {tmax}° / {tmin}°
-                </dd>
+            {w && info && tcur != null && tmax != null && tmin != null && rain != null ? (
+              <>
+                <div>
+                  <dt className="text-xs font-semibold uppercase tracking-wide text-slate-400">Hiện tại</dt>
+                  <dd className="text-4xl font-light text-slate-900 dark:text-white">{tcur}°C</dd>
+                  <dd className="text-sm text-slate-600 dark:text-slate-300">{info.label}</dd>
+                </div>
+                <div className="grid grid-cols-2 gap-3 text-sm">
+                  <div>
+                    <dt className="text-slate-400">Cao / Thấp hôm nay</dt>
+                    <dd className="font-semibold text-slate-900 dark:text-white">
+                      {tmax}° / {tmin}°
+                    </dd>
+                  </div>
+                  <div>
+                    <dt className="text-slate-400">Khả năng mưa (hôm nay)</dt>
+                    <dd className="font-semibold text-slate-900 dark:text-white">{rain}%</dd>
+                  </div>
+                </div>
+              </>
+            ) : (
+              <div className="text-sm text-slate-600 dark:text-slate-300">
+                <p className="font-medium text-slate-800 dark:text-slate-100">
+                  Tạm thời không tải được số liệu Open-Meteo (thường do giới hạn tốc độ API khi build hoặc mạng).
+                </p>
+                <p className="mt-2">
+                  Mở ứng dụng để xem nhiệt độ, theo giờ và radar — dữ liệu sẽ được tải trực tiếp từ máy chủ của chúng tôi.
+                </p>
               </div>
-              <div>
-                <dt className="text-slate-400">Khả năng mưa (hôm nay)</dt>
-                <dd className="font-semibold text-slate-900 dark:text-white">{rain}%</dd>
-              </div>
-            </div>
+            )}
           </dl>
         </article>
         <section>

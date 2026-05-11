@@ -28,9 +28,9 @@ export function MobileBottomNav() {
   }
 
   return (
-    <div className="fixed inset-x-0 bottom-0 z-40 p-4 pb-[max(1rem,env(safe-area-inset-bottom))] md:hidden pointer-events-none">
+    <div className="fixed inset-x-0 bottom-0 z-50 p-4 pb-[max(1.5rem,env(safe-area-inset-bottom))] md:hidden pointer-events-none">
       <nav
-        className="mx-auto flex max-w-md items-stretch justify-around gap-1 rounded-2xl border border-black/5 bg-white/80 p-1.5 shadow-xl backdrop-blur-xl dark:border-white/10 dark:bg-slate-900/80 pointer-events-auto"
+        className="mx-auto flex max-w-md items-stretch justify-around gap-1 rounded-[2rem] border border-white/20 bg-white/60 p-2 shadow-2xl backdrop-blur-2xl backdrop-saturate-150 dark:border-white/10 dark:bg-[#1C1C1E]/70 pointer-events-auto"
         aria-label="Mobile navigation"
       >
         {ITEMS.map(({ href, key, Icon }) => {
@@ -40,19 +40,22 @@ export function MobileBottomNav() {
               key={href}
               href={href}
               className={cn(
-                'flex min-h-[52px] min-w-[44px] flex-1 flex-col items-center justify-center gap-1 rounded-xl px-1 text-[11px] font-semibold transition-colors',
+                'group relative flex min-h-[56px] min-w-[48px] flex-1 flex-col items-center justify-center gap-1.5 rounded-3xl px-1 text-[10px] font-medium transition-all duration-300',
                 active
-                  ? 'bg-sky-50 text-sky-600 dark:bg-sky-500/10 dark:text-sky-300'
-                  : 'text-slate-400 hover:bg-slate-50 hover:text-slate-700 dark:text-slate-500 dark:hover:bg-white/5 dark:hover:text-slate-200',
+                  ? 'text-sky-600 dark:text-sky-400'
+                  : 'text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200',
               )}
             >
+              {active && (
+                <span className="absolute inset-0 rounded-3xl bg-sky-100/50 dark:bg-sky-500/10 transition-opacity" aria-hidden="true" />
+              )}
               <Icon
-                size={22}
-                strokeWidth={active ? 2 : 1.5}
-                className="transition-all"
+                size={24}
+                strokeWidth={active ? 2.5 : 2}
+                className={cn('relative z-10 transition-transform duration-300', active && 'scale-110')}
                 aria-hidden
               />
-              <span className="truncate">{label[key]}</span>
+              <span className="relative z-10 truncate tracking-wide">{label[key]}</span>
             </Link>
           )
         })}

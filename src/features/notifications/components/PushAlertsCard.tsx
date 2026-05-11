@@ -10,12 +10,13 @@ export function PushAlertsCard() {
   const [show, setShow] = useState(false)
 
   useEffect(() => {
-    // Chỉ hiển thị khi trình duyệt hỗ trợ Push và người dùng chưa có quyết định
-    if (typeof window !== 'undefined' && 'Notification' in window) {
-      if (Notification.permission === 'default' && !localStorage.getItem('hide_push_card')) {
-        setShow(true)
+    queueMicrotask(() => {
+      if (typeof window !== 'undefined' && 'Notification' in window) {
+        if (Notification.permission === 'default' && !localStorage.getItem('hide_push_card')) {
+          setShow(true)
+        }
       }
-    }
+    })
   }, [])
 
   const handleSubscribe = async () => {

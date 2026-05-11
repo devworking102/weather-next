@@ -39,7 +39,9 @@ export function useNotifications() {
   const [permission, setPermission] = useState<Perm>('default')
 
   useEffect(() => {
-    setPermission(currentPermission())
+    queueMicrotask(() => {
+      setPermission(currentPermission())
+    })
   }, [])
 
   const request = useCallback(async () => {

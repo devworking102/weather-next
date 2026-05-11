@@ -19,6 +19,13 @@
   --color-sun: #f59e0b;
   --color-rain: #38bdf8;
   --color-night: #0b1220;
+
+  --radius-card: 1rem;
+  --radius-pill: 9999px;
+  --shadow-card:
+    0 1px 2px rgb(15 23 42 / 0.04), 0 8px 24px rgb(15 23 42 / 0.06);
+  --shadow-card-dark:
+    0 1px 2px rgb(0 0 0 / 0.2), 0 12px 40px rgb(0 0 0 / 0.35);
 }
 
 :root {
@@ -45,6 +52,42 @@ body {
   font-family: var(--font-sans), system-ui, -apple-system, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+/* Skip link — WCAG 2.4.1 */
+.skip-link {
+  position: absolute;
+  left: -9999px;
+  top: auto;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  z-index: 100;
+}
+.skip-link:focus {
+  left: max(1rem, env(safe-area-inset-left));
+  top: max(1rem, env(safe-area-inset-top));
+  width: auto;
+  height: auto;
+  overflow: visible;
+  padding: 0.65rem 1rem;
+  border-radius: 0.75rem;
+  background: var(--surface);
+  color: var(--foreground);
+  font-size: 0.875rem;
+  font-weight: 600;
+  box-shadow: var(--shadow-card);
+  outline: 2px solid var(--color-brand);
+  outline-offset: 2px;
+}
+
+/* Focus visible — bàn phím */
+:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--color-brand) 70%, transparent);
+  outline-offset: 2px;
+}
+:focus:not(:focus-visible) {
+  outline: none;
 }
 
 /* Shimmer skeleton — gradient sweep */
@@ -124,3 +167,18 @@ textarea {
 .atmo-fog-drift    { animation: atmo-fog-drift     9s ease-in-out infinite alternate; }
 .atmo-storm-flicker{ animation: atmo-storm-flicker 2.8s ease-in-out infinite; }
 .atmo-night-shimmer{ animation: atmo-night-shimmer 6s ease-in-out infinite alternate; }
+
+@media (prefers-reduced-motion: reduce) {
+  .atmo-sunny-pulse,
+  .atmo-rain-fall,
+  .atmo-fog-drift,
+  .atmo-storm-flicker,
+  .atmo-night-shimmer {
+    animation: none !important;
+  }
+  .animate-fade-in {
+    animation: none !important;
+    opacity: 1;
+    transform: none;
+  }
+}

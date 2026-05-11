@@ -6,7 +6,6 @@ import { Card } from '@/shared/ui/Card'
 import type { WeatherBundle } from '@/features/weather/types'
 import { formatWind, uvCategory, windDirection } from '@/features/weather/utils/format'
 import { useT } from '@/shared/hooks/useT'
-import { cn } from '@/shared/lib/cn'
 
 interface Props {
   weather: WeatherBundle

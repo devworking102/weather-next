@@ -1,8 +1,24 @@
 'use client'
 
+import dynamic from 'next/dynamic'
 import { useLocationStore } from '@/features/geocoding/store/location-store'
-import { OpenLayersRainMap } from '@/features/radar/components/OpenLayersRainMap'
-import { RadarEmbed } from '@/features/radar/components/RadarEmbed'
+import { Skeleton } from '@/shared/ui/Skeleton'
+
+const OpenLayersRainMap = dynamic(
+  () => import('./OpenLayersRainMap').then((m) => ({ default: m.OpenLayersRainMap })),
+  {
+    ssr: false,
+    loading: () => <Skeleton className="h-[420px] w-full max-w-full rounded-2xl" />,
+  },
+)
+
+const RadarEmbed = dynamic(
+  () => import('./RadarEmbed').then((m) => ({ default: m.RadarEmbed })),
+  {
+    ssr: false,
+    loading: () => <Skeleton className="h-[480px] w-full max-w-full rounded-2xl" />,
+  },
+)
 
 const DEFAULT = { lat: 21.0285, lon: 105.8542 }
 
