@@ -48,6 +48,7 @@ const LunarHoursCard      = dynamic(() => import('./today/LunarHoursCard').then(
 const HistoricalCompareCard = dynamic(() => import('./today/HistoricalCompareCard').then(m => ({ default: m.HistoricalCompareCard })), { ssr: false })
 const RecommendationsCard = dynamic(() => import('@/features/recommendations/components/RecommendationsCard').then(m => ({ default: m.RecommendationsCard })), { ssr: false })
 const RadarPreviewCard    = dynamic(() => import('./today/RadarPreviewCard').then(m => ({ default: m.RadarPreviewCard })), { ssr: false, loading: tabFallback })
+const ChatWidget          = dynamic(() => import('./ChatWidget').then(m => ({ default: m.ChatWidget })), { ssr: false })
 
 const TemperatureChart    = dynamicChart('temperature')
 const RainProbabilityChart = dynamicChart('rain')
@@ -174,6 +175,9 @@ export function WeatherView() {
             )}
             {tab === 'widget' && <WidgetTab />}
           </div>
+
+          {/* Global AI Chat Assistant */}
+          <ChatWidget />
         </>
       )}
     </div>

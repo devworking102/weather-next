@@ -58,7 +58,7 @@ export function NextRainCard({ weather }: Props) {
       : null
 
   return (
-    <Card className="border-sky-100/80 bg-gradient-to-br from-sky-50/90 to-white p-5 dark:border-sky-500/15 dark:from-slate-900/80 dark:to-slate-900/40">
+    <Card className="border-sky-200/50 bg-gradient-to-br from-sky-100/60 to-white/30 p-5 dark:border-sky-400/20 dark:from-sky-900/30 dark:to-slate-900/20">
       <div className="flex items-start gap-3">
         <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-sky-500/15 text-sky-600 dark:bg-sky-400/10 dark:text-sky-300">
           <CloudRain size={20} aria-hidden />
