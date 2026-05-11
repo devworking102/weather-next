@@ -7,7 +7,7 @@ import { useLocationStore } from '@/features/geocoding/store/location-store'
 import { useAutoLocation } from '@/features/geocoding/hooks/useAutoLocation'
 import { useEarthquakes } from '@/features/earthquakes/hooks/useEarthquakes'
 import { cn } from '@/shared/lib/cn'
-import { HeroCard } from './HeroCard'
+import { SmartWeatherHero } from './hero/SmartWeatherHero'
 import { StatsGrid } from './StatsGrid'
 import { HourlyStrip } from './HourlyStrip'
 import { WeatherSkeleton } from './WeatherSkeleton'
@@ -16,7 +16,6 @@ import { WeatherEmpty } from './WeatherEmpty'
 import { FavoriteStar } from '@/features/favorites/components/FavoriteStar'
 import { SearchBar } from '@/features/geocoding/components/SearchBar'
 import { FavoritesBar } from '@/features/favorites/components/FavoritesBar'
-import { AiSummary } from './AiSummary'
 import { AlertsBanner } from '@/features/alerts/components/AlertsBanner'
 import { useNotificationScanner } from '@/features/notifications/hooks/useNotifications'
 import { Card } from '@/shared/ui/Card'
@@ -79,8 +78,8 @@ export function WeatherView() {
       ) : (
         <>
           <div className="relative">
-            <HeroCard location={location} weather={data} />
-            <FavoriteStar location={location} className="absolute right-4 top-4" />
+            <SmartWeatherHero location={location} weather={data} aqi={aqi} />
+            <FavoriteStar location={location} className="absolute right-4 top-4 z-10" />
           </div>
 
           <div>
@@ -89,7 +88,6 @@ export function WeatherView() {
               className={cn('space-y-4', tab !== 'today' && 'hidden')}
               aria-hidden={tab !== 'today'}
             >
-              <AiSummary location={location} weather={data} />
               <NextRainCard weather={data} />
               <TodaySummary daily={data.daily} />
               <StatsGrid weather={data} />
