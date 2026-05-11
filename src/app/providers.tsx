@@ -2,13 +2,16 @@
 
 import { QueryClientProvider } from '@tanstack/react-query'
 import { ReactNode, useEffect } from 'react'
+import { usePathname } from 'next/navigation'
 import { getQueryClient } from '@/shared/lib/query-client'
 import { useUiStore } from '@/shared/store/ui-store'
 import { ChatWidget } from '@/features/weather/components/ChatWidget'
 
 export function Providers({ children }: { children: ReactNode }) {
   const queryClient = getQueryClient()
+  const pathname = usePathname()
   const theme = useUiStore((s) => s.theme)
+  const showChat = !pathname?.startsWith('/widget')
 
   // Áp dụng class `dark` lên <html> theo theme + media query hệ thống
   useEffect(() => {
@@ -28,7 +31,7 @@ export function Providers({ children }: { children: ReactNode }) {
   return (
     <QueryClientProvider client={queryClient}>
       {children}
-      <ChatWidget />
+      {showChat ? <ChatWidget /> : null}
     </QueryClientProvider>
   )
 }
