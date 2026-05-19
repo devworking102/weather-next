@@ -67,6 +67,14 @@ const themeInitScript = `
   })();
 `
 
+const googleAnalyticsId = 'G-7RQ54609BW'
+const googleAnalyticsInitScript = `
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', '${googleAnalyticsId}');
+`
+
 const siteJsonLd = () => {
   const base = getSiteUrl()
   return {
@@ -88,6 +96,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       className={`${geistSans.variable} ${geistMono.variable} antialiased`}
     >
       <head>
+        <script async src={`https://www.googletagmanager.com/gtag/js?id=${googleAnalyticsId}`} />
+        <script dangerouslySetInnerHTML={{ __html: googleAnalyticsInitScript }} />
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(siteJsonLd()) }} />
         <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
       </head>
