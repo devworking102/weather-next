@@ -118,11 +118,11 @@ export function SmartWeatherHero({ location, weather, aqi }: Props) {
           </button>
         </div>
 
-        <div className="max-w-3xl space-y-5">
+        <div className="space-y-4">
           <div>
             <p className="text-base font-medium text-white/90">{info.label}</p>
             <div className="mt-2 flex flex-wrap items-end gap-4">
-              <div className="text-[5.75rem] font-extralight leading-[0.86] tracking-tight drop-shadow-[0_2px_30px_rgba(0,0,0,0.4)] sm:text-[7.5rem] md:text-[9rem]">
+              <div className="text-[4.5rem] font-extralight leading-[0.86] tracking-tight drop-shadow-[0_2px_30px_rgba(0,0,0,0.4)] sm:text-[5.5rem] md:text-[7rem]">
                 {formatTemp(current.temperature, tempUnit)}
               </div>
               <div className="pb-2 text-6xl leading-none sm:text-7xl" aria-hidden>
