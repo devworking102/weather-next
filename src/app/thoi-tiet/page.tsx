@@ -7,9 +7,9 @@ import { WeatherTabsBar } from '@/features/weather/components/WeatherTabsBar'
 import { TopBar } from '@/shared/ui/TopBar'
 
 export const metadata: Metadata = {
-  title: 'Thời tiết hôm nay tại Việt Nam',
+  title: 'Trợ lý thời tiết AI hôm nay tại Việt Nam',
   description:
-    'Tra cứu thời tiết hôm nay theo tỉnh/thành: nhiệt độ, khả năng mưa, AQI, UV, radar mưa và dự báo 7 ngày.',
+    'Trợ lý thời tiết AI giúp bạn biết hôm nay có mưa không, nên mặc gì, có nên ra ngoài không, AQI ra sao và cần chuẩn bị gì.',
   alternates: { canonical: '/thoi-tiet' },
 }
 
@@ -20,13 +20,15 @@ export default function WeatherPage() {
     <>
       <TopBar />
       <WeatherTabsBar />
-      <main className="mx-auto container space-y-8 p-4 pb-28 md:p-6">
-        <section className="rounded-3xl border border-sky-100 bg-gradient-to-br from-white to-sky-50 p-5 shadow-sm dark:border-white/10 dark:from-white/10 dark:to-sky-400/10">
-          <h1 className="text-3xl font-semibold tracking-tight text-slate-950 dark:text-white">
-            Thời tiết hôm nay
-          </h1>
-          <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-600 dark:text-slate-300">
-            Chọn tỉnh/thành để xem trang dự báo SEO server-rendered, hoặc dùng app bên dưới để tra cứu theo vị trí hiện tại.
+      <main className="mx-auto container space-y-8 p-3 pb-32 md:p-6">
+        <WeatherView />
+
+        <section className="rounded-[2rem] border border-black/5 bg-white/65 p-5 shadow-sm backdrop-blur-xl dark:border-white/10 dark:bg-white/[0.06]">
+          <h2 className="text-xl font-semibold tracking-tight text-slate-950 dark:text-white">
+            Trang thời tiết theo thành phố
+          </h2>
+          <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-600 dark:text-slate-300">
+            Các trang này sẵn sàng cho SEO theo tỉnh/thành, tóm tắt AI, schema.org và bài viết thời tiết địa phương.
           </p>
           <div className="mt-5 flex flex-wrap gap-2">
             {popularCities.map((city) => (
@@ -42,7 +44,6 @@ export default function WeatherPage() {
         </section>
 
         <CitySearchLinks cities={SEO_CITIES} />
-        <WeatherView />
       </main>
     </>
   )

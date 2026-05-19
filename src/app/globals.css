@@ -19,8 +19,12 @@
   --color-sun: #f59e0b;
   --color-rain: #38bdf8;
   --color-night: #0b1220;
+  --color-ai: #7c3aed;
+  --color-health: #10b981;
+  --space-app: clamp(0.75rem, 2vw, 1.5rem);
 
   --radius-card: 1rem;
+  --radius-companion: 1.75rem;
   --radius-pill: 9999px;
   --shadow-card:
     0 1px 2px rgb(15 23 42 / 0.04), 0 8px 24px rgb(15 23 42 / 0.06);
@@ -161,19 +165,25 @@ textarea {
   0%   { opacity: 0.18; }
   100% { opacity: 0.32; }
 }
+@keyframes atmo-cloud-drift {
+  0%   { transform: translate3d(-3%, 0, 0); }
+  100% { transform: translate3d(3%, 0, 0); }
+}
 
 .atmo-sunny-pulse  { animation: atmo-sunny-pulse  4s ease-in-out infinite alternate; }
 .atmo-rain-fall    { animation: atmo-rain-fall     1.4s linear infinite; }
 .atmo-fog-drift    { animation: atmo-fog-drift     9s ease-in-out infinite alternate; }
 .atmo-storm-flicker{ animation: atmo-storm-flicker 2.8s ease-in-out infinite; }
 .atmo-night-shimmer{ animation: atmo-night-shimmer 6s ease-in-out infinite alternate; }
+.atmo-cloud-drift  { animation: atmo-cloud-drift  16s ease-in-out infinite alternate; }
 
 @media (prefers-reduced-motion: reduce) {
   .atmo-sunny-pulse,
   .atmo-rain-fall,
   .atmo-fog-drift,
   .atmo-storm-flicker,
-  .atmo-night-shimmer {
+  .atmo-night-shimmer,
+  .atmo-cloud-drift {
     animation: none !important;
   }
   .animate-fade-in {

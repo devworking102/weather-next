@@ -1,7 +1,7 @@
 'use client'
 
 import dynamic from 'next/dynamic'
-import { useCallback } from 'react'
+import { useCallback, useMemo, useRef } from 'react'
 import { useUiStore } from '@/shared/store/ui-store'
 import { useT } from '@/shared/hooks/useT'
 import { useWeather, useAirQuality } from '@/features/weather/hooks/useWeather'
@@ -30,6 +30,11 @@ import { ExpandableSection } from './ExpandableSection'
 import { NextRainCard } from './today/NextRainCard'
 import { StatsGrid } from './StatsGrid'
 import { createElement } from 'react'
+import { buildWeatherCompanion } from '@/ai/weather-companion'
+import { AssistantActionCards } from './AssistantActionCards'
+import { HumanWeatherDetails } from './HumanWeatherDetails'
+import { MobileWeatherSummary } from './MobileWeatherSummary'
+import { formatTemp } from '@/features/weather/utils/format'
 
 // Lazy-loaded tab content — only bundled when first activated
 const tabFallback = () => createElement(Skeleton, { className: 'h-64 rounded-2xl' })
@@ -65,6 +70,7 @@ export function WeatherView() {
   const tempUnit = unit === 'f' ? 'fahrenheit' : 'celsius'
   const tab = useUiStore((s) => s.weatherTab)
   const setTab = useUiStore((s) => s.setWeatherTab)
+  const searchRef = useRef<HTMLDivElement>(null)
 
   const { data, isLoading, isError, error, refetch } = useWeather(
     location?.latitude,
@@ -80,6 +86,16 @@ export function WeatherView() {
     await refetch()
   }, [refetch])
   const { pullDistance, refreshing } = usePullToRefresh(onPullRefresh, 72)
+  const companion = useMemo(
+    () => (location && data ? buildWeatherCompanion(location.name, data, aqi, tempUnit) : null),
+    [location, data, aqi, tempUnit],
+  )
+  const focusSearch = useCallback(() => {
+    searchRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    window.setTimeout(() => {
+      searchRef.current?.querySelector('input')?.focus()
+    }, 220)
+  }, [])
 
   return (
     <div className="relative space-y-6">
@@ -103,7 +119,7 @@ export function WeatherView() {
           ) : null}
         </>
       ) : null}
-      <div className="space-y-3">
+      <div ref={searchRef} className="sticky top-[4.5rem] z-30 space-y-3 rounded-[1.75rem] bg-background/80 p-2 backdrop-blur-xl md:static md:bg-transparent md:p-0 md:backdrop-blur-0">
         <SearchBar />
         <RecentLocationsRow />
         <FavoritesBar />
@@ -125,6 +141,14 @@ export function WeatherView() {
             <SmartWeatherHero location={location} weather={data} aqi={aqi} />
             <FavoriteStar location={location} className="absolute right-4 top-4 z-10" />
           </div>
+          {companion ? (
+            <MobileWeatherSummary
+              city={location.name}
+              temperature={formatTemp(data.current.temperature, tempUnit)}
+              insight={companion}
+              onSearchClick={focusSearch}
+            />
+          ) : null}
 
           <div>
             {/*
@@ -142,7 +166,7 @@ export function WeatherView() {
               <PushAlertsCard />
 
               {/* § 1 — AI: “hôm nay ra sao?” ngay sau hero + cảnh báo */}
-              <WeatherInsightsPanel location={location} weather={data} aqi={aqi} />
+              {companion ? <AssistantActionCards insight={companion} /> : null}
 
               {/* § 2 — Hourly strip */}
               <HourlyStrip hourly={data.hourly} />
@@ -160,8 +184,11 @@ export function WeatherView() {
               {/* § 5 — Radar preview */}
               <RadarPreviewCard location={location} />
 
+              {companion ? <HumanWeatherDetails weather={data} insight={companion} /> : null}
+
               {/* § 6 — All secondary detail: collapsed by default to keep page scannable */}
               <ExpandableSection>
+                <WeatherInsightsPanel location={location} weather={data} aqi={aqi} />
                 <StatsGrid weather={data} compact />
                 <TodaySummary daily={data.daily} />
                 <div className="grid gap-4 lg:grid-cols-2">

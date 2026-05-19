@@ -1,7 +1,7 @@
 'use client'
 
 import { useRef, useState } from 'react'
-import { Loader2, MapPin, Search } from 'lucide-react'
+import { Loader2, MapPin, Navigation, Search } from 'lucide-react'
 import { usePlaceAutocomplete } from '@/features/geocoding/hooks/useGeocoding'
 import { useLocationStore } from '@/features/geocoding/store/location-store'
 import { useT } from '@/shared/hooks/useT'
@@ -18,6 +18,7 @@ export function SearchBar() {
   const t = useT()
 
   const { data, isFetching } = usePlaceAutocomplete(query)
+  const quickCities = ['Hà Nội', 'TP. Hồ Chí Minh', 'Đà Nẵng', 'Đà Lạt']
 
   function onPick(loc: GeoLocation) {
     setCurrent(loc)
@@ -48,8 +49,8 @@ export function SearchBar() {
   }
 
   return (
-    <div ref={rootRef} className="relative">
-      <div className="flex items-center gap-2 rounded-2xl border border-black/5 bg-white px-3 py-2 shadow-sm dark:border-white/10 dark:bg-slate-900/60">
+    <div ref={rootRef} className="relative space-y-2">
+      <div className="flex items-center gap-2 rounded-[1.5rem] border border-black/5 bg-white/90 px-3 py-2 shadow-sm backdrop-blur-xl dark:border-white/10 dark:bg-slate-900/70">
         <Search className="shrink-0 text-slate-400" size={18} />
         <Input
           value={query}
@@ -71,9 +72,35 @@ export function SearchBar() {
           title={t.search.useCurrentLocation}
           type="button"
         >
-          <MapPin size={18} />
+          <Navigation size={18} />
         </button>
       </div>
+
+      {query.length === 0 ? (
+        <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-thin">
+          <button
+            type="button"
+            onClick={onLocate}
+            className="inline-flex min-h-10 shrink-0 items-center gap-1.5 rounded-full bg-slate-950 px-3 text-xs font-semibold text-white shadow-sm transition active:scale-95 dark:bg-white dark:text-slate-950"
+          >
+            <MapPin size={14} aria-hidden />
+            Vị trí của tôi
+          </button>
+          {quickCities.map((city) => (
+            <button
+              key={city}
+              type="button"
+              onClick={() => {
+                setQuery(city)
+                setOpen(true)
+              }}
+              className="min-h-10 shrink-0 rounded-full border border-black/5 bg-white/75 px-3 text-xs font-semibold text-slate-600 shadow-sm transition hover:text-sky-700 active:scale-95 dark:border-white/10 dark:bg-white/8 dark:text-slate-300"
+            >
+              {city}
+            </button>
+          ))}
+        </div>
+      ) : null}
 
       {open && query.length >= 2 && data && data.length > 0 ? (
         <ul className="absolute z-30 mt-2 w-full overflow-hidden rounded-2xl border border-black/5 bg-white shadow-xl dark:border-white/10 dark:bg-slate-900">

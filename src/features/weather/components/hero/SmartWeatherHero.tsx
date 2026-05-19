@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { useState } from 'react'
-import { MapPin, Share2, Sparkles } from 'lucide-react'
+import { MapPin, Share2, Sparkles, Umbrella } from 'lucide-react'
 import { motion, useReducedMotion } from 'framer-motion'
 import type { AirQualityBundle, WeatherBundle } from '@/features/weather/types'
 import type { GeoLocation } from '@/features/geocoding/types'
@@ -12,6 +12,7 @@ import { useUiStore } from '@/shared/store/ui-store'
 import { useT } from '@/shared/hooks/useT'
 import { DynamicBackground } from '@/features/weather/components/DynamicBackground'
 import { useWeatherAiSummary } from '@/features/ai-summary/hooks/useWeatherAiSummary'
+import { buildWeatherCompanion } from '@/ai/weather-companion'
 
 interface Props {
   location: GeoLocation
@@ -19,10 +20,7 @@ interface Props {
   aqi?: AirQualityBundle
 }
 
-function aqiLabelFromEu(
-  t: ReturnType<typeof useT>,
-  eu: number | undefined,
-): string | null {
+function aqiLabelFromEu(t: ReturnType<typeof useT>, eu: number | undefined): string | null {
   if (eu == null || !Number.isFinite(eu)) return null
   const v = Math.round(eu)
   const items = t.aqi.scaleItems
@@ -34,10 +32,7 @@ function aqiLabelFromEu(
   return items[5].name
 }
 
-function uvCategory(
-  t: ReturnType<typeof useT>,
-  uv: number | undefined,
-): string | null {
+function uvCategory(t: ReturnType<typeof useT>, uv: number | undefined): string | null {
   if (uv == null || !Number.isFinite(uv)) return null
   const u = Math.round(uv)
   if (u < 3) return t.smartHero.uvLow
@@ -65,8 +60,8 @@ export function SmartWeatherHero({ location, weather, aqi }: Props) {
   const eu = aqi?.current?.europeanAqi
   const aqiName = aqiLabelFromEu(t, eu)
   const uvWord = uvCategory(t, current.uvIndex)
-
   const ai = useWeatherAiSummary(location, weather, locale)
+  const companion = buildWeatherCompanion(location.name, weather, aqi, tempUnit)
 
   async function shareWeather() {
     const origin = typeof window !== 'undefined' ? window.location.origin : ''
@@ -91,7 +86,7 @@ export function SmartWeatherHero({ location, weather, aqi }: Props) {
 
   return (
     <motion.section
-      className="relative isolate overflow-hidden rounded-3xl p-5 text-white shadow-xl ring-1 ring-white/20 sm:p-8"
+      className="relative isolate min-h-[540px] overflow-hidden rounded-[2.25rem] p-5 text-white shadow-[0_30px_90px_rgba(15,23,42,0.24)] ring-1 ring-white/20 sm:min-h-[560px] sm:p-8 lg:p-10"
       {...(!reduceMotion
         ? {
             initial: { opacity: 0, y: 10 },
@@ -101,11 +96,11 @@ export function SmartWeatherHero({ location, weather, aqi }: Props) {
         : {})}
     >
       <DynamicBackground weatherCode={current.weatherCode} isDay={current.isDay} />
-      <div className="absolute inset-0 -z-10 bg-gradient-to-b from-black/15 via-transparent to-black/30" aria-hidden />
+      <div className="absolute inset-0 -z-10 bg-gradient-to-b from-black/10 via-black/5 to-black/45" aria-hidden />
 
-      <div className="flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between sm:gap-6">
-        <div className="min-w-0 flex-1 space-y-3">
-          <div className="inline-flex max-w-full items-center gap-1.5 rounded-full bg-white/20 px-3 py-1 text-xs font-medium backdrop-blur">
+      <div className="flex min-h-[500px] flex-col justify-between gap-8">
+        <div className="flex items-start justify-between gap-4">
+          <div className="inline-flex max-w-full items-center gap-1.5 rounded-full bg-white/18 px-3 py-1.5 text-xs font-medium shadow-sm backdrop-blur-xl">
             <MapPin size={12} className="shrink-0" />
             <span className="truncate">
               {location.name}
@@ -113,57 +108,62 @@ export function SmartWeatherHero({ location, weather, aqi }: Props) {
               {location.country ? ` · ${location.country}` : ''}
             </span>
           </div>
+          <button
+            type="button"
+            onClick={() => void shareWeather()}
+            className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-full border border-white/30 bg-white/12 text-white shadow-sm backdrop-blur-xl transition hover:bg-white/20 active:scale-[0.98]"
+            aria-label={t.smartHeroShare.label}
+          >
+            <Share2 size={17} aria-hidden />
+          </button>
+        </div>
 
-          <div className="flex flex-wrap items-end justify-between gap-3">
-            <div>
-              <p className="text-sm text-white/85">{info.label}</p>
-              <div className="mt-0.5 text-6xl font-extralight leading-none tracking-tighter drop-shadow-[0_2px_24px_rgba(0,0,0,0.35)] sm:text-7xl md:text-8xl">
+        <div className="max-w-3xl space-y-5">
+          <div>
+            <p className="text-base font-medium text-white/90">{info.label}</p>
+            <div className="mt-2 flex flex-wrap items-end gap-4">
+              <div className="text-[5.75rem] font-extralight leading-[0.86] tracking-tight drop-shadow-[0_2px_30px_rgba(0,0,0,0.4)] sm:text-[7.5rem] md:text-[9rem]">
                 {formatTemp(current.temperature, tempUnit)}
               </div>
-              <p className="mt-2 text-sm text-white/85">
-                {t.hero.feelsLike} <span className="font-medium text-white">{formatTemp(current.apparentTemperature, tempUnit)}</span>
-                {today ? (
-                  <>
-                    {' · '}
-                    {t.hero.high} {formatTemp(today.tempMax, tempUnit)} / {t.hero.low}{' '}
-                    {formatTemp(today.tempMin, tempUnit)}
-                  </>
-                ) : null}
-              </p>
+              <div className="pb-2 text-6xl leading-none sm:text-7xl" aria-hidden>
+                {info.icon}
+              </div>
             </div>
-            <div className="text-5xl sm:text-6xl md:text-7xl" aria-hidden>
-              {info.icon}
-            </div>
+            <p className="mt-3 text-sm font-medium text-white/85 sm:text-base">
+              {t.hero.feelsLike}{' '}
+              <span className="text-white">{formatTemp(current.apparentTemperature, tempUnit)}</span>
+              {today ? (
+                <>
+                  {' · '}
+                  {t.hero.high} {formatTemp(today.tempMax, tempUnit)} / {t.hero.low}{' '}
+                  {formatTemp(today.tempMin, tempUnit)}
+                </>
+              ) : null}
+            </p>
           </div>
 
-          <div className="rounded-xl border border-white/15 bg-white/10 px-3 py-3 shadow-inner backdrop-blur-sm sm:rounded-2xl sm:px-4 sm:py-3.5">
-            {ai.isPending && !ai.data ? (
-              <div className="flex items-start gap-2" aria-busy aria-label={t.smartHero.aiLoading}>
-                <Sparkles size={13} className="mt-0.5 shrink-0 text-amber-300/60" aria-hidden />
-                <div className="flex-1 space-y-2">
-                  <div className="h-3 w-full animate-pulse rounded-full bg-white/20" />
-                  <div className="h-3 w-4/5 animate-pulse rounded-full bg-white/15" />
-                  <div className="h-3 w-3/5 animate-pulse rounded-full bg-white/10" />
-                </div>
-              </div>
-            ) : ai.data ? (
-              <div className="flex items-start gap-2">
-                <Sparkles size={13} className="mt-0.5 shrink-0 text-amber-300/80" aria-hidden />
-                <p className="min-w-0 flex-1 text-sm leading-relaxed text-white/90 sm:text-[15px]">
-                  {ai.data.summary}
-                </p>
-              </div>
-            ) : (
-              <div className="flex items-center gap-2">
-                <Sparkles size={13} className="shrink-0 text-amber-300/40" aria-hidden />
-                <p className="text-sm text-white/60">{t.smartHero.aiFailed}</p>
-              </div>
-            )}
+          <div className="rounded-[1.75rem] border border-white/18 bg-white/14 p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.18)] backdrop-blur-2xl sm:p-5">
+            <div className="mb-3 flex items-center gap-2 text-sm font-semibold text-amber-200">
+              <Sparkles size={16} aria-hidden />
+              Trợ lý thời tiết
+            </div>
+            <h1 className="max-w-2xl text-2xl font-semibold leading-tight tracking-tight text-white sm:text-3xl md:text-4xl">
+              {companion.tone}
+            </h1>
+            <p className="mt-3 max-w-2xl text-base leading-7 text-white/90 sm:text-lg">
+              {ai.data?.summary ?? companion.summary}
+            </p>
+            <div className="mt-4 flex items-start gap-3 rounded-2xl bg-white/12 p-3 text-sm leading-6 text-white/90 ring-1 ring-white/15">
+              <Umbrella size={18} className="mt-0.5 shrink-0 text-amber-200" aria-hidden />
+              <p>{companion.recommendation}</p>
+            </div>
           </div>
 
           <div className="flex flex-wrap gap-2 text-xs font-medium sm:text-sm">
             {rainPct != null ? (
-              <span className="rounded-full bg-white/15 px-3 py-2 backdrop-blur">☔ {t.smartHero.rainChance(rainPct)}</span>
+              <span className="rounded-full bg-white/15 px-3 py-2 backdrop-blur">
+                {t.smartHero.rainChance(rainPct)}
+              </span>
             ) : null}
             <span
               className={
@@ -172,10 +172,12 @@ export function SmartWeatherHero({ location, weather, aqi }: Props) {
                   : 'rounded-full bg-white/15 px-3 py-2 backdrop-blur'
               }
             >
-              🌬 {aqiName ? t.smartHero.aqiLine(aqiName) : t.smartHero.aqiMissing}
+              {aqiName ? t.smartHero.aqiLine(aqiName) : t.smartHero.aqiMissing}
             </span>
             {uvWord ? (
-              <span className="rounded-full bg-white/15 px-3 py-2 backdrop-blur">☀ {t.smartHero.uvLine(uvWord)}</span>
+              <span className="rounded-full bg-white/15 px-3 py-2 backdrop-blur">
+                {t.smartHero.uvLine(uvWord)}
+              </span>
             ) : null}
           </div>
 
@@ -195,11 +197,10 @@ export function SmartWeatherHero({ location, weather, aqi }: Props) {
             </button>
             <button
               type="button"
-              onClick={() => void shareWeather()}
-              className="inline-flex min-h-11 min-w-[44px] items-center justify-center gap-1.5 rounded-full border border-white/40 bg-white/10 px-4 py-2.5 text-sm font-semibold text-white backdrop-blur transition hover:bg-white/20 active:scale-[0.98]"
+              onClick={() => setTab('health')}
+              className="inline-flex min-h-11 min-w-[44px] items-center justify-center rounded-full border border-white/40 bg-white/10 px-4 py-2.5 text-sm font-semibold text-white backdrop-blur transition hover:bg-white/20 active:scale-[0.98]"
             >
-              <Share2 size={16} aria-hidden />
-              {t.smartHeroShare.label}
+              AQI & UV
             </button>
             {shareHint ? <span className="w-full text-xs text-white/80 sm:w-auto">{shareHint}</span> : null}
           </div>

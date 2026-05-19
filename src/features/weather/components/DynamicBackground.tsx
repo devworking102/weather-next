@@ -57,6 +57,16 @@ export function DynamicBackground({ weatherCode, isDay, className = '' }: Props)
         />
       )}
 
+      {(mood === 'cloudy' || mood === 'rain' || mood === 'night-rain') && (
+        <div
+          className="absolute -left-1/4 top-[12%] h-40 w-[150%] atmo-cloud-drift opacity-25 blur-2xl"
+          style={{
+            backgroundImage:
+              'radial-gradient(ellipse at 20% 40%, rgba(255,255,255,0.32) 0%, transparent 28%), radial-gradient(ellipse at 55% 35%, rgba(255,255,255,0.22) 0%, transparent 30%), radial-gradient(ellipse at 82% 45%, rgba(255,255,255,0.24) 0%, transparent 26%)',
+          }}
+        />
+      )}
+
       {mood === 'storm' && (
         <>
           <div
