@@ -16,7 +16,9 @@ const ROUTE_ALIASES: Record<string, string> = {
 }
 
 const VI_TO_INTERNAL = Object.fromEntries(
-  Object.entries(ROUTE_ALIASES).map(([internal, vi]) => [vi, internal]),
+  Object.entries(ROUTE_ALIASES)
+    .filter(([, vi]) => vi !== '/thoi-tiet')
+    .map(([internal, vi]) => [vi, internal]),
 )
 
 function replacePrefix(pathname: string, from: string, to: string) {

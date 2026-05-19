@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { fetchWeather } from '@/features/weather/services/weather'
+import { getWeatherBundleByCoords } from '@/lib/weather'
 import type { TempUnit } from '@/features/weather/types'
 
-export const revalidate = 300
+export const revalidate = 1800
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url)
@@ -15,10 +15,10 @@ export async function GET(req: NextRequest) {
   }
 
   try {
-    const data = await fetchWeather(lat, lon, unit)
+    const data = await getWeatherBundleByCoords(lat, lon, unit)
     return NextResponse.json(data, {
       headers: {
-        'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=600',
+        'Cache-Control': 'public, s-maxage=1800, stale-while-revalidate=3600',
       },
     })
   } catch (e) {

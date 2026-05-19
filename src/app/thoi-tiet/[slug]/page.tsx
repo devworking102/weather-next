@@ -2,12 +2,13 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { cache } from 'react'
 import { notFound } from 'next/navigation'
-import { CurrentWeatherCard } from '@/components/weather/CurrentWeatherCard'
+import { AQICard } from '@/components/weather/AQICard'
 import { DailyForecast } from '@/components/weather/DailyForecast'
 import { HourlyForecast } from '@/components/weather/HourlyForecast'
+import { WeatherHero } from '@/components/weather/WeatherHero'
+import { WeatherMap } from '@/components/weather/WeatherMap'
 import { WeatherAdvice } from '@/components/weather/WeatherAdvice'
 import { WeatherStats } from '@/components/weather/WeatherStats'
-import { buildWeatherSummary } from '@/components/weather/utils'
 import { getSeoCity, listSeoCitySlugs } from '@/data/seo-cities'
 import {
   getAirQualityByCoords,
@@ -86,10 +87,6 @@ export default async function WeatherCityPage({ params }: PageProps) {
   const forecast = weather
   const aqi = airQuality.status === 'fulfilled' ? airQuality.value : null
   const today = forecast?.daily[0]
-  const summary = current
-    ? buildWeatherSummary(city.name, current, today)
-    : `Chưa tải được dữ liệu thời tiết ${city.name}. Bạn vẫn có thể xem thông tin tỉnh/thành và thử lại sau ít phút.`
-
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
@@ -108,33 +105,16 @@ export default async function WeatherCityPage({ params }: PageProps) {
             <span>{city.name}</span>
           </nav>
 
-          <header className="rounded-3xl bg-gradient-to-br from-sky-600 via-cyan-600 to-emerald-500 p-5 text-white shadow-lg sm:p-8">
-            <p className="text-sm font-medium uppercase tracking-wide text-white/80">{city.region}</p>
-            <h1 className="mt-3 text-3xl font-semibold tracking-tight sm:text-5xl">Thời tiết {city.name} hôm nay</h1>
-            <p className="mt-4 max-w-3xl text-base leading-7 text-white/90 sm:text-lg">{summary}</p>
-            <div className="mt-6 flex flex-wrap gap-3">
-              <Link
-                href="/thoi-tiet"
-                className="inline-flex min-h-11 items-center justify-center rounded-xl bg-white px-4 py-2 text-sm font-semibold text-sky-800 shadow-sm transition hover:bg-sky-50"
-              >
-                Tìm thành phố khác
-              </Link>
-              <Link
-                href="/radar-mua"
-                className="inline-flex min-h-11 items-center justify-center rounded-xl border border-white/40 px-4 py-2 text-sm font-semibold text-white transition hover:bg-white/10"
-              >
-                Xem radar mưa
-              </Link>
-            </div>
-          </header>
+          <WeatherHero cityName={city.name} region={city.region} current={current} today={today} />
 
           {weather && current && forecast ? (
             <div className="mt-6 space-y-5">
-              <CurrentWeatherCard cityName={city.name} current={current} today={today} />
               <HourlyForecast hourly={forecast.hourly} />
               <DailyForecast daily={forecast.daily} />
+              <AQICard airQuality={aqi} />
               <WeatherAdvice weather={weather} airQuality={aqi} />
               <WeatherStats weather={weather} airQuality={aqi} />
+              <WeatherMap cityName={city.name} />
             </div>
           ) : (
             <section className="mt-6 rounded-2xl border border-amber-200 bg-amber-50 p-5 text-amber-950 dark:border-amber-400/30 dark:bg-amber-400/10 dark:text-amber-100">

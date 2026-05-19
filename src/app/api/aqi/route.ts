@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { fetchAirQuality } from '@/features/weather/services/air-quality'
+import { getAirQualityByCoords } from '@/lib/weather'
 
-export const revalidate = 600
+export const revalidate = 1800
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url)
@@ -11,9 +11,9 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: 'invalid_coordinates' }, { status: 400 })
   }
   try {
-    const data = await fetchAirQuality(lat, lon)
+    const data = await getAirQualityByCoords(lat, lon)
     return NextResponse.json(data, {
-      headers: { 'Cache-Control': 'public, s-maxage=600, stale-while-revalidate=1200' },
+      headers: { 'Cache-Control': 'public, s-maxage=1800, stale-while-revalidate=3600' },
     })
   } catch (e) {
     return NextResponse.json({ error: 'upstream_error', message: (e as Error).message }, { status: 502 })

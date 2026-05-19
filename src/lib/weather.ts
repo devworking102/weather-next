@@ -43,6 +43,8 @@ export async function getCurrentWeatherByCoords(
   return weather.current
 }
 
+export const getCurrentWeather = getCurrentWeatherByCoords
+
 export async function getForecastByCoords(
   lat: number,
   lon: number,
@@ -56,6 +58,16 @@ export async function getForecastByCoords(
     latitude: weather.latitude,
     longitude: weather.longitude,
   }
+}
+
+export async function getHourlyForecast(lat: number, lon: number, tempUnit: TempUnit = 'celsius'): Promise<HourlyPoint[]> {
+  const forecast = await getForecastByCoords(lat, lon, tempUnit)
+  return forecast.hourly
+}
+
+export async function getDailyForecast(lat: number, lon: number, tempUnit: TempUnit = 'celsius'): Promise<DailyPoint[]> {
+  const forecast = await getForecastByCoords(lat, lon, tempUnit)
+  return forecast.daily
 }
 
 export async function getWeatherBundleByCoords(
@@ -105,6 +117,49 @@ export async function getAirQualityByCoords(lat: number, lon: number): Promise<A
   } catch {
     return null
   }
+}
+
+export const getAirQuality = getAirQualityByCoords
+
+export interface WeatherAlert {
+  id: string
+  title: string
+  severity: 'info' | 'watch' | 'warning'
+  description: string
+}
+
+export async function getWeatherAlerts(lat: number, lon: number): Promise<WeatherAlert[]> {
+  const weather = await getWeatherBundleByCoords(lat, lon)
+  const today = weather.daily[0]
+  if (!today) return []
+
+  const alerts: WeatherAlert[] = []
+  if (today.precipitationProbability >= 70 || today.precipitationSum >= 20) {
+    alerts.push({
+      id: 'heavy-rain',
+      title: 'Khả năng mưa lớn',
+      severity: 'warning',
+      description: 'Nên theo dõi radar mưa và hạn chế di chuyển ngoài trời trong thời điểm mưa mạnh.',
+    })
+  }
+  if (today.uvIndexMax >= 8) {
+    alerts.push({
+      id: 'high-uv',
+      title: 'UV cao',
+      severity: 'watch',
+      description: 'Nên che chắn, dùng kem chống nắng và tránh nắng gắt giữa trưa.',
+    })
+  }
+  if (today.windGustsMax >= 50) {
+    alerts.push({
+      id: 'strong-wind',
+      title: 'Gió giật mạnh',
+      severity: 'watch',
+      description: 'Cẩn thận khi đi xe máy, qua cầu hoặc khu vực nhiều cây và biển quảng cáo.',
+    })
+  }
+
+  return alerts
 }
 
 async function fetchOpenMeteo<T>(url: string, errorMessage: string): Promise<T> {
