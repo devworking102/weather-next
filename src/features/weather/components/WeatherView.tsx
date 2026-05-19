@@ -10,7 +10,6 @@ import { useAutoLocation } from '@/features/geocoding/hooks/useAutoLocation'
 import { useEarthquakes } from '@/features/earthquakes/hooks/useEarthquakes'
 import { cn } from '@/shared/lib/cn'
 import { SmartWeatherHero } from './hero/SmartWeatherHero'
-import { HourlyStrip } from './HourlyStrip'
 import { WeatherSkeleton } from './WeatherSkeleton'
 import { WeatherError } from './WeatherError'
 import { WeatherEmpty } from './WeatherEmpty'
@@ -27,7 +26,6 @@ import { Skeleton } from '@/shared/ui/Skeleton'
 import { dynamicChart } from './chart-loader'
 import { DailyPreviewRow } from './DailyPreviewRow'
 import { ExpandableSection } from './ExpandableSection'
-import { NextRainCard } from './today/NextRainCard'
 import { StatsGrid } from './StatsGrid'
 import { createElement } from 'react'
 import { buildWeatherCompanion } from '@/ai/weather-companion'
@@ -36,6 +34,7 @@ import { HumanWeatherDetails } from './HumanWeatherDetails'
 import { MobileWeatherSummary } from './MobileWeatherSummary'
 import { formatTemp } from '@/features/weather/utils/format'
 import { PersonalWeatherFeed } from './PersonalWeatherFeed'
+import { WeatherMoments } from './WeatherMoments'
 
 // Lazy-loaded tab content — only bundled when first activated
 const tabFallback = () => createElement(Skeleton, { className: 'h-64 rounded-2xl' })
@@ -50,14 +49,9 @@ const WidgetTab   = dynamic(() => import('./tabs/WidgetTab').then(m => ({ defaul
 const NewsList    = dynamic(() => import('@/features/news/components/NewsList').then(m => ({ default: m.NewsList })), { ssr: false, loading: tabFallback })
 
 // Lazy-loaded detail panels inside the expandable section
-const TodaySummary        = dynamic(() => import('./today/TodaySummary').then(m => ({ default: m.TodaySummary })), { ssr: false })
 const SunMoonCard         = dynamic(() => import('./today/SunMoonCard').then(m => ({ default: m.SunMoonCard })), { ssr: false })
 const LunarHoursCard      = dynamic(() => import('./today/LunarHoursCard').then(m => ({ default: m.LunarHoursCard })), { ssr: false })
 const HistoricalCompareCard = dynamic(() => import('./today/HistoricalCompareCard').then(m => ({ default: m.HistoricalCompareCard })), { ssr: false })
-const WeatherInsightsPanel = dynamic(
-  () => import('./WeatherInsightsPanel').then((m) => ({ default: m.WeatherInsightsPanel })),
-  { ssr: false, loading: tabFallback },
-)
 const RadarPreviewCard    = dynamic(() => import('./today/RadarPreviewCard').then(m => ({ default: m.RadarPreviewCard })), { ssr: false, loading: tabFallback })
 
 const TemperatureChart    = dynamicChart('temperature')
@@ -154,47 +148,29 @@ export function WeatherView() {
 
           <div>
             {/*
-              TODAY — 4-section hierarchy answering core questions in order:
-                1. Hourly  — what happens in the next few hours?
-                2. Rain    — will it rain, and exactly when?
-                3. Weekly  — what does the week look like?
-                4. Details — everything else, collapsed by default
+              Today keeps one primary summary in the hero, then only distinct decision sections:
+              recommendations, meaningful moments, weekly outlook, and collapsed details.
             */}
             <div
               className={cn('space-y-6', tab !== 'today' && 'hidden')}
               aria-hidden={tab !== 'today'}
             >
-              {/* § Retention: push — an toàn trước */}
-              <PushAlertsCard />
-
-              {/* § 1 — Assistant: “hôm nay ra sao?” ngay sau hero + cảnh báo */}
               {companion ? <AssistantActionCards insight={companion} /> : null}
 
-              {/* § 2 — Hourly strip */}
-              <HourlyStrip hourly={data.hourly} />
+              <WeatherMoments weather={data} onViewHourly={() => setTab('hourly')} />
 
-              {/* § 3 — Rain prediction */}
-              <NextRainCard weather={data} />
-
-              {/* § 4 — 7-day preview */}
               <DailyPreviewRow
                 weather={data}
                 days={7}
                 onViewAll={() => setTab('week')}
               />
 
-              <PersonalWeatherFeed location={location} />
-
-              {/* § 5 — Radar preview */}
-              <RadarPreviewCard location={location} />
-
-              {companion ? <HumanWeatherDetails weather={data} insight={companion} /> : null}
-
-              {/* § 6 — All secondary detail: collapsed by default to keep page scannable */}
               <ExpandableSection>
-                <WeatherInsightsPanel location={location} weather={data} aqi={aqi} />
+                <PushAlertsCard />
+                <PersonalWeatherFeed location={location} />
+                <RadarPreviewCard location={location} />
+                {companion ? <HumanWeatherDetails weather={data} insight={companion} /> : null}
                 <StatsGrid weather={data} compact />
-                <TodaySummary daily={data.daily} />
                 <div className="grid gap-4 lg:grid-cols-2">
                   <TemperatureChart hourly={data.hourly} />
                   <RainProbabilityChart hourly={data.hourly} />

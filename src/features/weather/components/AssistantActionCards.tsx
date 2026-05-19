@@ -1,6 +1,6 @@
 'use client'
 
-import { Activity, HeartPulse, Shirt, Umbrella } from 'lucide-react'
+import { Activity, HeartPulse, Shirt } from 'lucide-react'
 import type { CompanionInsight } from '@/ai/weather-companion'
 import { cn } from '@/shared/lib/cn'
 import { useT } from '@/shared/hooks/useT'
@@ -23,12 +23,6 @@ const cards = [
     className: 'from-emerald-50 to-teal-50 text-emerald-700 dark:from-emerald-500/15 dark:to-teal-500/10 dark:text-emerald-200',
   },
   {
-    key: 'rain',
-    titleKey: 'rain',
-    Icon: Umbrella,
-    className: 'from-sky-50 to-blue-50 text-sky-700 dark:from-sky-500/15 dark:to-blue-500/10 dark:text-sky-200',
-  },
-  {
     key: 'aqi',
     titleKey: 'health',
     Icon: HeartPulse,
@@ -40,7 +34,16 @@ export function AssistantActionCards({ insight }: Props) {
   const t = useT()
 
   return (
-    <section aria-label={t.assistant.aiSuggestion} className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+    <section aria-label={t.assistant.aiSuggestion} className="space-y-3">
+      <div className="px-1">
+        <p className="text-xs font-semibold uppercase tracking-wide text-slate-400 dark:text-slate-500">
+          {t.assistant.aiSuggestion}
+        </p>
+        <h2 className="mt-1 text-xl font-semibold tracking-tight text-slate-950 dark:text-white">
+          {t.assistant.recommendations}
+        </h2>
+      </div>
+      <div className="grid gap-3 md:grid-cols-3">
       {cards.map(({ key, titleKey, Icon, className }) => (
         <article
           key={key}
@@ -53,9 +56,6 @@ export function AssistantActionCards({ insight }: Props) {
             <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-white/70 shadow-sm dark:bg-white/10">
               <Icon size={20} aria-hidden />
             </div>
-            <span className="text-xs font-semibold uppercase text-slate-500 dark:text-slate-400">
-              {t.assistant.aiSuggestion}
-            </span>
           </div>
           <h2 className="text-sm font-semibold text-slate-950 dark:text-white">{t.assistant[titleKey]}</h2>
           <p className="mt-2 text-sm leading-6 text-slate-700 dark:text-slate-200">
@@ -63,6 +63,7 @@ export function AssistantActionCards({ insight }: Props) {
           </p>
         </article>
       ))}
+      </div>
     </section>
   )
 }

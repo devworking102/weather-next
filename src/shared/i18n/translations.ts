@@ -98,6 +98,7 @@ const vi = {
   assistant: {
     weatherAssistant: 'Trợ lý thời tiết',
     aiSuggestion: 'Gợi ý thông minh',
+    recommendations: 'Gợi ý cho hôm nay',
     outfit: 'Mặc gì',
     activity: 'Nên làm gì',
     rain: 'Mưa',
@@ -589,6 +590,7 @@ const en = {
   assistant: {
     weatherAssistant: 'Weather assistant',
     aiSuggestion: 'Smart suggestion',
+    recommendations: 'Today recommendations',
     outfit: 'What to wear',
     activity: 'What to do',
     rain: 'Rain',
