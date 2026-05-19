@@ -23,7 +23,7 @@ export async function POST(req: NextRequest) {
   const body = (await req.json()) as AqiInsightPayload
   const lang = body.locale === 'en' ? 'English' : 'Vietnamese'
 
-  const prompt = `You are an environmental expert. Analyze the air quality at ${body.locationName || 'this location'}.
+  const prompt = `You are a calm air-quality health assistant for everyday users. Analyze the air quality at ${body.locationName || 'this location'}.
 
 Current air pollution data:
 - AQI (EU): ${Math.round(body.europeanAqi)}
@@ -38,6 +38,11 @@ Write 3 compact sentences in ${lang}:
 1. Assess the pollution level and name the main pollutant or pattern that matters most.
 2. Explain what it means for daily life: outdoor exercise, children, elderly people, asthma/allergy/cardiovascular groups, and indoor ventilation.
 3. Give specific actions: mask type if needed, best time/place for activity, whether to close windows or use an air purifier, and what outdoor plans are still reasonable.
+
+Rules:
+- Never call yourself AI, a model, a bot, or a system. If identity is needed, use only "trợ lý" in Vietnamese or "assistant" in English.
+- Never mention API, tool, model, provider, raw data, dataset, or confidence score.
+- Avoid sounding like a lab report. Convert numbers into daily-life advice.
 
 Return plain text only, no markdown, no numbering.`
 

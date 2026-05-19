@@ -7,9 +7,9 @@ import { WeatherTabsBar } from '@/features/weather/components/WeatherTabsBar'
 import { TopBar } from '@/shared/ui/TopBar'
 
 export const metadata: Metadata = {
-  title: 'Trợ lý thời tiết AI hôm nay tại Việt Nam',
+  title: 'Trợ lý thời tiết hôm nay tại Việt Nam',
   description:
-    'Trợ lý thời tiết AI giúp bạn biết hôm nay có mưa không, nên mặc gì, có nên ra ngoài không, AQI ra sao và cần chuẩn bị gì.',
+    'Trợ lý thời tiết giúp bạn biết hôm nay có mưa không, nên mặc gì, có nên ra ngoài không, AQI ra sao và cần chuẩn bị gì.',
   alternates: { canonical: '/thoi-tiet' },
 }
 
@@ -28,7 +28,7 @@ export default function WeatherPage() {
             Trang thời tiết theo thành phố
           </h2>
           <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-600 dark:text-slate-300">
-            Các trang này sẵn sàng cho SEO theo tỉnh/thành, tóm tắt AI, schema.org và bài viết thời tiết địa phương.
+            Các trang này sẵn sàng cho SEO theo tỉnh/thành, tóm tắt thông minh, schema.org và bài viết thời tiết địa phương.
           </p>
           <div className="mt-5 flex flex-wrap gap-2">
             {popularCities.map((city) => (

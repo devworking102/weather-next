@@ -1,13 +1,22 @@
 'use client'
 
 import { useEffect, useRef } from 'react'
+import { Bell, CalendarDays, Clock3, HeartPulse, Sparkles, Wind } from 'lucide-react'
 import { cn } from '@/shared/lib/cn'
 import { useT } from '@/shared/hooks/useT'
 import type { WeatherTabId } from '@/shared/store/ui-store'
 
 export type { WeatherTabId }
 
-const TAB_IDS: WeatherTabId[] = ['today', 'hourly', 'week', 'daily', 'month']
+const TAB_IDS = ['today', 'hourly', 'week', 'aqi', 'health', 'alerts'] as const satisfies WeatherTabId[]
+const TAB_ICONS = {
+  today: Sparkles,
+  hourly: Clock3,
+  week: CalendarDays,
+  aqi: Wind,
+  health: HeartPulse,
+  alerts: Bell,
+} satisfies Partial<Record<WeatherTabId, typeof Sparkles>>
 
 interface Props {
   value: WeatherTabId
@@ -15,7 +24,7 @@ interface Props {
   alertCount?: number
 }
 
-export function TabsNav({ value, onChange }: Props) {
+export function TabsNav({ value, onChange, alertCount = 0 }: Props) {
   const navRef = useRef<HTMLDivElement>(null)
   const btnRefs = useRef<Map<WeatherTabId, HTMLButtonElement>>(new Map())
   const t = useT()
@@ -23,6 +32,7 @@ export function TabsNav({ value, onChange }: Props) {
   const tabs = TAB_IDS.map((id) => ({
     id,
     label: t.tabs[id as keyof typeof t.tabs],
+    Icon: TAB_ICONS[id],
   }))
 
   useEffect(() => {
@@ -47,9 +57,10 @@ export function TabsNav({ value, onChange }: Props) {
         className="scrollbar-thin -mx-4 overflow-x-auto px-4"
         aria-label="Forecast range"
       >
-        <div className="flex gap-1 whitespace-nowrap pb-1">
+        <div className="flex gap-1.5 whitespace-nowrap pb-1">
           {tabs.map((tab) => {
             const active = value === tab.id
+            const Icon = tab.Icon
             return (
               <button
                 key={tab.id}
@@ -61,13 +72,19 @@ export function TabsNav({ value, onChange }: Props) {
                 type="button"
                 aria-pressed={active}
                 className={cn(
-                  'rounded-full px-3.5 py-1.5 text-sm font-medium transition-all duration-200',
+                  'relative inline-flex min-h-10 items-center gap-1.5 rounded-full px-3.5 py-2 text-sm font-semibold transition-all duration-200',
                   active
-                    ? 'bg-slate-900 text-white shadow-sm dark:bg-white dark:text-slate-900'
-                    : 'text-slate-500 hover:bg-slate-100 hover:text-slate-800 dark:text-slate-400 dark:hover:bg-white/8 dark:hover:text-slate-200',
+                    ? 'bg-slate-950 text-white shadow-sm dark:bg-white dark:text-slate-950'
+                    : 'bg-white/55 text-slate-500 hover:bg-white hover:text-slate-800 dark:bg-white/5 dark:text-slate-400 dark:hover:bg-white/10 dark:hover:text-slate-200',
                 )}
               >
+                {Icon ? <Icon size={15} aria-hidden /> : null}
                 {tab.label}
+                {tab.id === 'alerts' && alertCount > 0 ? (
+                  <span className="ml-0.5 rounded-full bg-rose-500 px-1.5 py-0.5 text-[10px] leading-none text-white">
+                    {alertCount}
+                  </span>
+                ) : null}
               </button>
             )
           })}

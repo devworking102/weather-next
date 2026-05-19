@@ -35,6 +35,7 @@ import { AssistantActionCards } from './AssistantActionCards'
 import { HumanWeatherDetails } from './HumanWeatherDetails'
 import { MobileWeatherSummary } from './MobileWeatherSummary'
 import { formatTemp } from '@/features/weather/utils/format'
+import { PersonalWeatherFeed } from './PersonalWeatherFeed'
 
 // Lazy-loaded tab content — only bundled when first activated
 const tabFallback = () => createElement(Skeleton, { className: 'h-64 rounded-2xl' })
@@ -66,6 +67,7 @@ export function WeatherView() {
   useAutoLocation()
   const location = useLocationStore((s) => s.current)
   const unit = useUiStore((s) => s.unit)
+  const locale = useUiStore((s) => s.locale)
   const t = useT()
   const tempUnit = unit === 'f' ? 'fahrenheit' : 'celsius'
   const tab = useUiStore((s) => s.weatherTab)
@@ -87,8 +89,8 @@ export function WeatherView() {
   }, [refetch])
   const { pullDistance, refreshing } = usePullToRefresh(onPullRefresh, 72)
   const companion = useMemo(
-    () => (location && data ? buildWeatherCompanion(location.name, data, aqi, tempUnit) : null),
-    [location, data, aqi, tempUnit],
+    () => (location && data ? buildWeatherCompanion(location.name, data, aqi, tempUnit, locale) : null),
+    [location, data, aqi, tempUnit, locale],
   )
   const focusSearch = useCallback(() => {
     searchRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
@@ -165,7 +167,7 @@ export function WeatherView() {
               {/* § Retention: push — an toàn trước */}
               <PushAlertsCard />
 
-              {/* § 1 — AI: “hôm nay ra sao?” ngay sau hero + cảnh báo */}
+              {/* § 1 — Assistant: “hôm nay ra sao?” ngay sau hero + cảnh báo */}
               {companion ? <AssistantActionCards insight={companion} /> : null}
 
               {/* § 2 — Hourly strip */}
@@ -180,6 +182,8 @@ export function WeatherView() {
                 days={7}
                 onViewAll={() => setTab('week')}
               />
+
+              <PersonalWeatherFeed location={location} />
 
               {/* § 5 — Radar preview */}
               <RadarPreviewCard location={location} />

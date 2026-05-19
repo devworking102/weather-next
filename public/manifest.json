@@ -2,7 +2,7 @@
   "id": "/",
   "name": "Trời Hôm Nay",
   "short_name": "Trời Hôm Nay",
-  "description": "Dự báo thời tiết thông minh, hỗ trợ bởi AI. Cập nhật theo thời gian thực.",
+  "description": "Dự báo thời tiết thông minh. Cập nhật theo thời gian thực.",
   "start_url": "/thoi-tiet",
   "scope": "/",
   "display": "standalone",

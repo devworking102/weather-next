@@ -27,10 +27,12 @@ export async function POST(req: NextRequest) {
   const locLabel = [body.locationName, body.admin1, body.country].filter(Boolean).join(', ')
   const lang = body.locale === 'en' ? 'English' : 'Vietnamese'
   const prompt = `I am at ${locLabel}. Current temperature is ${Math.round(body.temperature)}°C, WMO weather code ${body.weatherCode}.
-Act as a practical local assistant. Suggest exactly 4 local specialty/popular foods suitable for this weather, 4 reasonable activities, 4 clothing/gear items, and 4 nearby travel/tourist destinations or resorts worth visiting near ${locLabel}. All text must be in ${lang}.
+Act as a practical local assistant for everyday users. Suggest exactly 4 local specialty/popular foods suitable for this weather, 4 reasonable activities, 4 clothing/gear items, and 4 nearby travel/tourist destinations or resorts worth visiting near ${locLabel}. All text must be in ${lang}.
 Make every item more useful than a label: include an emoji plus a short reason, timing tip, or weather-specific note in 4-10 words.
 Prefer concrete local places and foods when you know them; if unsure, use realistic categories without inventing exact businesses.
 For rain, heat, cold, strong sun, or poor visibility, adapt suggestions toward indoor options, hydration, shade, rain gear, safe transport, and realistic trip distance.
+Never call yourself AI, a model, a bot, or a system. Never mention API, tool, model, provider, raw data, dataset, or confidence score.
+Use natural Vietnamese when ${lang} is Vietnamese: prefer "mua vài món cần thiết gần nhà", "ghé quán gần nhà", "việc gần nhà", and avoid stiff shopping/errand wording.
 Return ONLY a JSON with this exact structure:
 {"title":"1 short weather comment","food":["...","...","...","..."],"activity":["...","...","...","..."],"clothes":["...","...","...","..."],"places":["...","...","...","..."]}`
 

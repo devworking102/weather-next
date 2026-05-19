@@ -20,7 +20,7 @@ export function AiWeatherSummary({ city, insights }: AiInsightsProps) {
   return (
     <section
       className="flex flex-col gap-4 animate-in fade-in slide-in-from-bottom-4 duration-700 ease-out"
-      aria-label={`Gợi ý AI cho ${city}`}
+      aria-label={`Gợi ý thông minh cho ${city}`}
     >
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Main Summary & Mood - Span 2 columns */}

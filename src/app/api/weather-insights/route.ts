@@ -39,18 +39,21 @@ export async function POST(req: NextRequest) {
   const aqi = body.europeanAqi != null ? Math.round(body.europeanAqi) : null
   const pm = body.pm25 != null ? Math.round(body.pm25) : null
 
-  const prompt = `You are a concise weather coach for people in ${loc}.
+  const prompt = `You are a concise local weather assistant for everyday people in ${loc}.
 Current: ${Math.round(body.temperature)}°C (feels ${body.apparentTemperature != null ? Math.round(body.apparentTemperature) : 'n/a'}°C), WMO code ${body.weatherCode} (${wmo.label}), humidity ${Math.round(body.humidity)}%, wind ${Math.round(body.windSpeed)} km/h, UV ${Number(body.uvIndex).toFixed(1)}.
 ${aqi != null ? `EU AQI ~${aqi}` : 'AQI unknown'}. ${pm != null ? `PM2.5 ~${pm} µg/m³.` : ''}
 
 Return ONLY JSON (no markdown) with keys: summary, outfit, health, travel, mood, severe.
 Rules:
 - All human text must be in ${lang}, concise but information-rich for mobile.
+- Never call yourself AI, a model, a bot, or a system. If identity is needed, use only "trợ lý" in Vietnamese or "assistant" in English.
+- Never mention API, tool, model, provider, raw data, dataset, WMO code, or confidence score in the returned fields.
+- Translate raw metrics into plain-life meaning. Users care about rain, heat, umbrella, clothing, AQI health, and whether plans should move indoors.
 - Each field should give 2 useful details when natural; do not just restate the same number in different words.
 - summary: 2 sentences. Lead with the most important condition for the next hours, then add the second-priority factor (rain/heat/cold/AQI/wind/UV).
 - outfit: 1-2 sentences with clothing, footwear, and one carry item such as umbrella, raincoat, sunscreen, mask, water bottle, or light jacket.
 - health: 2 sentences combining AQI, UV, humidity, heat/cold, and who should be more careful (children, elderly, asthma, outdoor workers) when relevant.
-- travel: 2 sentences with commute timing, motorbike/walking/public transport advice, and whether outdoor plans should move earlier/later/indoors.
+- travel: 2 sentences with commute timing, motorbike/walking/public transport advice, and whether outdoor plans should move earlier/later/indoors. Use natural phrases like "mua vài món cần thiết gần nhà", "ghé quán gần nhà", or "xử lý vài việc gần nhà"; avoid stiff shopping/errand wording.
 - mood: one memorable emotional line about the day/sky. If Vietnamese: friendly, lightly witty, grounded in daily life, not cheesy, toxic, political, or religious.
 - severe: if thunderstorms (code>=95), heavy rain (>=82), snow storms, extreme heat/cold, very high UV, or poor AQI, write 1-2 practical warning sentences and say to follow official alerts when severe; else "" (empty string).
 `
@@ -99,11 +102,15 @@ function buildFallback(b: WeatherInsightsRequest): WeatherInsightsResponse {
           ? 'Trời khá lạnh: giữ ấm cổ tay và cổ; cẩn thận khi lái xe sương mù.'
           : ''
 
-  let health = `Độ ẩm ${Math.round(b.humidity)}%, UV khoảng ${uv.toFixed(1)}.`
+  let health = b.humidity >= 80
+    ? 'Không khí khá ẩm nên dễ thấy oi và mệt nhanh hơn. Ra ngoài lâu thì nhớ uống nước, nghỉ trong bóng râm và mặc đồ thoáng.'
+    : 'Thời tiết nhìn chung không quá nặng cho sức khỏe. Nếu ra ngoài lâu, vẫn nên uống nước và che nắng vừa đủ.'
   if (aqi != null) {
-    if (aqi > 100) health = `AQI EU ~${aqi} khá cao — hạn chế gắng sức ngoài trời; đeo khẩu trang khi cần. UV ${uv.toFixed(1)}.`
-    else if (aqi > 50) health = `AQI EU ~${aqi} trung bình — nhóm nhạy cảm nên thận trọng. UV ${uv.toFixed(1)}.`
-    else health = `AQI EU ~${aqi} tốt. UV ${uv.toFixed(1)} — ${uv >= 7 ? 'dùng kem chống nắng.' : 'có thể tắm nắng ngắn.'}`
+    if (aqi > 100) health = 'Không khí hôm nay khá kém, người nhạy cảm nên giảm thời gian ngoài trời. Nếu phải đi đường lâu, nên đeo khẩu trang tốt và tránh vận động mạnh.'
+    else if (aqi > 50) health = 'Không khí ở mức cần để ý, nhất là với trẻ em, người lớn tuổi hoặc người dễ dị ứng. Hoạt động nhẹ vẫn ổn, nhưng nên tránh tập nặng ngoài trời.'
+    else health = uv >= 7
+      ? 'Không khí khá ổn, nhưng nắng dễ gắt vào buổi trưa. Nhớ bôi kem chống nắng, đội mũ và chọn bóng râm khi có thể.'
+      : 'Không khí khá ổn cho sinh hoạt thường ngày. Bạn có thể ra ngoài thoải mái, chỉ cần giữ nước và che nắng cơ bản.'
   }
 
   const outfit =
@@ -138,7 +145,9 @@ function buildFallback(b: WeatherInsightsRequest): WeatherInsightsResponse {
       ? `Chất lượng không khí đang kém tại ${b.locationName}; ưu tiên sức khỏe khi ra ngoài.`
       : storm || heavyRain
         ? `${b.locationName}: thời tiết có thể “ồn ào” vài tiếng tới — theo dõi cảnh báo địa phương.`
-        : `Hôm nay tại ${b.locationName}: ${t}°C, ${wmo.label}. Gió ${Math.round(b.windSpeed)} km/h.`
+        : t >= 32
+          ? `${b.locationName} hôm nay khá nóng, nên ưu tiên việc ngoài trời vào sáng sớm hoặc chiều muộn.`
+          : `${b.locationName} hôm nay ${wmo.label.toLowerCase()}, nhìn chung phù hợp cho đi làm, cafe hoặc vài việc gần nhà.`
 
   return {
     summary: summaryLead,

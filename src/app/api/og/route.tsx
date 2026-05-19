@@ -8,7 +8,7 @@ export async function GET(req: NextRequest) {
   const { searchParams } = req.nextUrl
   const type = searchParams.get('type') ?? 'brand'
   const title = searchParams.get('title') ?? 'Trời Hôm Nay'
-  const line2 = searchParams.get('line2') ?? 'Dự báo thời tiết & AI thông minh'
+  const line2 = searchParams.get('line2') ?? 'Dự báo thời tiết thông minh'
   const line3 = searchParams.get('line3') ?? ''
 
   let fontData: ArrayBuffer | undefined
@@ -87,7 +87,7 @@ export async function GET(req: NextRequest) {
 
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
           <span style={{ fontSize: 20, opacity: 0.55 }}>troihomnay.vn · Open-Meteo</span>
-          <span style={{ fontSize: 18, opacity: 0.45 }}>AI weather</span>
+          <span style={{ fontSize: 18, opacity: 0.45 }}>weather assistant</span>
         </div>
       </div>
     ),

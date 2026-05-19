@@ -15,7 +15,7 @@ export const metadata: Metadata = {
     template: '%s · Trời Hôm Nay',
   },
   description:
-    'Dự báo thời tiết thông minh, cập nhật theo thời gian thực. Chất lượng không khí, cảnh báo thiên tai, radar mưa và gợi ý sinh hoạt được hỗ trợ bởi AI.',
+    'Dự báo thời tiết thông minh, cập nhật theo thời gian thực. Chất lượng không khí, cảnh báo thiên tai, radar mưa và gợi ý sinh hoạt dễ hiểu.',
   applicationName: 'Trời Hôm Nay',
   manifest: '/manifest.json',
   appleWebApp: { capable: true, statusBarStyle: 'black-translucent', title: 'Trời Hôm Nay' },
@@ -26,7 +26,7 @@ export const metadata: Metadata = {
     locale: 'vi_VN',
     images: [
       {
-        url: '/api/og?type=brand&title=Trời+Hôm+Nay&line2=Dự+báo+thời+tiết+%26+AI+thông+minh',
+        url: '/api/og?type=brand&title=Trời+Hôm+Nay&line2=Dự+báo+thời+tiết+thông+minh',
         width: 1200,
         height: 630,
       },
@@ -35,8 +35,8 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'Trời Hôm Nay',
-    description: 'Dự báo thời tiết, AQI, radar mưa và gợi ý AI.',
-    images: ['/api/og?type=brand&title=Trời+Hôm+Nay&line2=Dự+báo+thời+tiết+%26+AI+thông+minh'],
+    description: 'Dự báo thời tiết, AQI, radar mưa và gợi ý sinh hoạt.',
+    images: ['/api/og?type=brand&title=Trời+Hôm+Nay&line2=Dự+báo+thời+tiết+thông+minh'],
   },
   alternates: { canonical: '/' },
   robots: {
@@ -76,7 +76,7 @@ const siteJsonLd = () => {
     url: base,
     inLanguage: 'vi',
     description:
-      'Dự báo thời tiết, AQI, radar mưa, cảnh báo và gợi ý AI — ưu tiên người dùng Việt Nam.',
+      'Dự báo thời tiết, AQI, radar mưa, cảnh báo và gợi ý sinh hoạt — ưu tiên người dùng Việt Nam.',
   }
 }
 

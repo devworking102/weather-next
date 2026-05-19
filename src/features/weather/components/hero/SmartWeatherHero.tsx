@@ -61,7 +61,7 @@ export function SmartWeatherHero({ location, weather, aqi }: Props) {
   const aqiName = aqiLabelFromEu(t, eu)
   const uvWord = uvCategory(t, current.uvIndex)
   const ai = useWeatherAiSummary(location, weather, locale)
-  const companion = buildWeatherCompanion(location.name, weather, aqi, tempUnit)
+  const companion = buildWeatherCompanion(location.name, weather, aqi, tempUnit, locale)
 
   async function shareWeather() {
     const origin = typeof window !== 'undefined' ? window.location.origin : ''
@@ -145,7 +145,7 @@ export function SmartWeatherHero({ location, weather, aqi }: Props) {
           <div className="rounded-[1.75rem] border border-white/18 bg-white/14 p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.18)] backdrop-blur-2xl sm:p-5">
             <div className="mb-3 flex items-center gap-2 text-sm font-semibold text-amber-200">
               <Sparkles size={16} aria-hidden />
-              Trợ lý thời tiết
+              {t.assistant.weatherAssistant}
             </div>
             <h1 className="max-w-2xl text-2xl font-semibold leading-tight tracking-tight text-white sm:text-3xl md:text-4xl">
               {companion.tone}
@@ -200,7 +200,7 @@ export function SmartWeatherHero({ location, weather, aqi }: Props) {
               onClick={() => setTab('health')}
               className="inline-flex min-h-11 min-w-[44px] items-center justify-center rounded-full border border-white/40 bg-white/10 px-4 py-2.5 text-sm font-semibold text-white backdrop-blur transition hover:bg-white/20 active:scale-[0.98]"
             >
-              AQI & UV
+              {t.assistant.aqiUv}
             </button>
             {shareHint ? <span className="w-full text-xs text-white/80 sm:w-auto">{shareHint}</span> : null}
           </div>

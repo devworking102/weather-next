@@ -4,6 +4,7 @@ import { Cloud, Droplets, Eye, Gauge, Sun, Wind } from 'lucide-react'
 import type { WeatherBundle } from '@/features/weather/types'
 import { formatWind, windDirection } from '@/features/weather/utils/format'
 import type { CompanionInsight } from '@/ai/weather-companion'
+import { useT } from '@/shared/hooks/useT'
 
 interface Props {
   weather: WeatherBundle
@@ -11,43 +12,44 @@ interface Props {
 }
 
 export function HumanWeatherDetails({ weather, insight }: Props) {
+  const t = useT()
   const c = weather.current
   const details = [
     {
       icon: Droplets,
-      label: 'Độ ẩm',
-      value: c.humidity >= 82 ? 'Khá ẩm' : c.humidity >= 65 ? 'Hơi ẩm' : 'Dễ chịu',
+      label: t.humanDetails.humidity,
+      value: c.humidity >= 82 ? t.humanDetails.humidityWet : c.humidity >= 65 ? t.humanDetails.humiditySome : t.humanDetails.comfortable,
       hint: insight.comfort,
     },
     {
       icon: Sun,
-      label: 'Nắng',
-      value: c.uvIndex >= 8 ? 'Rất gắt' : c.uvIndex >= 6 ? 'Cao' : 'Ổn',
+      label: t.humanDetails.sun,
+      value: c.uvIndex >= 8 ? t.humanDetails.sunVeryStrong : c.uvIndex >= 6 ? t.humanDetails.sunHigh : t.humanDetails.okay,
       hint: insight.uv,
     },
     {
       icon: Wind,
-      label: 'Gió',
-      value: c.windSpeed >= 28 ? 'Gió mạnh' : c.windSpeed >= 16 ? 'Có gió' : 'Gió nhẹ',
-      hint: `${formatWind(c.windSpeed)} từ hướng ${windDirection(c.windDirection).toLowerCase()}.`,
+      label: t.humanDetails.wind,
+      value: c.windSpeed >= 28 ? t.humanDetails.windStrong : c.windSpeed >= 16 ? t.humanDetails.windSome : t.humanDetails.windLight,
+      hint: t.humanDetails.windHint(formatWind(c.windSpeed), windDirection(c.windDirection).toLowerCase()),
     },
     {
       icon: Cloud,
-      label: 'Mây',
-      value: c.cloudCover >= 75 ? 'Nhiều mây' : c.cloudCover >= 35 ? 'Có mây' : 'Trời thoáng',
-      hint: c.cloudCover >= 75 ? 'Ánh nắng có thể dịu hơn, nhưng trời vẫn có thể oi.' : 'Bầu trời dễ quan sát hơn.',
+      label: t.humanDetails.clouds,
+      value: c.cloudCover >= 75 ? t.humanDetails.cloudy : c.cloudCover >= 35 ? t.humanDetails.partlyCloudy : t.humanDetails.clearSky,
+      hint: c.cloudCover >= 75 ? t.humanDetails.cloudHintHeavy : t.humanDetails.cloudHintLight,
     },
     {
       icon: Eye,
-      label: 'Tầm nhìn',
-      value: c.visibility < 5000 ? 'Hạn chế' : 'Tốt',
-      hint: c.visibility < 5000 ? 'Đi xe nên chậm hơn và bật đèn khi cần.' : 'Di chuyển ngoài trời không bị ảnh hưởng nhiều.',
+      label: t.humanDetails.visibility,
+      value: c.visibility < 5000 ? t.humanDetails.limited : t.humanDetails.good,
+      hint: c.visibility < 5000 ? t.humanDetails.visibilityLimitedHint : t.humanDetails.visibilityGoodHint,
     },
     {
       icon: Gauge,
-      label: 'Áp suất',
-      value: 'Ổn định',
-      hint: `Thông số kỹ thuật: ${Math.round(c.pressure)} hPa.`,
+      label: t.humanDetails.pressure,
+      value: t.humanDetails.stable,
+      hint: t.humanDetails.pressureHint(Math.round(c.pressure)),
     },
   ]
 
@@ -55,10 +57,10 @@ export function HumanWeatherDetails({ weather, insight }: Props) {
     <section className="space-y-3" aria-label="Chi tiết thời tiết dễ hiểu">
       <div>
         <h2 className="text-lg font-semibold tracking-tight text-slate-950 dark:text-white">
-          Chi tiết dễ hiểu
+          {t.humanDetails.title}
         </h2>
         <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
-          Các chỉ số kỹ thuật được chuyển thành lời khuyên thực tế.
+          {t.humanDetails.subtitle}
         </p>
       </div>
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">

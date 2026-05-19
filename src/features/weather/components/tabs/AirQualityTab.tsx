@@ -75,6 +75,14 @@ export function AirQualityTab() {
 
   const c = data.current
   const cat = aqiCategory(c.europeanAqi)
+  const outdoor =
+    c.europeanAqi <= 40
+      ? t.aqi.outdoorGood
+      : c.europeanAqi <= 60
+        ? t.aqi.outdoorOkay
+        : c.europeanAqi <= 80
+          ? t.aqi.outdoorLimit
+          : t.aqi.outdoorStayIn
   const arc = Math.min(c.europeanAqi, 150)
   const theta = (arc / 150) * Math.PI
   const ex = 80 - 70 * Math.cos(theta)
@@ -112,6 +120,25 @@ export function AirQualityTab() {
           )}
         </div>
       </Card>
+
+      <div className="grid gap-3 sm:grid-cols-3">
+        <Card className="bg-emerald-50/80 p-4 text-emerald-950 dark:bg-emerald-400/10 dark:text-emerald-100">
+          <p className="text-xs font-bold uppercase tracking-wider opacity-70">{t.aqi.outdoors}</p>
+          <p className="mt-2 text-sm font-semibold leading-6">{outdoor}</p>
+        </Card>
+        <Card className="bg-sky-50/80 p-4 text-sky-950 dark:bg-sky-400/10 dark:text-sky-100">
+          <p className="text-xs font-bold uppercase tracking-wider opacity-70">{t.aqi.activity}</p>
+          <p className="mt-2 text-sm font-semibold leading-6">
+            {c.europeanAqi > 60 ? t.aqi.activityIndoor : t.aqi.activityOutdoor}
+          </p>
+        </Card>
+        <Card className="bg-amber-50/80 p-4 text-amber-950 dark:bg-amber-400/10 dark:text-amber-100">
+          <p className="text-xs font-bold uppercase tracking-wider opacity-70">{t.aqi.sensitive}</p>
+          <p className="mt-2 text-sm font-semibold leading-6">
+            {c.europeanAqi > 40 ? t.aqi.sensitiveMask : t.aqi.sensitiveGood}
+          </p>
+        </Card>
+      </div>
 
       <Card className="p-0">
         <div className="flex items-center gap-2 border-b border-black/5 px-5 py-3 dark:border-white/5">

@@ -1,7 +1,7 @@
 import type { DailyPoint, HourlyPoint } from '@/features/weather/types'
 import { wmoInfo } from '@/features/weather/utils/wmo'
 
-/** Gợi ý khung giờ mưa / mưa nhẹ trong ~24–36h tới (chuỗi ngắn cho prompt AI). */
+/** Gợi ý khung giờ mưa / mưa nhẹ trong ~24–36h tới (chuỗi ngắn cho prompt trợ lý). */
 export function buildHourlyRainDigest(
   hourly: HourlyPoint[],
   timeZone: string,

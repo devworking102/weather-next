@@ -1,5 +1,7 @@
 import type { AirQualityBundle, TempUnit, WeatherBundle } from '@/features/weather/types'
 import { computeNextRainWindow } from '@/features/weather/utils/next-rain'
+import { translations } from '@/shared/i18n/translations'
+import type { Locale } from '@/shared/store/ui-store'
 
 export interface CompanionInsight {
   tone: string
@@ -14,83 +16,85 @@ export interface CompanionInsight {
   alertLevel: 'calm' | 'notice' | 'warning'
 }
 
-function tempLabel(temp: number) {
-  if (temp >= 35) return 'rất nóng'
-  if (temp >= 31) return 'khá nóng'
-  if (temp >= 27) return 'ấm và dễ chịu'
-  if (temp >= 22) return 'mát'
-  if (temp >= 17) return 'se lạnh'
-  return 'lạnh'
+type CompanionCopy = (typeof translations)[Locale]['companion']
+
+function tempLabel(temp: number, t: CompanionCopy) {
+  if (temp >= 35) return t.veryHot
+  if (temp >= 31) return t.hot
+  if (temp >= 27) return t.warm
+  if (temp >= 22) return t.cool
+  if (temp >= 17) return t.chilly
+  return t.cold
 }
 
-function hourLabel(iso: string) {
+function hourLabel(iso: string, t: CompanionCopy) {
   const hour = new Date(iso).getHours()
-  if (hour === 0) return 'nửa đêm'
+  if (hour === 0) return t.midnight
   if (hour < 12) return `${hour}AM`
   if (hour === 12) return '12PM'
   return `${hour - 12}PM`
 }
 
-function rainText(weather: WeatherBundle) {
+function rainText(weather: WeatherBundle, t: CompanionCopy) {
   const rain = computeNextRainWindow(weather.hourly, 24)
   const todayRain = Math.round(weather.daily[0]?.precipitationProbability ?? 0)
 
   if (rain.kind === 'window') {
     return {
-      text: `Có khả năng mưa khoảng ${hourLabel(rain.startTime)}. Mang ô hoặc áo mưa nhỏ nếu ra ngoài sau thời điểm này.`,
+      text: t.rainWindow(hourLabel(rain.startTime, t)),
       level: rain.maxProbability >= 70 ? ('warning' as const) : ('notice' as const),
     }
   }
 
   if (todayRain >= 45) {
     return {
-      text: 'Hôm nay vẫn có khả năng mưa rải rác. Nên chuẩn bị áo mưa gọn nhẹ.',
+      text: t.scatteredRain,
       level: 'notice' as const,
     }
   }
 
   return {
-    text: 'Khả năng mưa thấp trong vài giờ tới. Có thể ra ngoài thoải mái hơn.',
+    text: t.lowRain,
     level: 'calm' as const,
   }
 }
 
-function aqiText(aqi?: AirQualityBundle) {
+function aqiText(aqi: AirQualityBundle | undefined, t: CompanionCopy) {
   const value = aqi?.current?.europeanAqi
   if (value == null || !Number.isFinite(value)) {
-    return 'Chưa có dữ liệu không khí, nên quan sát thực tế nếu trời mù hoặc có mùi khói.'
+    return t.aqiUnknown
   }
 
-  if (value <= 40) return 'Không khí ổn cho sinh hoạt thường ngày.'
-  if (value <= 60) return 'Không khí trung bình. Người nhạy cảm nên giảm vận động mạnh ngoài trời.'
-  if (value <= 80) return 'Không khí kém. Nên đeo khẩu trang nếu đi lâu ngoài đường.'
-  return 'Không khí xấu. Hạn chế ra ngoài lâu và ưu tiên không gian trong nhà.'
+  if (value <= 40) return t.aqiGood
+  if (value <= 60) return t.aqiMedium
+  if (value <= 80) return t.aqiPoor
+  return t.aqiBad
 }
 
-function uvText(uv: number) {
-  if (uv >= 8) return 'UV rất cao, tránh nắng trưa và dùng kem chống nắng.'
-  if (uv >= 6) return 'UV cao, nên đội nón và hạn chế ở ngoài trời buổi trưa.'
-  if (uv >= 3) return 'UV vừa phải, vẫn nên che nắng nếu đi lâu.'
-  return 'UV thấp, dễ chịu hơn cho hoạt động ngoài trời.'
+function uvText(uv: number, t: CompanionCopy) {
+  if (uv >= 8) return t.uvVeryHigh
+  if (uv >= 6) return t.uvHigh
+  if (uv >= 3) return t.uvModerate
+  return t.uvLow
 }
 
-function outfitText(temp: number, rainLine: string, windSpeed: number) {
-  if (temp >= 34) return 'Áo thun thoáng, quần nhẹ và nước uống là ưu tiên.'
-  if (temp <= 20) return 'Áo khoác mỏng sẽ hợp lý, nhất là sáng sớm hoặc tối.'
-  if (rainLine.includes('mưa')) return 'Áo thun hoặc sơ mi nhẹ, kèm ô nhỏ hoặc áo mưa gấp gọn.'
-  if (windSpeed >= 24) return 'Trang phục gọn, thêm áo khoác mỏng nếu đi xe máy.'
-  return 'Áo thun hoặc sơ mi nhẹ là đủ thoải mái hôm nay.'
+function outfitText(temp: number, rainLine: string, windSpeed: number, t: CompanionCopy) {
+  if (temp >= 34) return t.outfitHot
+  if (temp <= 20) return t.outfitCold
+  if (rainLine === t.rainWindow('') || rainLine === t.scatteredRain || rainLine.toLowerCase().includes('rain') || rainLine.includes('mưa')) return t.outfitRain
+  if (windSpeed >= 24) return t.outfitWind
+  return t.outfitNormal
 }
 
-function activityText(temp: number, rainLine: string, aqiLine: string) {
-  if (aqiLine.includes('xấu') || aqiLine.includes('kém')) {
-    return 'Hợp với cafe trong nhà, làm việc nhẹ hoặc đi siêu thị ngắn.'
+function activityText(temp: number, hasRain: boolean, aqiBad: boolean, t: CompanionCopy) {
+  if (aqiBad) {
+    return t.activityIndoor
   }
-  if (rainLine.includes('mưa')) {
-    return 'Nên chọn cafe trong nhà, lịch hẹn gần nhà hoặc mang đồ chống mưa.'
+  if (hasRain) {
+    return t.activityRain
   }
-  if (temp >= 34) return 'Nên ra ngoài sáng sớm hoặc sau hoàng hôn, tránh đi bộ giữa trưa.'
-  return 'Thời tiết hợp để đi dạo, cafe ngoài trời hoặc chạy việc ngắn.'
+  if (temp >= 34) return t.activityHot
+  return t.activityNice
 }
 
 export function buildWeatherCompanion(
@@ -98,22 +102,26 @@ export function buildWeatherCompanion(
   weather: WeatherBundle,
   aqi?: AirQualityBundle,
   unit: TempUnit = 'celsius',
+  locale: Locale = 'vi',
 ): CompanionInsight {
+  const t = translations[locale].companion
   const current = weather.current
   const feels = Math.round(current.apparentTemperature)
   const temp = Math.round(current.temperature)
   const today = weather.daily[0]
-  const tempWord = tempLabel(current.apparentTemperature)
-  const rain = rainText(weather)
-  const aqiLine = aqiText(aqi)
-  const uvLine = uvText(current.uvIndex)
-  const outfit = outfitText(current.apparentTemperature, rain.text, current.windSpeed)
-  const activity = activityText(current.apparentTemperature, rain.text, aqiLine)
+  const tempWord = tempLabel(current.apparentTemperature, t)
+  const rain = rainText(weather, t)
+  const aqiLine = aqiText(aqi, t)
+  const uvLine = uvText(current.uvIndex, t)
+  const hasRain = rain.level !== 'calm'
+  const hasBadAqi = (aqi?.current?.europeanAqi ?? 0) > 60
+  const outfit = outfitText(current.apparentTemperature, rain.text, current.windSpeed, t)
+  const activity = activityText(current.apparentTemperature, hasRain, hasBadAqi, t)
   const unitLabel = unit === 'fahrenheit' ? 'F' : 'C'
 
   const highLow = today
-    ? `Nhiệt độ dao động khoảng ${Math.round(today.tempMin)}-${Math.round(today.tempMax)}°${unitLabel}.`
-    : `Cảm giác ngoài trời khoảng ${feels}°${unitLabel}.`
+    ? t.tempRange(Math.round(today.tempMin), Math.round(today.tempMax), unitLabel)
+    : t.feelsLike(feels, unitLabel)
 
   const alertLevel =
     rain.level === 'warning' || current.uvIndex >= 8 || (aqi?.current?.europeanAqi ?? 0) > 80
@@ -121,7 +129,7 @@ export function buildWeatherCompanion(
       : rain.level
 
   return {
-    tone: `${city} hôm nay ${tempWord}.`,
+    tone: t.tone(city, tempWord),
     summary: `${highLow} ${rain.text}`,
     recommendation: activity,
     outfit,
@@ -131,10 +139,10 @@ export function buildWeatherCompanion(
     uv: uvLine,
     comfort:
       current.humidity >= 82
-        ? 'Không khí khá ẩm, dễ thấy oi hoặc bí nếu di chuyển lâu.'
+        ? t.humidComfort
         : current.windSpeed >= 24
-          ? 'Có gió rõ, cảm giác ngoài trời sẽ mát hơn nhiệt độ hiển thị.'
-          : `Cảm giác thực tế khoảng ${feels}°${unitLabel}, khá gần với nhiệt độ ${temp}°${unitLabel}.`,
+          ? t.windyComfort
+          : t.normalComfort(feels, unitLabel, temp),
     alertLevel,
   }
 }

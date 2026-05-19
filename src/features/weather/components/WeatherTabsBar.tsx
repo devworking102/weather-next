@@ -26,8 +26,8 @@ export function WeatherTabsBar() {
   )
 
   return (
-    <div className="sticky top-[57px] z-30 border-b border-black/5 bg-[color:var(--background)]/90 backdrop-blur dark:border-white/5">
-      <div className="mx-auto container px-4 py-2 md:px-6">
+    <div className="sticky top-[57px] z-30 border-b border-black/5 bg-[color:var(--background)]/80 shadow-sm backdrop-blur-2xl dark:border-white/5">
+      <div className="mx-auto container px-3 py-2 md:px-6">
         <TabsNav value={tab} onChange={setTab} alertCount={alertCount} />
       </div>
     </div>
