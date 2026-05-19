@@ -38,7 +38,6 @@ export function WeatherInsightsPanel({ location, weather, aqi }: Props) {
   return (
     <AiWeatherSummary
       city={location.name}
-      badgeSource={data.source}
       insights={{
         summary: data.summary,
         outfit: data.outfit,

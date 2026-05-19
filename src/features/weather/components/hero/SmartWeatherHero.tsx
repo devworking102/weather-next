@@ -11,7 +11,6 @@ import { formatTemp } from '@/features/weather/utils/format'
 import { useUiStore } from '@/shared/store/ui-store'
 import { useT } from '@/shared/hooks/useT'
 import { DynamicBackground } from '@/features/weather/components/DynamicBackground'
-import { AiBadge } from '@/shared/ui/AiBadge'
 import { useWeatherAiSummary } from '@/features/ai-summary/hooks/useWeatherAiSummary'
 
 interface Props {
@@ -71,7 +70,7 @@ export function SmartWeatherHero({ location, weather, aqi }: Props) {
 
   async function shareWeather() {
     const origin = typeof window !== 'undefined' ? window.location.origin : ''
-    const url = `${origin}/weather`
+    const url = `${origin}/thoi-tiet`
     const line = `${location.name}: ${formatTemp(current.temperature, tempUnit)} · ${info.label}`
     try {
       if (typeof navigator !== 'undefined' && navigator.share) {
@@ -153,9 +152,6 @@ export function SmartWeatherHero({ location, weather, aqi }: Props) {
                 <p className="min-w-0 flex-1 text-sm leading-relaxed text-white/90 sm:text-[15px]">
                   {ai.data.summary}
                 </p>
-                {ai.data.source !== 'heuristic' && (
-                  <AiBadge source={ai.data.source} />
-                )}
               </div>
             ) : (
               <div className="flex items-center gap-2">
@@ -185,7 +181,7 @@ export function SmartWeatherHero({ location, weather, aqi }: Props) {
 
           <div className="flex flex-wrap items-center gap-2 pt-1">
             <Link
-              href="/radar"
+              href="/radar-mua"
               className="inline-flex min-h-11 min-w-[44px] items-center justify-center rounded-full bg-white/95 px-4 py-2.5 text-sm font-semibold text-slate-900 shadow-md transition hover:bg-white active:scale-[0.98] dark:bg-white dark:text-slate-900"
             >
               {t.smartHero.radarCta}

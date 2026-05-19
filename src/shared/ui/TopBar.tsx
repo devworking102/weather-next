@@ -19,16 +19,16 @@ export function TopBar() {
   const setCurrent = useLocationStore((s) => s.setCurrent)
 
   const navItems = [
-    { href: '/weather',     label: t.nav.weather     },
-    { href: '/radar',       label: t.nav.radar       },
-    { href: '/aqi',         label: t.nav.aqi         },
-    { href: '/alerts',      label: t.nav.alerts      },
-    { href: '/health',      label: t.nav.health      },
-    { href: '/news',        label: t.nav.news        },
-    { href: '/earthquakes', label: t.nav.earthquakes },
-    { href: '/calendar',    label: t.nav.calendar    },
-    { href: '/wind',        label: t.nav.wind        },
-    { href: '/widget',      label: t.nav.widget      },
+    { href: '/thoi-tiet',            label: t.nav.weather     },
+    { href: '/radar-mua',            label: t.nav.radar       },
+    { href: '/chat-luong-khong-khi', label: t.nav.aqi         },
+    { href: '/canh-bao',             label: t.nav.alerts      },
+    { href: '/suc-khoe',             label: t.nav.health      },
+    { href: '/tin-tuc',              label: t.nav.news        },
+    { href: '/dong-dat',             label: t.nav.earthquakes },
+    { href: '/lich',                 label: t.nav.calendar    },
+    { href: '/gio',                  label: t.nav.wind        },
+    { href: '/tien-ich',             label: t.nav.widget      },
   ]
 
   useEffect(() => {

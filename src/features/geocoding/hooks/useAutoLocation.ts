@@ -41,7 +41,7 @@ export function useAutoLocation() {
   const [step, setStep] = useState<GeoStep>('pending')
   const geoRanRef = useRef(false)
 
-  const ipQuery = useIpLocation()
+  const ipQuery = useIpLocation(step === 'browser-failed')
 
   // Step 1: browser geolocation (chạy đúng 1 lần)
   useEffect(() => {
@@ -53,9 +53,13 @@ export function useAutoLocation() {
     }
     geoRanRef.current = true
 
+    if (!current) {
+      setCurrent(DEFAULT_FALLBACK)
+    }
+
     let cancelled = false
     void (async () => {
-      const coords = await browserGeolocate(4000)
+      const coords = await browserGeolocate(2500)
       if (cancelled) return
       if (coords) {
         setCurrent({

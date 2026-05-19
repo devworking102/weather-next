@@ -1,10 +1,8 @@
 import { Card } from '@/shared/ui/Card'
-import { Sparkles, Shirt, Activity, Map, Smile, CloudLightning } from 'lucide-react'
-import { AiBadge, type AiBadgeSource } from '@/shared/ui/AiBadge'
+import { Shirt, Activity, Map, Smile, CloudLightning } from 'lucide-react'
 
 interface AiInsightsProps {
   city: string
-  badgeSource?: AiBadgeSource
   insights: {
     summary: string
     outfit: string
@@ -16,7 +14,7 @@ interface AiInsightsProps {
   }
 }
 
-export function AiWeatherSummary({ city, insights, badgeSource = 'gemini' }: AiInsightsProps) {
+export function AiWeatherSummary({ city, insights }: AiInsightsProps) {
   const severe = insights.severe?.trim()
 
   return (
@@ -24,14 +22,6 @@ export function AiWeatherSummary({ city, insights, badgeSource = 'gemini' }: AiI
       className="flex flex-col gap-4 animate-in fade-in slide-in-from-bottom-4 duration-700 ease-out"
       aria-label={`Gợi ý AI cho ${city}`}
     >
-      <div className="flex items-center justify-between px-1">
-        <h2 className="text-lg font-bold tracking-tight text-slate-900 dark:text-white flex items-center gap-2">
-          <Sparkles className="h-5 w-5 text-sky-500" />
-          AI Khuyên Dùng
-        </h2>
-        <AiBadge source={badgeSource} />
-      </div>
-
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Main Summary & Mood - Span 2 columns */}
         <Card className="md:col-span-2 flex flex-col justify-between bg-gradient-to-br from-sky-500/10 to-purple-500/10 dark:from-sky-400/10 dark:to-purple-500/10 border-sky-200/50 dark:border-sky-800/50">

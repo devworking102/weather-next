@@ -13,8 +13,8 @@ export function usePrefetchAppRoutes() {
 
   useEffect(() => {
     const path = pathname?.replace(/\/+$/, '') ?? ''
-    if (path === '/widget/embed') return
-    if (path === '/radar' || path === '/aqi' || path === '/wind') return
+    if (path === '/tien-ich/embed') return
+    if (path === '/radar-mua' || path === '/chat-luong-khong-khi' || path === '/gio') return
     if (ran.current) return
 
     let cancelled = false
@@ -25,9 +25,9 @@ export function usePrefetchAppRoutes() {
       if (cancelled || ran.current) return
       ran.current = true
       try {
-        router.prefetch('/radar')
-        router.prefetch('/aqi')
-        router.prefetch('/wind')
+        router.prefetch('/radar-mua')
+        router.prefetch('/chat-luong-khong-khi')
+        router.prefetch('/gio')
       } catch {
         /* noop */
       }

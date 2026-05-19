@@ -45,18 +45,19 @@ ${aqi != null ? `EU AQI ~${aqi}` : 'AQI unknown'}. ${pm != null ? `PM2.5 ~${pm} 
 
 Return ONLY JSON (no markdown) with keys: summary, outfit, health, travel, mood, severe.
 Rules:
-- All human text must be in ${lang}, short clauses for mobile (1–2 sentences per field where natural).
-- summary: factual + helpful overview for the next hours; lead with what matters today (mưa nắng, nóng, lạnh, AQI).
-- outfit: what to wear today.
-- health: AQI + UV + humidity in practical advice (sensitive groups if AQI high).
-- travel: one concrete suggestion for going out / commute / timing.
-- mood: one memorable emotional line about the day/sky — if Vietnamese: giọng thân thiện, hóm hỉnh nhẹ (có thể ví von đời thường), không sến, không toxic, không chính trị/tôn giáo; tránh chỉ lặp lại con số đã có ở summary.
-- severe: if thunderstorms (code>=95), heavy rain (>=82), snow storms, or extreme heat/cold risk, 1–2 sentences warning + "follow official alerts"; else "" (empty string).
+- All human text must be in ${lang}, concise but information-rich for mobile.
+- Each field should give 2 useful details when natural; do not just restate the same number in different words.
+- summary: 2 sentences. Lead with the most important condition for the next hours, then add the second-priority factor (rain/heat/cold/AQI/wind/UV).
+- outfit: 1-2 sentences with clothing, footwear, and one carry item such as umbrella, raincoat, sunscreen, mask, water bottle, or light jacket.
+- health: 2 sentences combining AQI, UV, humidity, heat/cold, and who should be more careful (children, elderly, asthma, outdoor workers) when relevant.
+- travel: 2 sentences with commute timing, motorbike/walking/public transport advice, and whether outdoor plans should move earlier/later/indoors.
+- mood: one memorable emotional line about the day/sky. If Vietnamese: friendly, lightly witty, grounded in daily life, not cheesy, toxic, political, or religious.
+- severe: if thunderstorms (code>=95), heavy rain (>=82), snow storms, extreme heat/cold, very high UV, or poor AQI, write 1-2 practical warning sentences and say to follow official alerts when severe; else "" (empty string).
 `
 
   const result = await aiGenerate(prompt, {
     temperature: 0.55,
-    maxOutputTokens: 520,
+    maxOutputTokens: 760,
     json: true,
   })
 

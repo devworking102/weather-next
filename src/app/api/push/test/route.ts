@@ -22,7 +22,7 @@ export async function POST(req: NextRequest) {
   const { sent, failed } = await sendPushToAll({
     title: 'Weather Next',
     body: 'Thử push từ máy chủ — nếu thấy thông báo này là đã cấu hình đúng.',
-    url: '/weather',
+    url: '/thoi-tiet',
   })
   return NextResponse.json({ ok: true, sent, failed })
 }

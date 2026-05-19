@@ -31,7 +31,7 @@ export async function sendPushToAll(payload: { title: string; body: string; url?
   failed: number
 }> {
   if (!configureWebPush()) return { sent: 0, failed: 0 }
-  const data = JSON.stringify({ title: payload.title, body: payload.body, url: payload.url ?? '/weather' })
+  const data = JSON.stringify({ title: payload.title, body: payload.body, url: payload.url ?? '/thoi-tiet' })
   const subs = listPushSubscriptions()
   let sent = 0
   let failed = 0
@@ -53,7 +53,7 @@ export async function sendPushToOne(
   payload: { title: string; body: string; url?: string },
 ): Promise<boolean> {
   if (!configureWebPush()) return false
-  const data = JSON.stringify({ title: payload.title, body: payload.body, url: payload.url ?? '/weather' })
+  const data = JSON.stringify({ title: payload.title, body: payload.body, url: payload.url ?? '/thoi-tiet' })
   try {
     await webpush.sendNotification(sub as webpush.PushSubscription, data, { TTL: 3600 })
     return true

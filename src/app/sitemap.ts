@@ -4,17 +4,16 @@ import { getSiteUrl } from '@/shared/lib/site-url'
 
 const STATIC = [
   '/',
-  '/weather',
-  '/wind',
-  '/radar',
-  '/aqi',
-  '/health',
-  '/news',
-  '/earthquakes',
-  '/calendar',
-  '/alerts',
+  '/thoi-tiet',
+  '/gio',
+  '/radar-mua',
+  '/chat-luong-khong-khi',
+  '/suc-khoe',
+  '/tin-tuc',
+  '/dong-dat',
+  '/lich',
   '/canh-bao',
-  '/widget',
+  '/tien-ich',
 ]
 
 export default function sitemap(): MetadataRoute.Sitemap {
@@ -25,35 +24,29 @@ export default function sitemap(): MetadataRoute.Sitemap {
     entries.push({
       url: `${base}${path}`,
       lastModified: new Date(),
-      changeFrequency: path === '/weather' ? 'hourly' : 'daily',
-      priority: path === '/' || path === '/weather' ? 1 : 0.75,
+      changeFrequency: path === '/thoi-tiet' ? 'hourly' : 'daily',
+      priority: path === '/' || path === '/thoi-tiet' ? 1 : 0.75,
     })
   }
 
   for (const slug of listSeoCitySlugs()) {
     entries.push({
-      url: `${base}/weather/${slug}`,
+      url: `${base}/thoi-tiet/${slug}`,
       lastModified: new Date(),
       changeFrequency: 'hourly',
       priority: 0.9,
     })
     entries.push({
-      url: `${base}/aqi/${slug}`,
+      url: `${base}/chat-luong-khong-khi/${slug}`,
       lastModified: new Date(),
       changeFrequency: 'daily',
       priority: 0.82,
     })
     entries.push({
-      url: `${base}/alerts/${slug}`,
-      lastModified: new Date(),
-      changeFrequency: 'daily',
-      priority: 0.78,
-    })
-    entries.push({
       url: `${base}/canh-bao/${slug}`,
       lastModified: new Date(),
       changeFrequency: 'daily',
-      priority: 0.76,
+      priority: 0.78,
     })
   }
 

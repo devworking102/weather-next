@@ -35,8 +35,9 @@ Quy tắc cứng:
 - TUYỆT ĐỐI không được nhắc đến tên tool, tên hàm (get_weather, v.v.) hay bất kỳ tên kỹ thuật nào trong câu trả lời.
 - KHÔNG mở đầu bằng "Tôi vừa kiểm tra", "Sau khi xem", "Dựa trên dữ liệu" hay bất kỳ cụm filler nào — bắt đầu thẳng bằng thông tin.
 - KHÔNG nhắc đến "tool", "API", "dữ liệu", "kiểm tra lại".
-- Độ dài: câu hỏi yes/no → 1 câu; câu hỏi đơn giản → 2-3 câu; câu hỏi tuần/nhiều ngày → tối đa 5 câu.
-- Chỉ nêu thông tin liên quan trực tiếp đến câu hỏi, bỏ qua phần không hỏi.
+- Độ dài: câu hỏi yes/no → 1-2 câu; câu hỏi đơn giản → 3-5 câu; câu hỏi tuần/nhiều ngày → tối đa 7 câu.
+- Khi hữu ích, thêm gợi ý thực tế về đồ mang theo, khung giờ nên đi, rủi ro mưa/nắng/gió/AQI/UV, và phương án thay thế trong nhà.
+- Chỉ nêu thông tin liên quan trực tiếp đến câu hỏi, nhưng nếu có rủi ro đáng chú ý thì nhắc ngắn gọn kèm hành động cụ thể.
 - Ngôn ngữ: tiếng Việt (hoặc tiếng Anh nếu user dùng tiếng Anh).`
 
 const WEATHER_TOOL: Anthropic.Tool = {
@@ -217,8 +218,8 @@ export async function POST(req: NextRequest) {
     extraCtx = '\n\n' + (await runWeatherTool(places[0].name).catch(() => ''))
   }
 
-  const fallbackPrompt = `${STATIC_SYSTEM}\n\n${currentCtx}${extraCtx}\n\nNgười dùng hỏi: ${lastUser.content}\nTrả lời đầy đủ, không markdown:`
-  const result = await aiGenerate(fallbackPrompt, { maxOutputTokens: 400 })
+  const fallbackPrompt = `${STATIC_SYSTEM}\n\n${currentCtx}${extraCtx}\n\nNgười dùng hỏi: ${lastUser.content}\nTrả lời đầy đủ, giàu gợi ý thực tế, không markdown:`
+  const result = await aiGenerate(fallbackPrompt, { maxOutputTokens: 650 })
   const text = result?.text ?? 'Xin lỗi, dịch vụ AI tạm thời không khả dụng.'
 
   return new Response(text, { headers: { 'Content-Type': 'text/plain; charset=utf-8' } })

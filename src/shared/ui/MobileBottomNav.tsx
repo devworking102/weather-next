@@ -7,10 +7,10 @@ import { useT } from '@/shared/hooks/useT'
 import { cn } from '@/shared/lib/cn'
 
 const ITEMS = [
-  { href: '/weather', key: 'weather', Icon: Cloud },
-  { href: '/radar',   key: 'radar',   Icon: CloudRain },
-  { href: '/aqi',     key: 'aqi',     Icon: Wind },
-  { href: '/wind',    key: 'wind',    Icon: Compass },
+  { href: '/thoi-tiet',            key: 'weather', Icon: Cloud },
+  { href: '/radar-mua',            key: 'radar',   Icon: CloudRain },
+  { href: '/chat-luong-khong-khi', key: 'aqi',     Icon: Wind },
+  { href: '/gio',                  key: 'wind',    Icon: Compass },
 ] as const
 
 export function MobileBottomNav() {
@@ -18,7 +18,7 @@ export function MobileBottomNav() {
   const t = useT()
   const path = pathname?.replace(/\/+$/, '') ?? ''
 
-  if (path === '/widget/embed') return null
+  if (path === '/tien-ich/embed') return null
 
   const label: Record<string, string> = {
     weather: t.bottomNav.weather,

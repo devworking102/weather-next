@@ -8,7 +8,6 @@ import { useLocationStore } from '@/features/geocoding/store/location-store'
 import { useUiStore } from '@/shared/store/ui-store'
 import { aqiCategory } from '@/features/weather/utils/format'
 import { useAiInsight } from '@/shared/hooks/useAiInsight'
-import { AiBadge } from '@/shared/ui/AiBadge'
 import { useT } from '@/shared/hooks/useT'
 import type { AqiInsightPayload, AqiInsightResponse } from '@/app/api/aqi-insight/route'
 import {
@@ -109,7 +108,6 @@ export function AirQualityTab() {
           ) : (
             <p className="mt-2 text-sm leading-relaxed text-slate-700 dark:text-slate-300">
               {insight?.insight ?? cat.advice}
-              {insight?.source && insight.source !== 'fallback' && <AiBadge source={insight.source} className="ml-2" />}
             </p>
           )}
         </div>

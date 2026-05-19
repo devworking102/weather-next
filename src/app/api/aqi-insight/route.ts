@@ -34,13 +34,14 @@ Current air pollution data:
 - O₃: ${body.ozone.toFixed(1)} μg/m³
 - CO: ${(body.co / 1000).toFixed(2)} mg/m³
 
-Write exactly 2 sentences in ${lang}:
-1. Assess the pollution level and the most concerning pollutant (if any)
-2. Specific recommendation: who should limit exposure, whether a mask is needed, and suitable activities
+Write 3 compact sentences in ${lang}:
+1. Assess the pollution level and name the main pollutant or pattern that matters most.
+2. Explain what it means for daily life: outdoor exercise, children, elderly people, asthma/allergy/cardiovascular groups, and indoor ventilation.
+3. Give specific actions: mask type if needed, best time/place for activity, whether to close windows or use an air purifier, and what outdoor plans are still reasonable.
 
 Return plain text only, no markdown, no numbering.`
 
-  const result = await aiGenerate(prompt, { temperature: 0.4, maxOutputTokens: 150 })
+  const result = await aiGenerate(prompt, { temperature: 0.4, maxOutputTokens: 260 })
   if (result) {
     return NextResponse.json({ insight: result.text, source: result.source } satisfies AqiInsightResponse)
   }

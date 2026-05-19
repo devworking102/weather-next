@@ -25,9 +25,9 @@ export async function POST(req: NextRequest) {
     .map((a) => `[${a.level.toUpperCase()}] ${a.title}: ${a.message}`)
     .join('\n')
 
-  const prompt = `Bạn là trợ lý thời tiết. Tóm tắt các cảnh báo sau thành 1-2 câu tự nhiên bằng ${lang}, ưu tiên cảnh báo nguy hiểm nhất trước. Không liệt kê, viết như đoạn văn ngắn.\n\nCảnh báo:\n${alertList}`
+  const prompt = `Bạn là trợ lý thời tiết. Tóm tắt các cảnh báo sau thành 2-3 câu tự nhiên bằng ${lang}, ưu tiên cảnh báo nguy hiểm nhất trước. Nêu rõ ai/cái gì bị ảnh hưởng, thời điểm cần chú ý nếu có trong nội dung, và một hành động an toàn cụ thể. Không liệt kê, viết như đoạn văn ngắn.\n\nCảnh báo:\n${alertList}`
 
-  const text = await claudeGenerate(prompt, { maxOutputTokens: 120 })
+  const text = await claudeGenerate(prompt, { maxOutputTokens: 200 })
   if (text) {
     return NextResponse.json({ summary: text.trim(), source: 'claude' } satisfies AlertSummaryResponse)
   }

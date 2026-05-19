@@ -34,13 +34,15 @@ Today's weather data:
 - AQI (EU): ${Math.round(body.aqi)}
 - UV index: ${Math.round(body.uvIndex)}
 
-Write a short, friendly message (2-3 sentences) in ${lang}.
+Write a friendly message (3-4 compact sentences) in ${lang}.
 - Start with a warm and natural observation about how it feels outside.
-- Give caring, practical advice based on the weather conditions.
+- Give caring, practical advice based on heat/cold, humidity, wind, rain, AQI, and UV.
+- Include advice for sensitive groups when relevant: children, elderly people, asthma/allergy/cardiovascular groups, outdoor workers, motorbike commuters.
+- Include at least one concrete action such as drink water, wear sunscreen, carry rain gear, choose shade, avoid intense noon exercise, mask up, or move plans indoors.
 - Use a soft, affectionate tone (e.g., in Vietnamese use words like "nha", "nhé", "nè").
 - Absolutely NO bullet points, NO robotic phrasing, NO formal reports. Make it sound human and caring.`
 
-  const result = await aiGenerate(prompt, { temperature: 0.5, maxOutputTokens: 150 })
+  const result = await aiGenerate(prompt, { temperature: 0.5, maxOutputTokens: 280 })
   if (result) {
     return NextResponse.json({ insight: result.text, source: result.source } satisfies HealthInsightResponse)
   }

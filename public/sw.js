@@ -71,7 +71,7 @@ self.addEventListener('fetch', (event) => {
           const offline = await shell.match('/offline.html')
           if (offline) return offline
           return new Response(
-            '<!doctype html><meta charset="utf-8"><title>Offline</title><p>Không có mạng.</p><p><a href="/weather">Về dự báo</a></p>',
+            '<!doctype html><meta charset="utf-8"><title>Offline</title><p>Không có mạng.</p><p><a href="/thoi-tiet">Về dự báo</a></p>',
             { status: 503, headers: { 'Content-Type': 'text/html; charset=utf-8' } },
           )
         }
@@ -101,7 +101,7 @@ self.addEventListener('fetch', (event) => {
 })
 
 self.addEventListener('push', (event) => {
-  let data = { title: 'Trời Hôm Nay', body: '', url: '/weather' }
+  let data = { title: 'Trời Hôm Nay', body: '', url: '/thoi-tiet' }
   try {
     if (event.data) data = { ...data, ...event.data.json() }
   } catch {
@@ -112,13 +112,13 @@ self.addEventListener('push', (event) => {
       body: data.body,
       icon: '/icon.svg',
       badge: '/icon.svg',
-      data: { url: data.url || '/weather' },
+      data: { url: data.url || '/thoi-tiet' },
     }),
   )
 })
 
 self.addEventListener('notificationclick', (event) => {
   event.notification.close()
-  const url = event.notification.data?.url || '/weather'
+  const url = event.notification.data?.url || '/thoi-tiet'
   event.waitUntil(self.clients.openWindow(url))
 })

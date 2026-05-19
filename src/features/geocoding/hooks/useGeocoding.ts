@@ -24,10 +24,11 @@ export function useReverseGeocode(lat?: number, lon?: number) {
   })
 }
 
-export function useIpLocation() {
+export function useIpLocation(enabled = true) {
   return useQuery<IpLocation | null>({
     queryKey: ['ip-location'],
     queryFn: () => apiFetch<IpLocation | null>(`/api/ip-location`),
+    enabled,
     staleTime: 30 * 60 * 1000,
   })
 }

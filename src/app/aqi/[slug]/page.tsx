@@ -29,11 +29,11 @@ export async function generateMetadata({
   return {
     title,
     description,
-    alternates: { canonical: `${base}/aqi/${slug}` },
+    alternates: { canonical: `${base}/chat-luong-khong-khi/${slug}` },
     openGraph: {
       title,
       description,
-      url: `${base}/aqi/${slug}`,
+      url: `${base}/chat-luong-khong-khi/${slug}`,
       locale: 'vi_VN',
       type: 'website',
       images: [
@@ -114,7 +114,7 @@ export default async function SeoAqiCityPage({ params }: { params: Promise<{ slu
           )}
         </div>
         <Link
-          href="/aqi"
+          href="/chat-luong-khong-khi"
           className="inline-flex min-h-11 items-center justify-center rounded-full bg-emerald-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-emerald-700"
         >
           Mở trang AQI đầy đủ →

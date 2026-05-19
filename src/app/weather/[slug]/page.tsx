@@ -30,11 +30,11 @@ export async function generateMetadata({
   return {
     title,
     description,
-    alternates: { canonical: `${base}/weather/${slug}` },
+    alternates: { canonical: `${base}/thoi-tiet/${slug}` },
     openGraph: {
       title,
       description,
-      url: `${base}/weather/${slug}`,
+      url: `${base}/thoi-tiet/${slug}`,
       locale: 'vi_VN',
       type: 'website',
       images: [
@@ -155,7 +155,7 @@ export default async function SeoWeatherCityPage({ params }: { params: Promise<{
         </section>
         <div>
           <Link
-            href="/weather"
+            href="/thoi-tiet"
             className="inline-flex min-h-11 items-center justify-center rounded-full bg-sky-600 px-5 py-2.5 text-sm font-semibold text-white shadow hover:bg-sky-700"
           >
             Mở đầy đủ trong app →

@@ -27,13 +27,16 @@ export async function POST(req: NextRequest) {
   const locLabel = [body.locationName, body.admin1, body.country].filter(Boolean).join(', ')
   const lang = body.locale === 'en' ? 'English' : 'Vietnamese'
   const prompt = `I am at ${locLabel}. Current temperature is ${Math.round(body.temperature)}°C, WMO weather code ${body.weatherCode}.
-Act as a local assistant and suggest exactly 4 local specialty/popular foods suitable for this weather (with emoji), 4 reasonable activities (with emoji), 4 clothing items to wear (with emoji), and 4 nearby travel/tourist destinations or resorts worth visiting near ${locLabel} (with emoji). All text must be in ${lang}.
+Act as a practical local assistant. Suggest exactly 4 local specialty/popular foods suitable for this weather, 4 reasonable activities, 4 clothing/gear items, and 4 nearby travel/tourist destinations or resorts worth visiting near ${locLabel}. All text must be in ${lang}.
+Make every item more useful than a label: include an emoji plus a short reason, timing tip, or weather-specific note in 4-10 words.
+Prefer concrete local places and foods when you know them; if unsure, use realistic categories without inventing exact businesses.
+For rain, heat, cold, strong sun, or poor visibility, adapt suggestions toward indoor options, hydration, shade, rain gear, safe transport, and realistic trip distance.
 Return ONLY a JSON with this exact structure:
 {"title":"1 short weather comment","food":["...","...","...","..."],"activity":["...","...","...","..."],"clothes":["...","...","...","..."],"places":["...","...","...","..."]}`
 
   const result = await aiGenerate(prompt, {
     temperature: 0.7,
-    maxOutputTokens: 450,
+    maxOutputTokens: 700,
     json: true,
   })
 

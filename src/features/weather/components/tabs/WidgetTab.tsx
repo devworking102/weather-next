@@ -31,11 +31,11 @@ export function WidgetTab() {
   const height = WIDGET_HEIGHTS[size]
 
   const embedSrc = lat && lon
-    ? `/widget/embed?lat=${lat}&lon=${lon}&name=${encodeURIComponent(name)}&theme=${theme}&units=${units}`
+    ? `/tien-ich/embed?lat=${lat}&lon=${lon}&name=${encodeURIComponent(name)}&theme=${theme}&units=${units}`
     : ''
 
   const iframeCode = `<iframe
-  src="${baseUrl}/widget/embed?lat=${lat}&lon=${lon}&name=${encodeURIComponent(name)}&theme=${theme}&units=${units}"
+  src="${baseUrl}/tien-ich/embed?lat=${lat}&lon=${lon}&name=${encodeURIComponent(name)}&theme=${theme}&units=${units}"
   width="360"
   height="${height}"
   style="border:0;border-radius:16px;box-shadow:0 4px 24px rgba(0,0,0,.12)"

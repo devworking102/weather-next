@@ -15,9 +15,9 @@ export function Providers({ children }: { children: ReactNode }) {
   const pathname = usePathname()
   usePrefetchAppRoutes()
   const theme = useUiStore((s) => s.theme)
-  // Chỉ ẩn chat trong trang iframe nhúng (`/widget/embed`), không ẩn ở `/widget` (trang lấy mã).
+  // Hide chat inside the embeddable iframe page.
   const path = pathname?.replace(/\/+$/, '') ?? ''
-  const showChat = path !== '/widget/embed'
+  const showChat = path !== '/tien-ich/embed'
 
   // Áp dụng class `dark` lên <html> theo theme + media query hệ thống
   useEffect(() => {

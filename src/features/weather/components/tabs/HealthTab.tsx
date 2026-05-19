@@ -3,7 +3,6 @@
 import { useMemo } from 'react'
 import { Card } from '@/shared/ui/Card'
 import { Skeleton } from '@/shared/ui/Skeleton'
-import { AiBadge } from '@/shared/ui/AiBadge'
 import { useAirQuality } from '@/features/weather/hooks/useWeather'
 import { useLocationStore } from '@/features/geocoding/store/location-store'
 import { useUiStore } from '@/shared/store/ui-store'
@@ -56,7 +55,6 @@ export function HealthTab({ weather }: Props) {
               <h3 className="text-sm font-semibold text-slate-800 dark:text-slate-200">
                 {t.health.aiTitle}
               </h3>
-              {insight?.source && insight.source !== 'fallback' && <AiBadge source={insight.source} />}
             </div>
             {insightLoading ? (
               <div className="space-y-1.5">

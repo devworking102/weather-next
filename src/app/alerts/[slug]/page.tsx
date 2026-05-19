@@ -25,11 +25,11 @@ export async function generateMetadata({
   return {
     title,
     description,
-    alternates: { canonical: `${base}/alerts/${slug}` },
+    alternates: { canonical: `${base}/canh-bao/${slug}` },
     openGraph: {
       title,
       description,
-      url: `${base}/alerts/${slug}`,
+      url: `${base}/canh-bao/${slug}`,
       locale: 'vi_VN',
       type: 'website',
       images: [{ url: `/api/og?type=weather&title=${ogTitle}&line2=${ogLine2}`, width: 1200, height: 630 }],
@@ -72,13 +72,13 @@ export default async function SeoAlertsCityPage({ params }: { params: Promise<{ 
         </article>
         <div className="flex flex-col gap-3 sm:flex-row">
           <Link
-            href="/alerts"
+            href="/canh-bao"
             className="inline-flex min-h-11 flex-1 items-center justify-center rounded-full bg-amber-600 px-5 py-2.5 text-sm font-semibold text-white shadow hover:bg-amber-700"
           >
             Mở cảnh báo đầy đủ →
           </Link>
           <Link
-            href={`/weather/${slug}`}
+            href={`/thoi-tiet/${slug}`}
             className="inline-flex min-h-11 flex-1 items-center justify-center rounded-full border border-slate-300 bg-white px-5 py-2.5 text-sm font-semibold text-slate-800 hover:bg-slate-50 dark:border-white/15 dark:bg-slate-900/40 dark:text-white dark:hover:bg-slate-800/60"
           >
             Dự báo {city.nameVi} →

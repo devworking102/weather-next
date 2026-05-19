@@ -16,7 +16,7 @@ export default function VoicePlaceholderPage() {
         <p className="mt-3 text-slate-600 dark:text-slate-300">
           Tính năng giọng nói và TTS sẽ được bổ sung sau khi tích hợp nhà cung cấp (OpenAI / Vbee / ElevenLabs…).
         </p>
-        <Link href="/weather" className="mt-6 inline-block text-sky-600 underline dark:text-sky-400">
+        <Link href="/thoi-tiet" className="mt-6 inline-block text-sky-600 underline dark:text-sky-400">
           ← Về thời tiết
         </Link>
       </main>
