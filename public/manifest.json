@@ -19,10 +19,10 @@
   ],
   "shortcuts": [
     { "name": "Thời tiết", "short_name": "Thời tiết", "url": "/thoi-tiet", "description": "Dự báo đầy đủ" },
-    { "name": "Radar mưa", "short_name": "Radar", "url": "/radar-mua", "description": "Radar RainViewer & Windy" },
-    { "name": "Không khí", "short_name": "AQI", "url": "/chat-luong-khong-khi", "description": "Chất lượng không khí" },
-    { "name": "Cảnh báo", "short_name": "Cảnh báo", "url": "/canh-bao", "description": "Cảnh báo thời tiết" },
-    { "name": "Sức khỏe", "short_name": "Sức khỏe", "url": "/suc-khoe", "description": "Chỉ số sức khỏe & thời tiết" },
-    { "name": "Lịch âm", "short_name": "Lịch", "url": "/lich", "description": "Âm lịch & tiết khí" }
+    { "name": "Radar mưa", "short_name": "Radar", "url": "/radar", "description": "Radar RainViewer & Windy" },
+    { "name": "Không khí", "short_name": "AQI", "url": "/aqi", "description": "Chất lượng không khí" },
+    { "name": "Cảnh báo", "short_name": "Cảnh báo", "url": "/alerts", "description": "Cảnh báo thời tiết" },
+    { "name": "Sức khỏe", "short_name": "Sức khỏe", "url": "/health", "description": "Chỉ số sức khỏe & thời tiết" },
+    { "name": "Lịch âm", "short_name": "Lịch", "url": "/calendar", "description": "Âm lịch & tiết khí" }
   ]
 }

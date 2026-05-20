@@ -11,6 +11,8 @@ import { Input } from '@/shared/ui/Input'
 export function SearchBar() {
   const [query, setQuery] = useState('')
   const [open, setOpen] = useState(false)
+  const [locating, setLocating] = useState(false)
+  const [locationError, setLocationError] = useState('')
   const rootRef = useRef<HTMLDivElement>(null)
   const setCurrent = useLocationStore((s) => s.setCurrent)
   const setPinned = useLocationStore((s) => s.setPinned)
@@ -29,7 +31,12 @@ export function SearchBar() {
   }
 
   function onLocate() {
-    if (typeof navigator === 'undefined' || !navigator.geolocation) return
+    setLocationError('')
+    if (typeof navigator === 'undefined' || !navigator.geolocation) {
+      setLocationError('Trình duyệt chưa hỗ trợ lấy vị trí. Bạn hãy nhập tên thành phố.')
+      return
+    }
+    setLocating(true)
     navigator.geolocation.getCurrentPosition(
       (pos) => {
         const loc = {
@@ -42,8 +49,12 @@ export function SearchBar() {
         setCurrent(loc)
         addRecentLocation(loc)
         setPinned(false)
+        setLocating(false)
       },
-      () => {},
+      () => {
+        setLocating(false)
+        setLocationError('Chưa lấy được vị trí. Bạn có thể nhập thành phố hoặc thử bật quyền vị trí.')
+      },
       { timeout: 8000 },
     )
   }
@@ -71,20 +82,28 @@ export function SearchBar() {
           className="rounded-lg p-1.5 text-slate-500 transition-colors hover:bg-slate-100 hover:text-sky-600 dark:hover:bg-white/5"
           title={t.search.useCurrentLocation}
           type="button"
+          disabled={locating}
         >
-          <Navigation size={18} />
+          {locating ? <Loader2 className="animate-spin" size={18} /> : <Navigation size={18} />}
         </button>
       </div>
+
+      {locationError ? (
+        <p className="px-2 text-xs leading-5 text-amber-700 dark:text-amber-300">
+          {locationError}
+        </p>
+      ) : null}
 
       {query.length === 0 ? (
         <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-thin">
           <button
             type="button"
             onClick={onLocate}
+            disabled={locating}
             className="inline-flex min-h-10 shrink-0 items-center gap-1.5 rounded-full bg-slate-950 px-3 text-xs font-semibold text-white shadow-sm transition active:scale-95 dark:bg-white dark:text-slate-950"
           >
-            <MapPin size={14} aria-hidden />
-            Vị trí của tôi
+            {locating ? <Loader2 className="animate-spin" size={14} aria-hidden /> : <MapPin size={14} aria-hidden />}
+            {locating ? 'Đang lấy vị trí' : 'Vị trí của tôi'}
           </button>
           {quickCities.map((city) => (
             <button
@@ -103,7 +122,7 @@ export function SearchBar() {
       ) : null}
 
       {open && query.length >= 2 && data && data.length > 0 ? (
-        <ul className="absolute z-30 mt-2 w-full overflow-hidden rounded-2xl border border-black/5 bg-white shadow-xl dark:border-white/10 dark:bg-slate-900">
+        <ul className="absolute z-50 mt-2 max-h-[min(22rem,60vh)] w-full overflow-y-auto rounded-2xl border border-black/5 bg-white shadow-xl dark:border-white/10 dark:bg-slate-900">
           {data.map((loc) => (
             <li key={loc.id}>
               <button
@@ -127,6 +146,11 @@ export function SearchBar() {
             </li>
           ))}
         </ul>
+      ) : null}
+      {open && query.length >= 2 && data && data.length === 0 && !isFetching ? (
+        <div className="absolute z-50 mt-2 w-full rounded-2xl border border-black/5 bg-white p-4 text-sm text-slate-600 shadow-xl dark:border-white/10 dark:bg-slate-900 dark:text-slate-300">
+          Chưa tìm thấy nơi này. Bạn thử nhập tên tỉnh/thành gần nhất nhé.
+        </div>
       ) : null}
     </div>
   )

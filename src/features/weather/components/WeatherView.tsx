@@ -18,6 +18,7 @@ import { SearchBar } from '@/features/geocoding/components/SearchBar'
 import { RecentLocationsRow } from '@/features/geocoding/components/RecentLocationsRow'
 import { FavoritesBar } from '@/features/favorites/components/FavoritesBar'
 import { AlertsBanner } from '@/features/alerts/components/AlertsBanner'
+import { computeAlerts } from '@/features/alerts/utils/compute'
 import { PushAlertsCard } from '@/features/notifications/components/PushAlertsCard'
 import { useNotificationScanner } from '@/features/notifications/hooks/useNotifications'
 import { usePullToRefresh } from '@/shared/hooks/usePullToRefresh'
@@ -35,6 +36,7 @@ import { MobileWeatherSummary } from './MobileWeatherSummary'
 import { formatTemp } from '@/features/weather/utils/format'
 import { PersonalWeatherFeed } from './PersonalWeatherFeed'
 import { WeatherMoments } from './WeatherMoments'
+import { TabsNav } from './TabsNav'
 
 // Lazy-loaded tab content — only bundled when first activated
 const tabFallback = () => createElement(Skeleton, { className: 'h-64 rounded-2xl' })
@@ -86,6 +88,10 @@ export function WeatherView() {
     () => (location && data ? buildWeatherCompanion(location.name, data, aqi, tempUnit, locale) : null),
     [location, data, aqi, tempUnit, locale],
   )
+  const alertCount = useMemo(
+    () => computeAlerts(data, aqi, quakes, locale).length,
+    [data, aqi, quakes, locale],
+  )
   const focusSearch = useCallback(() => {
     searchRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
     window.setTimeout(() => {
@@ -94,7 +100,7 @@ export function WeatherView() {
   }, [])
 
   return (
-    <div className="relative space-y-6">
+    <div className="relative space-y-5 sm:space-y-6">
       {(pullDistance > 0 || refreshing) && location && data ? (
         <>
           <div
@@ -115,11 +121,15 @@ export function WeatherView() {
           ) : null}
         </>
       ) : null}
-      <div ref={searchRef} className="sticky top-[4.5rem] z-30 space-y-3 rounded-[1.75rem] bg-background/80 p-2 backdrop-blur-xl md:static md:bg-transparent md:p-0 md:backdrop-blur-0">
+      <section
+        ref={searchRef}
+        className="relative z-20 space-y-3 rounded-[1.75rem] border border-black/5 bg-white/80 p-2.5 shadow-sm backdrop-blur-xl dark:border-white/10 dark:bg-slate-950/70 sm:p-3"
+        aria-label={t.search.placeholder}
+      >
         <SearchBar />
         <RecentLocationsRow />
         <FavoritesBar />
-      </div>
+      </section>
 
       <AlertsBanner />
 
@@ -133,9 +143,9 @@ export function WeatherView() {
         <WeatherEmpty />
       ) : (
         <>
-          <div className="relative">
+          <div className="relative z-0">
             <SmartWeatherHero location={location} weather={data} aqi={aqi} />
-            <FavoriteStar location={location} className="absolute right-4 top-4 z-10" />
+            <FavoriteStar location={location} className="absolute right-4 top-[4.75rem] z-10 sm:right-8 sm:top-[5.5rem]" />
           </div>
           {companion ? (
             <MobileWeatherSummary
@@ -145,6 +155,10 @@ export function WeatherView() {
               onSearchClick={focusSearch}
             />
           ) : null}
+
+          <section className="rounded-[1.5rem] border border-black/5 bg-white/70 p-2 shadow-sm backdrop-blur-xl dark:border-white/10 dark:bg-white/[0.06]">
+            <TabsNav value={tab} onChange={setTab} alertCount={alertCount} />
+          </section>
 
           <div>
             {/*

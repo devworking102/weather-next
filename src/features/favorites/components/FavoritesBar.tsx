@@ -15,35 +15,37 @@ export function FavoritesBar() {
   if (favorites.length === 0) return null
 
   return (
-    <div className="flex flex-wrap items-center gap-2">
-      <span className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+    <div className="flex min-w-0 items-center gap-2 overflow-hidden">
+      <span className="shrink-0 text-xs font-semibold uppercase tracking-wide text-slate-500">
         {t.favorites.title}
       </span>
-      {favorites.map((f) => (
-        <div
-          key={f.id}
-          className="group inline-flex items-center overflow-hidden rounded-full border border-amber-200/60 bg-amber-50/80 text-sm text-amber-900 dark:border-amber-500/20 dark:bg-amber-500/10 dark:text-amber-200"
-        >
-          <button
-            onClick={() => {
-              setCurrent({ ...f })
-              setPinned(true)
-            }}
-            className="px-3 py-1.5 font-medium hover:bg-amber-100 dark:hover:bg-amber-500/15"
-            type="button"
+      <div className="scrollbar-thin flex min-w-0 flex-1 gap-2 overflow-x-auto pb-1">
+        {favorites.map((f) => (
+          <div
+            key={f.id}
+            className="group inline-flex shrink-0 items-center overflow-hidden rounded-full border border-amber-200/60 bg-amber-50/80 text-sm text-amber-900 dark:border-amber-500/20 dark:bg-amber-500/10 dark:text-amber-200"
           >
-            {f.name}
-          </button>
-          <button
-            onClick={() => remove(f.id)}
-            className="px-2 py-1.5 text-amber-500 transition-colors hover:bg-rose-50 hover:text-rose-500 dark:hover:bg-rose-500/10"
-            aria-label={t.favorites.removeLabel}
-            type="button"
-          >
-            <X size={14} />
-          </button>
-        </div>
-      ))}
+            <button
+              onClick={() => {
+                setCurrent({ ...f })
+                setPinned(true)
+              }}
+              className="max-w-[10rem] truncate px-3 py-1.5 font-medium hover:bg-amber-100 dark:hover:bg-amber-500/15"
+              type="button"
+            >
+              {f.name}
+            </button>
+            <button
+              onClick={() => remove(f.id)}
+              className="px-2 py-1.5 text-amber-500 transition-colors hover:bg-rose-50 hover:text-rose-500 dark:hover:bg-rose-500/10"
+              aria-label={t.favorites.removeLabel}
+              type="button"
+            >
+              <X size={14} />
+            </button>
+          </div>
+        ))}
+      </div>
     </div>
   )
 }

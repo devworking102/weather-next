@@ -9,12 +9,19 @@ import { WeatherHero } from '@/components/weather/WeatherHero'
 import { WeatherMap } from '@/components/weather/WeatherMap'
 import { WeatherAdvice } from '@/components/weather/WeatherAdvice'
 import { WeatherStats } from '@/components/weather/WeatherStats'
-import { getSeoCity, listSeoCitySlugs } from '@/data/seo-cities'
+import { SEO_CITIES, getPopularSeoCities, getSeoCity, listSeoCitySlugs } from '@/data/seo-cities'
 import {
   getAirQualityByCoords,
   getWeatherBundleByCoords,
 } from '@/lib/weather'
-import { buildPlaceJsonLd, buildWeatherBreadcrumbJsonLd, buildWebsiteJsonLd } from '@/lib/seo'
+import {
+  buildCityFaq,
+  buildFaqJsonLd,
+  buildPlaceJsonLd,
+  buildWeatherBreadcrumbJsonLd,
+  buildWeatherForecastJsonLd,
+  buildWebsiteJsonLd,
+} from '@/lib/seo'
 import { getSiteUrl } from '@/shared/lib/site-url'
 import { TopBar } from '@/shared/ui/TopBar'
 
@@ -71,11 +78,6 @@ export default async function WeatherCityPage({ params }: PageProps) {
   if (!city) notFound()
 
   const base = getSiteUrl()
-  const jsonLd = [
-    buildWebsiteJsonLd(base),
-    buildWeatherBreadcrumbJsonLd(base, city),
-    buildPlaceJsonLd(base, city),
-  ]
 
   const [weatherResult, airQuality] = await Promise.allSettled([
     getCachedWeatherBundle(city.lat, city.lon),
@@ -87,6 +89,19 @@ export default async function WeatherCityPage({ params }: PageProps) {
   const forecast = weather
   const aqi = airQuality.status === 'fulfilled' ? airQuality.value : null
   const today = forecast?.daily[0]
+  const faq = buildCityFaq(city, weather, aqi)
+  const relatedCities = [
+    ...SEO_CITIES.filter((item) => item.region === city.region && item.slug !== city.slug),
+    ...getPopularSeoCities().filter((item) => item.slug !== city.slug),
+  ].slice(0, 8)
+  const jsonLd = [
+    buildWebsiteJsonLd(base),
+    buildWeatherBreadcrumbJsonLd(base, city),
+    buildPlaceJsonLd(base, city),
+    buildFaqJsonLd(faq),
+    buildWeatherForecastJsonLd(base, city, weather),
+  ].filter(Boolean)
+
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
@@ -125,6 +140,41 @@ export default async function WeatherCityPage({ params }: PageProps) {
               </p>
             </section>
           )}
+
+          <section className="mt-6 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-white/10 dark:bg-slate-950/60">
+            <h2 className="text-xl font-semibold tracking-tight text-slate-950 dark:text-white">
+              Câu hỏi thường gặp về thời tiết {city.name}
+            </h2>
+            <div className="mt-4 divide-y divide-slate-100 dark:divide-white/10">
+              {faq.map((item) => (
+                <details key={item.question} className="group py-3">
+                  <summary className="cursor-pointer list-none text-sm font-semibold text-slate-900 dark:text-white">
+                    {item.question}
+                  </summary>
+                  <p className="mt-2 text-sm leading-6 text-slate-600 dark:text-slate-300">
+                    {item.answer}
+                  </p>
+                </details>
+              ))}
+            </div>
+          </section>
+
+          <section className="mt-6 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-white/10 dark:bg-slate-950/60">
+            <h2 className="text-lg font-semibold text-slate-950 dark:text-white">
+              Xem thêm thời tiết các tỉnh/thành gần {city.region}
+            </h2>
+            <div className="mt-4 flex flex-wrap gap-2">
+              {relatedCities.map((item) => (
+                <Link
+                  key={item.slug}
+                  href={`/thoi-tiet/${item.slug}`}
+                  className="rounded-full bg-slate-100 px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-sky-100 hover:text-sky-800 dark:bg-white/10 dark:text-slate-100 dark:hover:bg-sky-400/20"
+                >
+                  {item.name}
+                </Link>
+              ))}
+            </div>
+          </section>
         </div>
       </main>
     </>

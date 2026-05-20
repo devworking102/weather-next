@@ -2,15 +2,15 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { Cloud, CloudRain, Wind, Compass } from 'lucide-react'
+import { Bell, Cloud, CloudRain, Wind } from 'lucide-react'
 import { useT } from '@/shared/hooks/useT'
 import { cn } from '@/shared/lib/cn'
 
 const ITEMS = [
-  { href: '/thoi-tiet',            key: 'weather', Icon: Cloud },
-  { href: '/radar-mua',            key: 'radar',   Icon: CloudRain },
-  { href: '/chat-luong-khong-khi', key: 'aqi',     Icon: Wind },
-  { href: '/gio',                  key: 'wind',    Icon: Compass },
+  { href: '/thoi-tiet', key: 'weather', Icon: Cloud },
+  { href: '/radar', key: 'radar', Icon: CloudRain },
+  { href: '/aqi', key: 'aqi', Icon: Wind },
+  { href: '/alerts', key: 'alerts', Icon: Bell },
 ] as const
 
 export function MobileBottomNav() {
@@ -22,9 +22,9 @@ export function MobileBottomNav() {
 
   const label: Record<string, string> = {
     weather: t.bottomNav.weather,
-    radar:   t.bottomNav.radar,
-    aqi:     t.bottomNav.aqi,
-    wind:    t.bottomNav.wind,
+    radar: t.bottomNav.radar,
+    aqi: t.bottomNav.aqi,
+    alerts: 'Cảnh báo',
   }
 
   return (

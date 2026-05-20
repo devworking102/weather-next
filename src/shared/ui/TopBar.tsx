@@ -8,7 +8,7 @@ import { InstallButton } from '@/features/pwa/components/InstallButton'
 import { useT } from '@/shared/hooks/useT'
 import { cn } from '@/shared/lib/cn'
 import { useLocationStore } from '@/features/geocoding/store/location-store'
-import { Star } from 'lucide-react'
+import { ChevronDown, Menu, Star, X } from 'lucide-react'
 
 export function TopBar() {
   const pathname = usePathname()
@@ -18,17 +18,18 @@ export function TopBar() {
   const currentLoc = useLocationStore((s) => s.current)
   const setCurrent = useLocationStore((s) => s.setCurrent)
 
-  const navItems = [
-    { href: '/thoi-tiet',            label: t.nav.weather     },
-    { href: '/radar-mua',            label: t.nav.radar       },
-    { href: '/chat-luong-khong-khi', label: t.nav.aqi         },
-    { href: '/canh-bao',             label: t.nav.alerts      },
-    { href: '/suc-khoe',             label: t.nav.health      },
-    { href: '/tin-tuc',              label: t.nav.news        },
-    { href: '/dong-dat',             label: t.nav.earthquakes },
-    { href: '/lich',                 label: t.nav.calendar    },
-    { href: '/gio',                  label: t.nav.wind        },
-    { href: '/tien-ich',             label: t.nav.widget      },
+  const primaryNavItems = [
+    { href: '/thoi-tiet', label: 'Thời tiết' },
+    { href: '/radar', label: 'Radar' },
+    { href: '/aqi', label: 'AQI' },
+    { href: '/alerts', label: 'Cảnh báo' },
+  ]
+  const moreNavItems = [
+    { href: '/news', label: 'Tin tức' },
+    { href: '/earthquakes', label: 'Địa chấn' },
+    { href: '/calendar', label: 'Lịch âm' },
+    { href: '/wind', label: 'Gió' },
+    { href: '/widget', label: 'Nhúng' },
   ]
 
   useEffect(() => {
@@ -50,7 +51,7 @@ export function TopBar() {
 
           {/* Desktop nav */}
           <nav className="hidden lg:flex items-center gap-1 overflow-x-auto whitespace-nowrap">
-            {navItems.map(({ href, label }) => {
+            {primaryNavItems.map(({ href, label }) => {
               const active = pathname?.startsWith(href)
               return (
                 <Link
@@ -67,6 +68,35 @@ export function TopBar() {
                 </Link>
               )
             })}
+            <div className="group relative">
+              <button
+                type="button"
+                className="inline-flex min-h-9 items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-medium text-slate-500 transition-all duration-300 hover:bg-black/5 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-white/5 dark:hover:text-slate-200"
+                aria-haspopup="menu"
+              >
+                Thêm
+                <ChevronDown size={15} aria-hidden />
+              </button>
+              <div className="invisible absolute right-0 top-full z-50 min-w-44 translate-y-2 rounded-2xl border border-black/5 bg-white p-2 opacity-0 shadow-xl transition group-hover:visible group-hover:translate-y-1 group-hover:opacity-100 group-focus-within:visible group-focus-within:translate-y-1 group-focus-within:opacity-100 dark:border-white/10 dark:bg-slate-950">
+                {moreNavItems.map(({ href, label }) => {
+                  const active = pathname?.startsWith(href)
+                  return (
+                    <Link
+                      key={href}
+                      href={href}
+                      className={cn(
+                        'block rounded-xl px-3 py-2 text-sm font-medium transition-colors',
+                        active
+                          ? 'bg-sky-50 text-sky-700 dark:bg-sky-400/10 dark:text-sky-300'
+                          : 'text-slate-600 hover:bg-slate-50 dark:text-slate-300 dark:hover:bg-white/5',
+                      )}
+                    >
+                      {label}
+                    </Link>
+                  )
+                })}
+              </div>
+            </div>
           </nav>
 
           <div className="flex items-center gap-2">
@@ -79,11 +109,7 @@ export function TopBar() {
               onClick={() => setOpen(true)}
               className="lg:hidden inline-flex items-center justify-center rounded-xl p-2 text-slate-600 transition-colors hover:bg-black/5 dark:text-slate-300 dark:hover:bg-white/5"
             >
-              <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden>
-                <rect y="3" width="20" height="2" rx="1" fill="currentColor" />
-                <rect y="9" width="20" height="2" rx="1" fill="currentColor" />
-                <rect y="15" width="20" height="2" rx="1" fill="currentColor" />
-              </svg>
+              <Menu size={21} aria-hidden />
             </button>
           </div>
         </div>
@@ -122,9 +148,7 @@ export function TopBar() {
             onClick={() => setOpen(false)}
             className="rounded-lg p-2 text-slate-500 transition-colors hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-white/5"
           >
-            <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden>
-              <path d="M2 2l14 14M16 2L2 16" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-            </svg>
+            <X size={19} aria-hidden />
           </button>
         </div>
 
@@ -167,7 +191,28 @@ export function TopBar() {
           <div className="mb-2 px-5 text-xs font-bold uppercase tracking-wider text-slate-400">
             Menu
           </div>
-          {navItems.map(({ href, label }) => {
+          {primaryNavItems.map(({ href, label }) => {
+            const active = pathname?.startsWith(href)
+            return (
+              <Link
+                key={href}
+                href={href}
+                onClick={() => setOpen(false)}
+                className={cn(
+                  'flex items-center gap-3 px-5 py-3 text-sm font-medium transition-colors',
+                  active
+                    ? 'bg-slate-100 text-slate-900 dark:bg-white/8 dark:text-white'
+                    : 'text-slate-600 hover:bg-slate-50 dark:text-slate-300 dark:hover:bg-white/5',
+                )}
+              >
+                {label}
+              </Link>
+            )
+          })}
+          <div className="mb-2 mt-4 px-5 text-xs font-bold uppercase tracking-wider text-slate-400">
+            Thêm
+          </div>
+          {moreNavItems.map(({ href, label }) => {
             const active = pathname?.startsWith(href)
             return (
               <Link

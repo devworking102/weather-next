@@ -3,7 +3,6 @@ import Link from 'next/link'
 import { CitySearchLinks } from '@/components/weather/CitySearchLinks'
 import { getPopularSeoCities, SEO_CITIES } from '@/data/seo-cities'
 import { WeatherView } from '@/features/weather/components/WeatherView'
-import { WeatherTabsBar } from '@/features/weather/components/WeatherTabsBar'
 import { TopBar } from '@/shared/ui/TopBar'
 
 export const metadata: Metadata = {
@@ -44,7 +43,6 @@ export default function HomePage() {
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <TopBar />
-      <WeatherTabsBar />
       <main className="mx-auto container space-y-8 p-3 pb-32 md:p-6">
         <WeatherView />
 

@@ -5,7 +5,7 @@ import { RadarPageContent } from '@/features/radar/components/RadarPageContent'
 export const metadata: Metadata = {
   title: 'Radar mưa Việt Nam',
   description: 'Bản đồ radar mưa trực quan, hỗ trợ định vị, phóng to và theo dõi vùng mưa gần nhất.',
-  alternates: { canonical: '/radar-mua' },
+  alternates: { canonical: '/radar' },
 }
 
 export default function RadarPage() {

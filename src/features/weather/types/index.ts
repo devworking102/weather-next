@@ -54,6 +54,19 @@ export interface WeatherBundle {
   longitude: number
 }
 
+export type ApiResponse<T> =
+  | {
+      ok: true
+      data: T
+    }
+  | {
+      ok: false
+      error: {
+        code: string
+        message: string
+      }
+    }
+
 export interface AirQualityCurrent {
   europeanAqi: number
   usAqi: number

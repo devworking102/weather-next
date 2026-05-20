@@ -83,8 +83,11 @@ self.addEventListener('fetch', (event) => {
   if (url.pathname === '/api/weather') {
     event.respondWith(
       networkFirstGet(request, WEATHER_API_CACHE, {
-        error: 'offline',
-        message: 'no_cached_weather',
+        ok: false,
+        error: {
+          code: 'offline',
+          message: 'Bạn đang offline và chưa có dự báo đã lưu cho vị trí này.',
+        },
       }),
     )
     return
@@ -92,8 +95,11 @@ self.addEventListener('fetch', (event) => {
   if (url.pathname === '/api/aqi') {
     event.respondWith(
       networkFirstGet(request, AQI_API_CACHE, {
-        error: 'offline',
-        message: 'no_cached_aqi',
+        ok: false,
+        error: {
+          code: 'offline',
+          message: 'Bạn đang offline và chưa có AQI đã lưu cho vị trí này.',
+        },
       }),
     )
     return

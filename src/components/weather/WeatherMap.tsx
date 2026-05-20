@@ -15,7 +15,7 @@ export function WeatherMap({ cityName }: WeatherMapProps) {
           </p>
         </div>
         <Link
-          href="/radar-mua"
+          href="/radar"
           className="inline-flex min-h-10 items-center justify-center rounded-xl bg-slate-950 px-4 py-2 text-sm font-semibold text-white transition hover:bg-slate-800 dark:bg-white dark:text-slate-950 dark:hover:bg-slate-200"
         >
           Mở bản đồ
