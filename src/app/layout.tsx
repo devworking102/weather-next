@@ -67,7 +67,7 @@ const themeInitScript = `
   })();
 `
 
-const googleAnalyticsId = 'G-7RQ54609BW'
+const googleAnalyticsId = 'G-K6MCJPP81W'
 const googleAnalyticsInitScript = `
   window.dataLayer = window.dataLayer || [];
   function gtag(){dataLayer.push(arguments);}
