@@ -75,7 +75,7 @@ export function TopBar() {
           </Link>
 
           {/* Desktop nav */}
-          <nav className="hidden lg:flex items-center gap-1 overflow-x-auto whitespace-nowrap">
+          <nav className="hidden lg:flex items-center gap-1 whitespace-nowrap">
             {primaryNavItems.map(({ href, label }) => {
               const active = pathname?.startsWith(href)
               return (
@@ -100,15 +100,19 @@ export function TopBar() {
                 aria-haspopup="menu"
               >
                 Thêm
-                <ChevronDown size={15} aria-hidden />
+                <ChevronDown className="size-[15px] shrink-0 transition-transform duration-200 group-hover:rotate-180 group-focus-within:rotate-180" aria-hidden />
               </button>
-              <div className="invisible absolute right-0 top-full z-50 min-w-44 translate-y-2 rounded-2xl border border-black/5 bg-white p-2 opacity-0 shadow-xl transition group-hover:visible group-hover:translate-y-1 group-hover:opacity-100 group-focus-within:visible group-focus-within:translate-y-1 group-focus-within:opacity-100 dark:border-white/10 dark:bg-slate-950">
+              <div
+                className="invisible absolute right-0 top-[calc(100%+0.25rem)] z-50 min-w-44 translate-y-1 rounded-2xl border border-black/5 bg-white p-2 opacity-0 shadow-xl transition group-hover:visible group-hover:translate-y-0 group-hover:opacity-100 group-focus-within:visible group-focus-within:translate-y-0 group-focus-within:opacity-100 dark:border-white/10 dark:bg-slate-950"
+                role="menu"
+              >
                 {moreNavItems.map(({ href, label }) => {
                   const active = pathname?.startsWith(href)
                   return (
                     <Link
                       key={href}
                       href={href}
+                      role="menuitem"
                       className={cn(
                         'block rounded-xl px-3 py-2 text-sm font-medium transition-colors',
                         active
