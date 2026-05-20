@@ -3,7 +3,6 @@
 import { Settings as Gear } from 'lucide-react'
 import { useUiStore, type WindUnit, type TempUnit, type ThemeMode, type Locale } from '@/shared/store/ui-store'
 import { useNotifications } from '@/features/notifications/hooks/useNotifications'
-import { WebPushSetup } from '@/features/pwa/components/WebPushSetup'
 import { useT } from '@/shared/hooks/useT'
 import { cn } from '@/shared/lib/cn'
 import { Popover, PopoverContent, PopoverTrigger } from '@/shared/ui/Popover'
@@ -128,9 +127,6 @@ export function SettingsMenu() {
           ) : notifyEnabled ? (
             <p className="mt-2 text-[10px] leading-snug text-slate-500">{t.settings.notifyDetail}</p>
           ) : null}
-        </Section>
-        <Section title={t.push.sectionTitle}>
-          <WebPushSetup />
         </Section>
       </PopoverContent>
     </Popover>
