@@ -8,15 +8,18 @@ import { InstallButton } from '@/features/pwa/components/InstallButton'
 import { useT } from '@/shared/hooks/useT'
 import { cn } from '@/shared/lib/cn'
 import { useLocationStore } from '@/features/geocoding/store/location-store'
-import { ChevronDown, Menu, Star, X } from 'lucide-react'
+import { ChevronDown, LocateFixed, Loader2, Menu, Star, X } from 'lucide-react'
 
 export function TopBar() {
   const pathname = usePathname()
   const [open, setOpen] = useState(false)
   const t = useT()
+  const [locating, setLocating] = useState(false)
   const pinned = useLocationStore((s) => s.pinned)
   const currentLoc = useLocationStore((s) => s.current)
   const setCurrent = useLocationStore((s) => s.setCurrent)
+  const setPinned = useLocationStore((s) => s.setPinned)
+  const addRecentLocation = useLocationStore((s) => s.addRecentLocation)
 
   const primaryNavItems = [
     { href: '/thoi-tiet', label: 'Thời tiết' },
@@ -36,6 +39,28 @@ export function TopBar() {
     document.body.style.overflow = open ? 'hidden' : ''
     return () => { document.body.style.overflow = '' }
   }, [open])
+
+  function locateMe() {
+    if (typeof navigator === 'undefined' || !navigator.geolocation || locating) return
+    setLocating(true)
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        const loc = {
+          id: Date.now(),
+          name: 'Vị trí của tôi',
+          latitude: pos.coords.latitude,
+          longitude: pos.coords.longitude,
+          country: '',
+        }
+        setCurrent(loc)
+        addRecentLocation(loc)
+        setPinned(false)
+        setLocating(false)
+      },
+      () => setLocating(false),
+      { timeout: 8000 },
+    )
+  }
 
   return (
     <>
@@ -100,8 +125,19 @@ export function TopBar() {
           </nav>
 
           <div className="flex items-center gap-2">
-            <InstallButton />
-            <SettingsMenu />
+            <button
+              type="button"
+              onClick={locateMe}
+              aria-label="Dùng vị trí hiện tại"
+              className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-slate-950 text-white shadow-sm transition active:scale-95 dark:bg-white dark:text-slate-950 lg:hidden"
+              disabled={locating}
+            >
+              {locating ? <Loader2 className="animate-spin" size={18} aria-hidden /> : <LocateFixed size={18} aria-hidden />}
+            </button>
+            <div className="hidden items-center gap-2 lg:flex">
+              <InstallButton />
+              <SettingsMenu />
+            </div>
             <button
               type="button"
               aria-label={t.nav.openMenu}

@@ -183,7 +183,7 @@ export function SmartWeatherHero({ location, weather, aqi }: Props) {
 
           <div className="flex flex-wrap items-center gap-2 pt-1">
             <Link
-              href="/radar-mua"
+              href="/radar"
               className="inline-flex min-h-11 min-w-[44px] items-center justify-center rounded-full bg-white/95 px-4 py-2.5 text-sm font-semibold text-slate-900 shadow-md transition hover:bg-white active:scale-[0.98] dark:bg-white dark:text-slate-900"
             >
               {t.smartHero.radarCta}

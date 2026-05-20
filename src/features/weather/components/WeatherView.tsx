@@ -32,11 +32,14 @@ import { createElement } from 'react'
 import { buildWeatherCompanion } from '@/ai/weather-companion'
 import { AssistantActionCards } from './AssistantActionCards'
 import { HumanWeatherDetails } from './HumanWeatherDetails'
-import { MobileWeatherSummary } from './MobileWeatherSummary'
-import { formatTemp } from '@/features/weather/utils/format'
 import { PersonalWeatherFeed } from './PersonalWeatherFeed'
 import { WeatherMoments } from './WeatherMoments'
 import { TabsNav } from './TabsNav'
+import { WeatherHeroCard } from './WeatherHeroCard'
+import { AiSummaryCard } from './AiSummaryCard'
+import { MobileForecastTabs } from './MobileForecastTabs'
+import { MobileHourlyForecast } from './MobileHourlyForecast'
+import { MobileAqiHealthCard } from './MobileAqiHealthCard'
 
 // Lazy-loaded tab content — only bundled when first activated
 const tabFallback = () => createElement(Skeleton, { className: 'h-64 rounded-2xl' })
@@ -92,13 +95,6 @@ export function WeatherView() {
     () => computeAlerts(data, aqi, quakes, locale).length,
     [data, aqi, quakes, locale],
   )
-  const focusSearch = useCallback(() => {
-    searchRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
-    window.setTimeout(() => {
-      searchRef.current?.querySelector('input')?.focus()
-    }, 220)
-  }, [])
-
   return (
     <div className="relative space-y-5 sm:space-y-6">
       {(pullDistance > 0 || refreshing) && location && data ? (
@@ -123,7 +119,7 @@ export function WeatherView() {
       ) : null}
       <section
         ref={searchRef}
-        className="relative z-20 space-y-3 rounded-[1.75rem] border border-black/5 bg-white/80 p-2.5 shadow-sm backdrop-blur-xl dark:border-white/10 dark:bg-slate-950/70 sm:p-3"
+        className="relative z-20 hidden space-y-3 rounded-[1.75rem] border border-black/5 bg-white/80 p-3 shadow-sm backdrop-blur-xl dark:border-white/10 dark:bg-slate-950/70 md:block"
         aria-label={t.search.placeholder}
       >
         <SearchBar />
@@ -143,20 +139,19 @@ export function WeatherView() {
         <WeatherEmpty />
       ) : (
         <>
-          <div className="relative z-0">
+          <div className="relative z-0 md:hidden">
+            <WeatherHeroCard location={location} weather={data} tempUnit={tempUnit} />
+            <FavoriteStar location={location} className="absolute right-4 top-4 z-10" />
+          </div>
+          <div className="relative z-0 hidden md:block">
             <SmartWeatherHero location={location} weather={data} aqi={aqi} />
             <FavoriteStar location={location} className="absolute right-4 top-[4.75rem] z-10 sm:right-8 sm:top-[5.5rem]" />
           </div>
-          {companion ? (
-            <MobileWeatherSummary
-              city={location.name}
-              temperature={formatTemp(data.current.temperature, tempUnit)}
-              insight={companion}
-              onSearchClick={focusSearch}
-            />
-          ) : null}
+          {companion ? <AiSummaryCard insight={companion} /> : null}
+          <MobileForecastTabs value={tab} onChange={setTab} />
+          {tab === 'today' ? <MobileHourlyForecast weather={data} /> : null}
 
-          <section className="rounded-[1.5rem] border border-black/5 bg-white/70 p-2 shadow-sm backdrop-blur-xl dark:border-white/10 dark:bg-white/[0.06]">
+          <section className="hidden rounded-[1.5rem] border border-black/5 bg-white/70 p-2 shadow-sm backdrop-blur-xl dark:border-white/10 dark:bg-white/[0.06] md:block">
             <TabsNav value={tab} onChange={setTab} alertCount={alertCount} />
           </section>
 
@@ -166,18 +161,27 @@ export function WeatherView() {
               recommendations, meaningful moments, weekly outlook, and collapsed details.
             */}
             <div
-              className={cn('space-y-6', tab !== 'today' && 'hidden')}
+              className={cn('space-y-4 md:space-y-6', tab !== 'today' && 'hidden')}
               aria-hidden={tab !== 'today'}
             >
-              {companion ? <AssistantActionCards insight={companion} /> : null}
+              <div className="hidden md:block">
+                {companion ? <AssistantActionCards insight={companion} /> : null}
+              </div>
 
-              <WeatherMoments weather={data} onViewHourly={() => setTab('hourly')} />
+              <div className="hidden md:block">
+                <WeatherMoments weather={data} onViewHourly={() => setTab('hourly')} />
+              </div>
 
+              <div className="md:hidden">
+                <AlertsTab weather={data} />
+              </div>
               <DailyPreviewRow
                 weather={data}
                 days={7}
                 onViewAll={() => setTab('week')}
               />
+
+              {companion ? <MobileAqiHealthCard weather={data} aqi={aqi} insight={companion} /> : null}
 
               <ExpandableSection>
                 <PushAlertsCard />
@@ -204,8 +208,26 @@ export function WeatherView() {
               </ExpandableSection>
             </div>
 
-            {tab === 'hourly' && <HourlyTab weather={data} hours={48} />}
-            {tab === 'week'   && <DailyTab weather={data} days={7} />}
+            {tab === 'hourly' && (
+              <>
+                <div className="md:hidden">
+                  <MobileHourlyForecast weather={data} />
+                </div>
+                <div className="hidden md:block">
+                  <HourlyTab weather={data} hours={48} />
+                </div>
+              </>
+            )}
+            {tab === 'week' && (
+              <>
+                <div className="md:hidden">
+                  <DailyPreviewRow weather={data} days={7} />
+                </div>
+                <div className="hidden md:block">
+                  <DailyTab weather={data} days={7} />
+                </div>
+              </>
+            )}
             {tab === 'daily'  && <DailyTab weather={data} days={16} />}
             {tab === 'month'  && <DailyTab weather={data} days={30} />}
             {tab === 'aqi'    && <AirQualityTab />}

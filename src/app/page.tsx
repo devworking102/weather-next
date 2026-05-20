@@ -1,7 +1,6 @@
 import type { Metadata } from 'next'
-import Link from 'next/link'
-import { CitySearchLinks } from '@/components/weather/CitySearchLinks'
-import { getPopularSeoCities, SEO_CITIES } from '@/data/seo-cities'
+import { getPopularSeoCities } from '@/data/seo-cities'
+import { PopularCitiesCompact } from '@/features/weather/components/PopularCitiesCompact'
 import { WeatherView } from '@/features/weather/components/WeatherView'
 import { TopBar } from '@/shared/ui/TopBar'
 
@@ -14,7 +13,6 @@ export const metadata: Metadata = {
 
 export default function HomePage() {
   const popularCities = getPopularSeoCities()
-  const trendingCities = SEO_CITIES.slice(0, 24)
 
   const jsonLd = {
     '@context': 'https://schema.org',
@@ -43,42 +41,9 @@ export default function HomePage() {
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <TopBar />
-      <main className="mx-auto container space-y-8 p-3 pb-32 md:p-6">
+      <main className="mx-auto container space-y-5 px-4 py-4 pb-28 md:space-y-8 md:p-6 md:pb-32">
         <WeatherView />
-
-        <section className="rounded-[2rem] border border-black/5 bg-white/65 p-5 shadow-sm backdrop-blur-xl dark:border-white/10 dark:bg-white/[0.06]">
-          <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
-            <div>
-              <h2 className="text-xl font-semibold tracking-tight text-slate-950 dark:text-white">
-                Thành phố được xem nhiều
-              </h2>
-              <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-600 dark:text-slate-300">
-                Các trang địa phương phục vụ SEO, chia sẻ nhanh và theo dõi thời tiết tại từng tỉnh/thành.
-              </p>
-            </div>
-            <Link
-              href="/thoi-tiet"
-              className="inline-flex min-h-11 items-center justify-center rounded-full bg-slate-950 px-4 text-sm font-semibold text-white shadow-sm transition hover:bg-slate-800 dark:bg-white dark:text-slate-950"
-            >
-              Xem tất cả
-            </Link>
-          </div>
-
-          <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
-            {popularCities.map((city) => (
-              <Link
-                key={city.slug}
-                href={`/thoi-tiet/${city.slug}`}
-                className="rounded-2xl bg-white/80 p-4 shadow-sm transition hover:-translate-y-0.5 hover:bg-sky-50 dark:bg-white/8 dark:hover:bg-sky-400/10"
-              >
-                <p className="font-semibold text-slate-950 dark:text-white">{city.name}</p>
-                <p className="mt-1 truncate text-xs text-slate-500 dark:text-slate-400">{city.region}</p>
-              </Link>
-            ))}
-          </div>
-        </section>
-
-        <CitySearchLinks cities={trendingCities} />
+        <PopularCitiesCompact cities={popularCities} />
       </main>
     </>
   )
