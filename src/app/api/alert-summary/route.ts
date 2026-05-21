@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { claudeGenerate } from '@/shared/lib/claude'
 import type { WeatherAlert } from '@/features/alerts/types'
+import { hasOnlySupportedLanguageText } from '@/shared/lib/language-guard'
 
 interface AlertSummaryPayload {
   alerts: Pick<WeatherAlert, 'level' | 'title' | 'message'>[]
@@ -21,14 +22,18 @@ export async function POST(req: NextRequest) {
   }
 
   const lang = locale === 'en' ? 'English' : 'tiếng Việt'
+  const localeRule =
+    locale === 'en'
+      ? 'Write only in English. Do not include Chinese, Japanese, Korean, or any other language.'
+      : 'Write only in Vietnamese. Do not include Chinese, Japanese, Korean, English phrases, or any other language.'
   const alertList = alerts
     .map((a) => `[${a.level.toUpperCase()}] ${a.title}: ${a.message}`)
     .join('\n')
 
-  const prompt = `Bạn là trợ lý thời tiết. Tóm tắt các cảnh báo sau thành 2-3 câu tự nhiên bằng ${lang}, ưu tiên cảnh báo nguy hiểm nhất trước. Nêu rõ ai/cái gì bị ảnh hưởng, thời điểm cần chú ý nếu có trong nội dung, và một hành động an toàn cụ thể. Không tự gọi mình là AI, mô hình, bot hay hệ thống. Không nhắc API, tool, dữ liệu, nguồn kỹ thuật hoặc độ tin cậy. Không liệt kê, viết như đoạn văn ngắn.\n\nCảnh báo:\n${alertList}`
+  const prompt = `Bạn là trợ lý thời tiết. Tóm tắt các cảnh báo sau thành 2-3 câu tự nhiên bằng ${lang}. ${localeRule} Ưu tiên cảnh báo nguy hiểm nhất trước. Nêu rõ ai/cái gì bị ảnh hưởng, thời điểm cần chú ý nếu có trong nội dung, và một hành động an toàn cụ thể. Không tự gọi mình là AI, mô hình, bot hay hệ thống. Không nhắc API, tool, dữ liệu, nguồn kỹ thuật hoặc độ tin cậy. Không liệt kê, viết như đoạn văn ngắn.\n\nCảnh báo:\n${alertList}`
 
   const text = await claudeGenerate(prompt, { maxOutputTokens: 200 })
-  if (text) {
+  if (text && hasOnlySupportedLanguageText(text)) {
     return NextResponse.json({ summary: text.trim(), source: 'claude' } satisfies AlertSummaryResponse)
   }
 

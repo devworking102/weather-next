@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { aiGenerate, parseGeminiJson } from '@/shared/lib/ai'
 import type { AiSource } from '@/shared/lib/ai'
+import { hasOnlySupportedLanguageText } from '@/shared/lib/language-guard'
 import { wmoInfo } from '@/features/weather/utils/wmo'
 
 export interface WeatherInsightsRequest {
@@ -34,6 +35,10 @@ export async function POST(req: NextRequest) {
   const fallback = buildFallback(body)
 
   const lang = body.locale === 'en' ? 'English' : 'Vietnamese'
+  const localeRule =
+    body.locale === 'en'
+      ? 'Write only in English. Do not include Chinese, Japanese, Korean, or any other language.'
+      : 'Write only in Vietnamese. Do not include Chinese, Japanese, Korean, English phrases, or any other language.'
   const loc = [body.locationName, body.admin1, body.country].filter(Boolean).join(', ')
   const wmo = wmoInfo(body.weatherCode)
   const aqi = body.europeanAqi != null ? Math.round(body.europeanAqi) : null
@@ -46,6 +51,7 @@ ${aqi != null ? `EU AQI ~${aqi}` : 'AQI unknown'}. ${pm != null ? `PM2.5 ~${pm} 
 Return ONLY JSON (no markdown) with keys: summary, outfit, health, travel, mood, severe.
 Rules:
 - All human text must be in ${lang}, concise but information-rich for mobile.
+- ${localeRule}
 - Never call yourself AI, a model, a bot, or a system. If identity is needed, use only "trợ lý" in Vietnamese or "assistant" in English.
 - Never mention API, tool, model, provider, raw data, dataset, WMO code, or confidence score in the returned fields.
 - Translate raw metrics into plain-life meaning. Users care about rain, heat, umbrella, clothing, AQI health, and whether plans should move indoors.
@@ -73,7 +79,8 @@ Rules:
       typeof parsed.health === 'string' &&
       typeof parsed.travel === 'string' &&
       typeof parsed.mood === 'string' &&
-      typeof parsed.severe === 'string'
+      typeof parsed.severe === 'string' &&
+      hasOnlySupportedLanguageText(parsed.summary, parsed.outfit, parsed.health, parsed.travel, parsed.mood, parsed.severe)
     ) {
       return NextResponse.json({
         ...parsed,

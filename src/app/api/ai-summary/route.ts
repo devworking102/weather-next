@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { aiGenerate } from '@/shared/lib/ai'
+import { hasOnlySupportedLanguageText } from '@/shared/lib/language-guard'
 import { wmoInfo } from '@/features/weather/utils/wmo'
 
 interface Payload {
@@ -21,6 +22,10 @@ interface Payload {
 export async function POST(req: NextRequest) {
   const body = (await req.json()) as Payload
   const lang = body.locale === 'en' ? 'English' : 'tiếng Việt'
+  const localeRule =
+    body.locale === 'en'
+      ? 'Write only in English. Do not include Chinese, Japanese, Korean, or any other language.'
+      : 'Write only in Vietnamese. Do not include Chinese, Japanese, Korean, English phrases, or any other language.'
   const hourly = (body.hourlyForecastDigest ?? '').trim() || (lang === 'English' ? 'n/a' : 'không có')
   const daily = (body.dailyOutlookDigest ?? '').trim() || (lang === 'English' ? 'n/a' : 'không có')
   const uv =
@@ -30,6 +35,7 @@ export async function POST(req: NextRequest) {
 
   const prompt = `You are a practical, warm local weather assistant for everyday users, not a formal meteorologist and not a technical product.
 Write 3-4 compact sentences in ${lang}. Total length: 75-105 words.
+${localeRule}
 
 Tone rules:
 - Act like a caring local friend texting before someone leaves home. No formal weather reporting.
@@ -65,7 +71,7 @@ Multi-day outlook: ${daily}
 Rules: plain text only, no markdown, no bullets. Do not parrot back the numbers — convert them to human insight and everyday decisions.`
 
   const result = await aiGenerate(prompt, { temperature: 0.55, maxOutputTokens: 520 })
-  if (result) {
+  if (result && hasOnlySupportedLanguageText(result.text)) {
     return NextResponse.json({ summary: result.text, source: result.source })
   }
   return NextResponse.json({ summary: buildHeuristicSummary(body), source: 'heuristic' })

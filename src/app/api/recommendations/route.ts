@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { aiGenerate, parseGeminiJson } from '@/shared/lib/ai'
 import type { AiSource } from '@/shared/lib/ai'
+import { hasOnlySupportedLanguageText } from '@/shared/lib/language-guard'
 
 interface Payload {
   locationName: string
@@ -26,8 +27,13 @@ export async function POST(req: NextRequest) {
 
   const locLabel = [body.locationName, body.admin1, body.country].filter(Boolean).join(', ')
   const lang = body.locale === 'en' ? 'English' : 'Vietnamese'
+  const localeRule =
+    body.locale === 'en'
+      ? 'Write only in English. Do not include Chinese, Japanese, Korean, or any other language.'
+      : 'Write only in Vietnamese. Do not include Chinese, Japanese, Korean, English phrases, or any other language.'
   const prompt = `I am at ${locLabel}. Current temperature is ${Math.round(body.temperature)}°C, WMO weather code ${body.weatherCode}.
 Act as a practical local assistant for everyday users. Suggest exactly 4 local specialty/popular foods suitable for this weather, 4 reasonable activities, 4 clothing/gear items, and 4 nearby travel/tourist destinations or resorts worth visiting near ${locLabel}. All text must be in ${lang}.
+${localeRule}
 Make every item more useful than a label: include an emoji plus a short reason, timing tip, or weather-specific note in 4-10 words.
 Prefer concrete local places and foods when you know them; if unsure, use realistic categories without inventing exact businesses.
 For rain, heat, cold, strong sun, or poor visibility, adapt suggestions toward indoor options, hydration, shade, rain gear, safe transport, and realistic trip distance.
@@ -49,7 +55,14 @@ Return ONLY a JSON with this exact structure:
       Array.isArray(parsed.food) && parsed.food.length >= 4 &&
       Array.isArray(parsed.activity) && parsed.activity.length >= 4 &&
       Array.isArray(parsed.clothes) && parsed.clothes.length >= 4 &&
-      Array.isArray(parsed.places) && parsed.places.length >= 4
+      Array.isArray(parsed.places) && parsed.places.length >= 4 &&
+      hasOnlySupportedLanguageText(
+        parsed.title,
+        ...parsed.food,
+        ...parsed.activity,
+        ...parsed.clothes,
+        ...parsed.places,
+      )
     ) {
       return NextResponse.json({ ...parsed, source: result.source } satisfies Recommendations)
     }

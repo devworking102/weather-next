@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { aiGenerate } from '@/shared/lib/ai'
 import type { AiSource } from '@/shared/lib/ai'
+import { hasOnlySupportedLanguageText } from '@/shared/lib/language-guard'
 
 export interface AqiInsightPayload {
   locationName: string
@@ -22,6 +23,10 @@ export interface AqiInsightResponse {
 export async function POST(req: NextRequest) {
   const body = (await req.json()) as AqiInsightPayload
   const lang = body.locale === 'en' ? 'English' : 'Vietnamese'
+  const localeRule =
+    body.locale === 'en'
+      ? 'Write only in English. Do not include Chinese, Japanese, Korean, or any other language.'
+      : 'Write only in Vietnamese. Do not include Chinese, Japanese, Korean, English phrases, or any other language.'
 
   const prompt = `You are a calm air-quality health assistant for everyday users. Analyze the air quality at ${body.locationName || 'this location'}.
 
@@ -34,7 +39,8 @@ Current air pollution data:
 - O₃: ${body.ozone.toFixed(1)} μg/m³
 - CO: ${(body.co / 1000).toFixed(2)} mg/m³
 
-Write 3 compact sentences in ${lang}:
+Write 3 compact sentences in ${lang}.
+${localeRule}
 1. Assess the pollution level and name the main pollutant or pattern that matters most.
 2. Explain what it means for daily life: outdoor exercise, children, elderly people, asthma/allergy/cardiovascular groups, and indoor ventilation.
 3. Give specific actions: mask type if needed, best time/place for activity, whether to close windows or use an air purifier, and what outdoor plans are still reasonable.
@@ -47,7 +53,7 @@ Rules:
 Return plain text only, no markdown, no numbering.`
 
   const result = await aiGenerate(prompt, { temperature: 0.4, maxOutputTokens: 260 })
-  if (result) {
+  if (result && hasOnlySupportedLanguageText(result.text)) {
     return NextResponse.json({ insight: result.text, source: result.source } satisfies AqiInsightResponse)
   }
   return NextResponse.json({ insight: buildFallback(body), source: 'fallback' } satisfies AqiInsightResponse)

@@ -2,6 +2,7 @@ import { NextRequest } from 'next/server'
 import Anthropic from '@anthropic-ai/sdk'
 import { getClaudeClient, CLAUDE_MODEL } from '@/shared/lib/claude'
 import { aiGenerate } from '@/shared/lib/ai'
+import { hasOnlySupportedLanguageText, stripDisallowedScript } from '@/shared/lib/language-guard'
 import { searchPlaces } from '@/features/geocoding/services/geocoding'
 import { fetchWeather } from '@/features/weather/services/weather'
 import { wmoInfo } from '@/features/weather/utils/wmo'
@@ -36,6 +37,7 @@ Quy tắc cứng:
 - KHÔNG mở đầu bằng "Tôi vừa kiểm tra", "Sau khi xem", "Dựa trên dữ liệu" hay bất kỳ cụm filler nào — bắt đầu thẳng bằng thông tin.
 - KHÔNG tự gọi mình là AI, mô hình, bot hay hệ thống. Nếu cần xưng vai trò thì chỉ dùng "trợ lý".
 - KHÔNG nhắc đến "tool", "API", "model", "provider", "dữ liệu", "nguồn", "độ tin cậy", "kiểm tra lại".
+- Chỉ trả lời bằng tiếng Việt hoặc English theo ngôn ngữ của user. Không dùng tiếng Trung, Nhật, Hàn hay ngôn ngữ khác.
 - Độ dài: câu hỏi yes/no → 1-2 câu; câu hỏi đơn giản → 3-5 câu; câu hỏi tuần/nhiều ngày → tối đa 7 câu.
 - Khi hữu ích, thêm gợi ý thực tế về đồ mang theo, khung giờ nên đi, rủi ro mưa/nắng/gió/AQI/UV, và phương án thay thế trong nhà.
 - Chỉ nêu thông tin liên quan trực tiếp đến câu hỏi, nhưng nếu có rủi ro đáng chú ý thì nhắc ngắn gọn kèm hành động cụ thể.
@@ -106,6 +108,10 @@ export async function POST(req: NextRequest) {
   const { messages, context, locale } = body
 
   const lang = locale === 'en' ? 'English' : 'tiếng Việt'
+  const localeRule =
+    locale === 'en'
+      ? 'Write only in English. Do not include Chinese, Japanese, Korean, or any other language.'
+      : 'Write only in Vietnamese. Do not include Chinese, Japanese, Korean, English phrases, or any other language.'
   const aqiNote = context.aqi != null ? ` AQI: ${Math.round(context.aqi)}.` : ''
   const currentCtx = `Vị trí hiện tại người dùng đang xem: ${context.locationName}, ${Math.round(context.temperature)}°C, ${context.weatherCondition}.${aqiNote} Ngôn ngữ: ${lang}`
 
@@ -180,20 +186,20 @@ export async function POST(req: NextRequest) {
                     head += event.delta.text
                     if (head.length >= 80) {
                       headDone = true
-                      controller.enqueue(enc.encode(stripToolPrefix(head)))
+                      controller.enqueue(enc.encode(stripDisallowedScript(stripToolPrefix(head))))
                     }
                   } else {
-                    controller.enqueue(enc.encode(event.delta.text))
+                    controller.enqueue(enc.encode(stripDisallowedScript(event.delta.text)))
                   }
                 }
               }
-              if (!headDone) controller.enqueue(enc.encode(stripToolPrefix(head)))
+              if (!headDone) controller.enqueue(enc.encode(stripDisallowedScript(stripToolPrefix(head))))
             }
           } else {
             // Claude answered directly — emit the text blocks
             for (const block of phase1.content) {
               if (block.type === 'text') {
-                controller.enqueue(enc.encode(block.text))
+                controller.enqueue(enc.encode(stripDisallowedScript(block.text)))
               }
             }
           }
@@ -219,9 +225,12 @@ export async function POST(req: NextRequest) {
     extraCtx = '\n\n' + (await runWeatherTool(places[0].name).catch(() => ''))
   }
 
-  const fallbackPrompt = `${STATIC_SYSTEM}\n\n${currentCtx}${extraCtx}\n\nNgười dùng hỏi: ${lastUser.content}\nTrả lời đầy đủ, giàu gợi ý thực tế, không markdown:`
+  const fallbackPrompt = `${STATIC_SYSTEM}\n${localeRule}\n\n${currentCtx}${extraCtx}\n\nNgười dùng hỏi: ${lastUser.content}\nTrả lời đầy đủ, giàu gợi ý thực tế, không markdown:`
   const result = await aiGenerate(fallbackPrompt, { maxOutputTokens: 650 })
-  const text = result?.text ?? 'Xin lỗi, dịch vụ trợ lý tạm thời không khả dụng.'
+  const text =
+    result && hasOnlySupportedLanguageText(result.text)
+      ? result.text
+      : 'Xin lỗi, dịch vụ trợ lý tạm thời không khả dụng.'
 
   return new Response(text, { headers: { 'Content-Type': 'text/plain; charset=utf-8' } })
 }

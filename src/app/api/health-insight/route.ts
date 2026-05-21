@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { aiGenerate } from '@/shared/lib/ai'
 import type { AiSource } from '@/shared/lib/ai'
+import { hasOnlySupportedLanguageText } from '@/shared/lib/language-guard'
 
 export interface HealthInsightPayload {
   locationName: string
@@ -23,6 +24,10 @@ export interface HealthInsightResponse {
 export async function POST(req: NextRequest) {
   const body = (await req.json()) as HealthInsightPayload
   const lang = body.locale === 'en' ? 'English' : 'Vietnamese'
+  const localeRule =
+    body.locale === 'en'
+      ? 'Write only in English. Do not include Chinese, Japanese, Korean, or any other language.'
+      : 'Write only in Vietnamese. Do not include Chinese, Japanese, Korean, English phrases, or any other language.'
 
   const prompt = `You are a caring, highly empathetic, and friendly weather assistant for everyday users. Your tone should be extremely natural, warm, and conversational, exactly like a close friend texting advice. Analyze the weather at ${body.locationName || 'this location'}.
 
@@ -35,6 +40,7 @@ Today's weather data:
 - UV index: ${Math.round(body.uvIndex)}
 
 Write a friendly message (3-4 compact sentences) in ${lang}.
+${localeRule}
 - Start with a warm and natural observation about how it feels outside.
 - Give caring, practical advice based on heat/cold, humidity, wind, rain, AQI, and UV.
 - Include advice for sensitive groups when relevant: children, elderly people, asthma/allergy/cardiovascular groups, outdoor workers, motorbike commuters.
@@ -45,7 +51,7 @@ Write a friendly message (3-4 compact sentences) in ${lang}.
 - Absolutely NO bullet points, NO robotic phrasing, NO formal reports. Make it sound human and caring.`
 
   const result = await aiGenerate(prompt, { temperature: 0.5, maxOutputTokens: 280 })
-  if (result) {
+  if (result && hasOnlySupportedLanguageText(result.text)) {
     return NextResponse.json({ insight: result.text, source: result.source } satisfies HealthInsightResponse)
   }
   return NextResponse.json({ insight: buildFallback(body), source: 'fallback' } satisfies HealthInsightResponse)
