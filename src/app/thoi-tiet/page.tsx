@@ -5,10 +5,17 @@ import { WeatherView } from '@/features/weather/components/WeatherView'
 import { TopBar } from '@/shared/ui/TopBar'
 
 export const metadata: Metadata = {
-  title: 'Trợ lý thời tiết hôm nay tại Việt Nam',
+  title: {
+    absolute: 'Dự báo thời tiết hôm nay tại Việt Nam | Trời Hôm Nay',
+  },
   description:
-    'Trợ lý thời tiết giúp bạn biết hôm nay có mưa không, nên mặc gì, có nên ra ngoài không, AQI ra sao và cần chuẩn bị gì.',
+    'Dự báo thời tiết hôm nay theo vị trí: nhiệt độ, mưa theo giờ, AQI, UV, radar mưa, cảnh báo và gợi ý sinh hoạt dễ hiểu.',
   alternates: { canonical: '/thoi-tiet' },
+  openGraph: {
+    title: 'Dự báo thời tiết hôm nay tại Việt Nam | Trời Hôm Nay',
+    description:
+      'Theo dõi thời tiết hôm nay, AQI, radar mưa và cảnh báo theo vị trí.',
+  },
 }
 
 export default function WeatherPage() {
