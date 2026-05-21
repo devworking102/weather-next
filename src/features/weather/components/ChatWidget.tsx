@@ -14,7 +14,6 @@ interface Message {
 }
 
 export function ChatWidget() {
-  const [open, setOpen] = useState(false)
   const [messages, setMessages] = useState<Message[]>([])
   const [input, setInput] = useState('')
   const [streaming, setStreaming] = useState(false)
@@ -27,6 +26,8 @@ export function ChatWidget() {
   const location = useLocationStore((s) => s.current)
   const unit = useUiStore((s) => s.unit)
   const locale = useUiStore((s) => s.locale)
+  const open = useUiStore((s) => s.chatOpen)
+  const setOpen = useUiStore((s) => s.setChatOpen)
   const tempUnit = unit === 'f' ? 'fahrenheit' : 'celsius'
   const { data: weather } = useWeather(location?.latitude, location?.longitude, tempUnit)
   const { data: aqi } = useAirQuality(location?.latitude, location?.longitude)
@@ -169,8 +170,8 @@ export function ChatWidget() {
     <>
       {/* Toggle button */}
       <button
-        onClick={() => setOpen((o) => !o)}
-        className="fixed bottom-[calc(5rem+env(safe-area-inset-bottom,0px))] right-5 z-50 flex h-12 w-12 items-center justify-center rounded-full bg-indigo-600 text-white shadow-lg transition hover:bg-indigo-700 active:scale-95 md:bottom-5"
+        onClick={() => setOpen(!open)}
+        className="fixed bottom-5 right-5 z-50 hidden h-12 w-12 items-center justify-center rounded-full bg-indigo-600 text-white shadow-lg transition hover:bg-indigo-700 active:scale-95 md:flex"
         aria-label="Mở chat thời tiết"
       >
         {open ? <X size={20} /> : <MessageSquare size={20} />}
@@ -182,12 +183,20 @@ export function ChatWidget() {
           {/* Header */}
           <div className="flex items-center gap-2.5 bg-indigo-600 px-4 py-3 text-white">
             <Bot size={18} className="shrink-0" />
-            <div className="min-w-0">
+            <div className="min-w-0 flex-1">
               <div className="truncate text-sm font-semibold">{location.name}</div>
               <div className="text-xs opacity-75">
                 {Math.round(weather.current.temperature)}°C · {wmoInfo(weather.current.weatherCode).label}
               </div>
             </div>
+            <button
+              type="button"
+              onClick={() => setOpen(false)}
+              className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-white/90 transition hover:bg-white/15 hover:text-white"
+              aria-label="Close chat"
+            >
+              <X size={18} aria-hidden />
+            </button>
           </div>
 
           {/* Messages */}

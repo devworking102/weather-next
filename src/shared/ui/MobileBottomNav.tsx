@@ -2,9 +2,10 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { Bell, Cloud, CloudRain, Wind } from 'lucide-react'
+import { Bell, Cloud, CloudRain, MessageSquare, Wind } from 'lucide-react'
 import { useT } from '@/shared/hooks/useT'
 import { cn } from '@/shared/lib/cn'
+import { useUiStore } from '@/shared/store/ui-store'
 
 const ITEMS = [
   { href: '/thoi-tiet', key: 'weather', Icon: Cloud },
@@ -17,6 +18,8 @@ export function MobileBottomNav() {
   const pathname = usePathname()
   const t = useT()
   const path = pathname?.replace(/\/+$/, '') ?? ''
+  const chatOpen = useUiStore((s) => s.chatOpen)
+  const toggleChat = useUiStore((s) => s.toggleChat)
 
   if (path === '/tien-ich/embed') return null
 
@@ -59,6 +62,29 @@ export function MobileBottomNav() {
             </Link>
           )
         })}
+        <button
+          type="button"
+          onClick={toggleChat}
+          aria-pressed={chatOpen}
+          aria-label="Mở chat thời tiết"
+          className={cn(
+            'group relative flex min-h-[56px] min-w-[48px] flex-1 flex-col items-center justify-center gap-1.5 rounded-3xl px-1 text-[10px] font-medium transition-all duration-300',
+            chatOpen
+              ? 'text-indigo-600 dark:text-indigo-300'
+              : 'text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200',
+          )}
+        >
+          {chatOpen ? (
+            <span className="absolute inset-0 rounded-3xl bg-indigo-100/60 transition-opacity dark:bg-indigo-500/10" aria-hidden="true" />
+          ) : null}
+          <MessageSquare
+            size={24}
+            strokeWidth={chatOpen ? 2.5 : 2}
+            className={cn('relative z-10 transition-transform duration-300', chatOpen && 'scale-110')}
+            aria-hidden
+          />
+          <span className="relative z-10 truncate tracking-wide">Chat</span>
+        </button>
       </nav>
     </div>
   )

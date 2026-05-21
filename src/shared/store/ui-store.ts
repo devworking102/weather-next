@@ -35,6 +35,7 @@ interface UiState {
   notifyEnabled: boolean
   favorites: FavoriteLocation[]
   weatherTab: WeatherTabId
+  chatOpen: boolean
   setTheme: (t: ThemeMode) => void
   setUnit: (u: TempUnit) => void
   setWindUnit: (u: WindUnit) => void
@@ -44,6 +45,8 @@ interface UiState {
   removeFavorite: (id: number) => void
   isFavorite: (id: number) => boolean
   setWeatherTab: (t: WeatherTabId) => void
+  setChatOpen: (v: boolean) => void
+  toggleChat: () => void
 }
 
 export const useUiStore = create<UiState>()(
@@ -56,6 +59,7 @@ export const useUiStore = create<UiState>()(
       notifyEnabled: false,
       favorites: [],
       weatherTab: 'today',
+      chatOpen: false,
       setTheme: (t) => set({ theme: t }),
       setUnit: (u) => set({ unit: u }),
       setWindUnit: (u) => set({ windUnit: u }),
@@ -69,6 +73,8 @@ export const useUiStore = create<UiState>()(
       removeFavorite: (id) => set({ favorites: get().favorites.filter((f) => f.id !== id) }),
       isFavorite: (id) => get().favorites.some((f) => f.id === id),
       setWeatherTab: (t) => set({ weatherTab: t }),
+      setChatOpen: (v) => set({ chatOpen: v }),
+      toggleChat: () => set({ chatOpen: !get().chatOpen }),
     }),
     {
       name: 'weather-ui-state',

@@ -129,7 +129,7 @@ export function TopBar() {
           </nav>
 
           <div className="flex items-center gap-2">
-            <button
+            {/* <button
               type="button"
               onClick={locateMe}
               aria-label="Dùng vị trí hiện tại"
@@ -137,9 +137,12 @@ export function TopBar() {
               disabled={locating}
             >
               {locating ? <Loader2 className="animate-spin" size={18} aria-hidden /> : <LocateFixed size={18} aria-hidden />}
-            </button>
+            </button> */}
             <div className="hidden items-center gap-2 lg:flex">
               <InstallButton />
+              <SettingsMenu />
+            </div>
+            <div className="lg:hidden">
               <SettingsMenu />
             </div>
             <button
