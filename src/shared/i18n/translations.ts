@@ -163,7 +163,7 @@ const vi = {
     installDesc: 'Mở nhanh mỗi sáng từ màn hình chính.',
   },
   humanDetails: {
-    title: 'Chi tiết dễ hiểu',
+    title: 'Chi tiết',
     subtitle: 'Các chỉ số kỹ thuật được chuyển thành lời khuyên thực tế.',
     humidity: 'Độ ẩm',
     humidityWet: 'Khá ẩm',
@@ -655,7 +655,7 @@ const en = {
     installDesc: 'Open quickly from your home screen every morning.',
   },
   humanDetails: {
-    title: 'Easy details',
+    title: 'Details',
     subtitle: 'Technical metrics translated into practical advice.',
     humidity: 'Humidity',
     humidityWet: 'Quite humid',
