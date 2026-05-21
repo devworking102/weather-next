@@ -119,7 +119,7 @@ export function WeatherView() {
       ) : null}
       <section
         ref={searchRef}
-        className="relative z-20 hidden space-y-3 rounded-[1.75rem] border border-black/5 bg-white/80 p-3 shadow-sm backdrop-blur-xl dark:border-white/10 dark:bg-slate-950/70 md:block"
+        className="relative z-20 space-y-3 rounded-[1.75rem] border border-black/5 bg-white/80 p-3 shadow-sm backdrop-blur-xl dark:border-white/10 dark:bg-slate-950/70"
         aria-label={t.search.placeholder}
       >
         <SearchBar />
@@ -148,7 +148,7 @@ export function WeatherView() {
             <FavoriteStar location={location} className="absolute right-4 top-[4.75rem] z-10 sm:right-8 sm:top-[5.5rem]" />
           </div>
           {companion ? <AiSummaryCard insight={companion} /> : null}
-          <MobileForecastTabs value={tab} onChange={setTab} />
+          <MobileForecastTabs value={tab} onChange={setTab} alertCount={alertCount} />
           {tab === 'today' ? <MobileHourlyForecast weather={data} /> : null}
 
           <section className="hidden rounded-[1.5rem] border border-black/5 bg-white/70 p-2 shadow-sm backdrop-blur-xl dark:border-white/10 dark:bg-white/[0.06] md:block">
@@ -164,9 +164,7 @@ export function WeatherView() {
               className={cn('space-y-4 md:space-y-6', tab !== 'today' && 'hidden')}
               aria-hidden={tab !== 'today'}
             >
-              <div className="hidden md:block">
-                {companion ? <AssistantActionCards insight={companion} /> : null}
-              </div>
+              {companion ? <AssistantActionCards insight={companion} /> : null}
 
               <div className="hidden md:block">
                 <WeatherMoments weather={data} onViewHourly={() => setTab('hourly')} />

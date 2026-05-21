@@ -271,6 +271,11 @@ export function TopBar() {
             )
           })}
         </nav>
+
+        <div className="flex items-center justify-between gap-3 border-t border-black/5 px-5 py-4 dark:border-white/5">
+          <InstallButton />
+          <SettingsMenu />
+        </div>
       </aside>
     </>
   )
