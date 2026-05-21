@@ -147,10 +147,10 @@ export function SmartWeatherHero({ location, weather, aqi }: Props) {
               <Sparkles size={16} aria-hidden />
               {t.assistant.weatherAssistant}
             </div>
-            <h1 className="max-w-2xl text-2xl font-semibold leading-tight tracking-tight text-white sm:text-3xl md:text-4xl">
+            <h1 className=" text-2xl font-semibold leading-tight tracking-tight text-white sm:text-3xl md:text-4xl">
               {companion.tone}
             </h1>
-            <p className="mt-3 max-w-2xl text-base leading-7 text-white/90 sm:text-lg">
+            <p className="mt-3 text-base leading-7 text-white/90 sm:text-lg">
               {ai.data?.summary ?? companion.summary}
             </p>
             <div className="mt-4 flex items-start gap-3 rounded-2xl bg-white/12 p-3 text-sm leading-6 text-white/90 ring-1 ring-white/15">
