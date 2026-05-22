@@ -47,6 +47,7 @@ function RadarFrame({ location, fullscreen = false }: { location: GeoLocation; f
       className="absolute inset-0 h-full w-full border-0"
       loading="lazy"
       referrerPolicy="strict-origin-when-cross-origin"
+      allow="geolocation https://embed.windy.com; fullscreen"
       allowFullScreen
     />
   )

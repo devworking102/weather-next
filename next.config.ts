@@ -14,7 +14,7 @@ const nextConfig: NextConfig = {
           {
             key: 'Permissions-Policy',
             value:
-              'accelerometer=(), camera=(), gyroscope=(), microphone=(), payment=(), usb=(), geolocation=(self), interest-cohort=()',
+              'accelerometer=(), camera=(), gyroscope=(), microphone=(), payment=(), usb=(), geolocation=(self "https://embed.windy.com"), interest-cohort=()',
           },
         ],
       },
